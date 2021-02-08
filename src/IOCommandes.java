@@ -19,7 +19,7 @@ public class IOCommandes {
         try {
            _ecritureEcran.println(texte);
         }catch(Exception ex){
-            writeLog("log_client.txt", ex.getMessage());
+            writeLog("src/log_client.txt", ex.getMessage());
         }
     }
 
@@ -29,7 +29,7 @@ public class IOCommandes {
         try{
             res= _lectureEcran.readLine();
         }catch(IOException ex){
-            writeLog("log_client.txt", ex.getMessage());
+            writeLog("src/log_client.txt", ex.getMessage());
         }
         return res;
     }
