@@ -15,7 +15,9 @@ public class Socket {
     public void ecrireSocket(String texte) throws IOException {
 
 
-        new BufferedWriter(new PrintWriter(this.socket.getOutputStream()));
+        PrintWriter out = new PrintWriter(this.socket.getOutputStream());
+        out.println(texte);
+        out.flush();
 
 
     }
