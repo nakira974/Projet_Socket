@@ -17,7 +17,7 @@ public class Principale {
         do{
             msg = commandes.lireEcran();
             socket.ecrireSocket(msg);
-            //commandes.writeLog("log_client.txt", msg);
+            commandes.writeLog("log_client.txt", msg);
             if(!msg.equals("quit")) {
                 commandes.ecrireEcran(socket.lireSocket());
             }

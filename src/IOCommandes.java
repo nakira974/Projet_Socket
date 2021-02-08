@@ -16,17 +16,22 @@ public class IOCommandes {
     }
 
     public void ecrireEcran(String texte){
-
-
-        _ecritureEcran.println(texte);
-
-
+        try {
+           _ecritureEcran.println(texte);
+        }catch(Exception ex){
+            writeLog("log_client.txt", ex.getMessage());
+        }
     }
 
-    public String lireEcran() throws IOException {
+    public String lireEcran() {
 
-        return _lectureEcran.readLine();
-
+        String res =null;
+        try{
+            res= _lectureEcran.readLine();
+        }catch(IOException ex){
+            writeLog("log_client.txt", ex.getMessage());
+        }
+        return res;
     }
 
     public void writeLog(String p_fileName, String p_fileData) {
