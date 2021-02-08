@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Socket;
 
 public class Principale {
 
@@ -8,15 +9,17 @@ public class Principale {
 
         IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         String msg;
+        SocketPerso socket = new SocketPerso(new Socket("grit.esiee-amiens.fr",8599));
 
 
         //commandes.readLog("log_client.txt");
 
         do{
             msg = commandes.lireEcran();
-            commandes.writeLog("log_client.txt", msg);
+            socket.ecrireSocket(msg);
+            //commandes.writeLog("log_client.txt", msg);
             if(!msg.equals("quit")) {
-                commandes.ecrireEcran(msg);
+                commandes.ecrireEcran(socket.lireSocket());
             }
 
         }while(!msg.equals("quit"));

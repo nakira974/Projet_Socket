@@ -1,10 +1,11 @@
 import java.io.*;
+import java.net.Socket;
 
-public class Socket {
+public class SocketPerso {
 
-    private java.net.Socket socket;
+    private Socket socket;
 
-    public Socket(java.net.Socket socket){
+    public SocketPerso(java.net.Socket socket){
 
 
         this.socket = socket;
