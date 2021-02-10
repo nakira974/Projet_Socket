@@ -3,7 +3,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-class Socket_Serveur {
+
+
+class Socket_Serveur extends Thread {
     private ServerSocket _srvSocket;
     private ArrayList<Socket> _clientList;
 
@@ -15,6 +17,7 @@ class Socket_Serveur {
     public void acceptClient(Socket client){
         try {
             client = _srvSocket.accept();
+            _clientList.add(client);
         }catch(Exception ex){}
 
     }

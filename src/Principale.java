@@ -3,6 +3,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+class ThreadClient extends Thread {
+    public void run() {
+        // faire quelque chose
+    }
+}
+
+class ThreadServer extends Thread {
+    public void run(){
+
+    }
+}
 public class Principale {
 
     public static void main(String[] args) throws IOException {
