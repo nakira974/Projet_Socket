@@ -15,6 +15,9 @@ public class IOCommandes {
 
     }
 
+    public IOCommandes() {
+    }
+
     public void ecrireEcran(String texte){
         try {
            _ecritureEcran.println(texte);
