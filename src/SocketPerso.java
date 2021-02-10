@@ -18,6 +18,7 @@ class Socket_Serveur {
 
     }
 
+
     public ServerSocket getServer(){
         return this._srvSocket;
     }
