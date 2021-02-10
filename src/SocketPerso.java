@@ -1,11 +1,10 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 class Socket_Serveur {
     private ServerSocket _srvSocket;
-    //private ArrayList<Socket> _clientList;
-    private Socket client_socket;
 
     public Socket_Serveur(java.net.ServerSocket socket){
 
@@ -19,19 +18,25 @@ class Socket_Serveur {
 
     }
 
-    public void ecrireSocket(String texte) throws IOException {
+    public ServerSocket getServer(){
+        return this._srvSocket;
+    }
 
+    public void ecrireSocket(String texte, ArrayList<Socket> clients) throws IOException {
 
-        PrintWriter out = new PrintWriter(client_socket.getOutputStream());
-        out.println(texte);
-        out.flush();
+        for (Socket socket : clients) {
+
+            PrintWriter out = new PrintWriter(socket.getOutputStream());
+            out.println(texte);
+            out.flush();
+        }
 
 
     }
 
-    public String lireSocket() throws IOException {
+    public String lireSocket(Socket client) throws IOException {
 
-        return new BufferedReader(new InputStreamReader(client_socket.getInputStream())).readLine();
+        return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
     }
     }
@@ -63,6 +68,33 @@ public class SocketPerso {
 
         return new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
 
+    }
+
+    class Thread_ClientReceive extends Thread {
+        public void run(Socket socket, BufferedInputStream inputText) throws IOException {
+            do{
+                PrintWriter out = new PrintWriter(socket.getOutputStream());
+                out.println(inputText);
+                out.flush();
+            }while(!inputText.toString().equals("END"));
+
+        }
+    }
+
+    class Thread_ClientSend extends Thread {
+        public void run(SocketPerso socket) throws IOException {
+            IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
+            String msg;
+            do {
+                msg = commandes.lireEcran();
+                if (!msg.equals("quit")) {
+                    socket.ecrireSocket(msg);
+                    commandes.writeLog("src/log_client.txt", msg);
+                    commandes.readLog("src/log_client.txt");
+                    commandes.ecrireEcran(socket.lireSocket());
+                }
+            } while (!msg.equals("quit"));
+        }
     }
 
 
