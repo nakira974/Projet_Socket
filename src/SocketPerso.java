@@ -3,49 +3,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-class Thread_ClientRecieve extends Thread {
-    public void run(SocketPerso socket, BufferedInputStream inputText) throws IOException {
-        do{
-            PrintWriter out = new PrintWriter(socket.lireSocket());
-            out.println(inputText);
-            out.flush();
-        }while(inputText.toString() != "END");
-
-    }
-
-}
-
-class Thread_ClientSend extends Thread {
-    public void run(SocketPerso socket) throws IOException {
-        IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
-        String msg;
-
-        do {
-            msg = commandes.lireEcran();
-            if (!msg.equals("quit")) {
-                socket.ecrireSocket(msg);
-                commandes.writeLog("src/log_client.txt", msg);
-                commandes.readLog("src/log_client.txt");
-                commandes.ecrireEcran(socket.lireSocket());
-            }
-
-        } while (!msg.equals("quit"));
-
-    }
-}
-
-class Thread_ServerSend extends Thread {
-    public void run(){
-    }
-}
-
-class Thread_ServerRecieve extends Thread {
-    public void run() {}
-
-}
-
-
-
 class Socket_Serveur {
     private ServerSocket _srvSocket;
 
@@ -56,11 +13,10 @@ class Socket_Serveur {
 
     public Socket acceptClient() throws IOException {
 
-            return _srvSocket.accept();
+        return _srvSocket.accept();
 
 
     }
-
 
     public ServerSocket getServer(){
         return this._srvSocket;
@@ -83,7 +39,7 @@ class Socket_Serveur {
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
     }
-    }
+}
 
 
 public class SocketPerso {
