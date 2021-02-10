@@ -1,31 +1,28 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 
-
-
-class Socket_Serveur extends Thread {
+class Socket_Serveur {
     private ServerSocket _srvSocket;
-    private ArrayList<Socket> _clientList;
+    //private ArrayList<Socket> _clientList;
+    private Socket client_socket;
 
     public Socket_Serveur(java.net.ServerSocket socket){
 
         this._srvSocket=socket;
     }
 
-    public void acceptClient(Socket client){
-        try {
-            client = _srvSocket.accept();
-            _clientList.add(client);
-        }catch(Exception ex){}
+    public Socket acceptClient() throws IOException {
+
+            return _srvSocket.accept();
+
 
     }
 
-    public void ecrireSocket(String texte, Socket client) throws IOException {
+    public void ecrireSocket(String texte) throws IOException {
 
 
-        PrintWriter out = new PrintWriter(this._srvSocket.getOutputStream());
+        PrintWriter out = new PrintWriter(client_socket.getOutputStream());
         out.println(texte);
         out.flush();
 
@@ -34,7 +31,7 @@ class Socket_Serveur extends Thread {
 
     public String lireSocket() throws IOException {
 
-        return new BufferedReader(new InputStreamReader(this._srvSocket.getInputStream())).readLine();
+        return new BufferedReader(new InputStreamReader(client_socket.getInputStream())).readLine();
 
     }
     }
