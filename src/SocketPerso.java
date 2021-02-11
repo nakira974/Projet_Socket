@@ -4,11 +4,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 class Socket_Serveur {
+
     private ServerSocket _srvSocket;
 
-    public Socket_Serveur(java.net.ServerSocket socket){
+    public Socket_Serveur(java.net.ServerSocket socket) throws IOException {
 
         this._srvSocket=socket;
+
     }
 
     public Socket acceptClient() throws IOException {
@@ -89,8 +91,6 @@ public class SocketPerso {
                 msg = commandes.lireEcran();
                 if (!msg.equals("quit")) {
                     socket.ecrireSocket(msg);
-                    commandes.writeLog("src/log_client.txt", msg);
-                    commandes.readLog("src/log_client.txt");
                     commandes.ecrireEcran(socket.lireSocket());
                 }
             } while (!msg.equals("quit"));

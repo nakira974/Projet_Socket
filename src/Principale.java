@@ -12,10 +12,10 @@ public class Principale {
         IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         ArrayList<Socket> _clientList = new ArrayList<>();
         String msg;
+        Logger logger = new Logger("src/logger.txt");
         do {
 
             msg = commandes.lireEcran();
-            //commandes.readLog("log_client.txt");
             if(msg.equals("client")) {
                 SocketPerso socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
 
@@ -24,8 +24,6 @@ public class Principale {
                     msg = commandes.lireEcran();
                     if (!msg.equals("quit")) {
                         socket_client.ecrireSocket(msg);
-                        commandes.writeLog("src/log_client.txt", msg);
-                        commandes.readLog("src/log_client.txt");
                         commandes.ecrireEcran(socket_client.lireSocket());
                     }
 
@@ -45,8 +43,10 @@ public class Principale {
                         if (!_clientList.isEmpty()) {
                             String response = socket_serveur.lireSocket(client);
                             if (!response.equals("quit")) {
+                                logger.writeLog("Reception: " + response);
                                 socket_serveur.ecrireSocket("Serveur> " + response, _clientList);
                             } else {
+                                logger.closeLog();
                                 System.exit(0);
                             }
 
