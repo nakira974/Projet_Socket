@@ -2,12 +2,13 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 
 class Socket_Serveur {
 
     private ServerSocket _srvSocket;
 
-    public Socket_Serveur(java.net.ServerSocket socket) throws IOException {
+    public Socket_Serveur(java.net.ServerSocket socket) {
 
         this._srvSocket=socket;
 
@@ -41,6 +42,84 @@ class Socket_Serveur {
 
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
+    }
+}
+
+class ClientServiceThread extends Thread {
+    Socket client;
+    boolean runState = true;
+    boolean ServerOn= true;
+    public ClientServiceThread() {
+        super();
+    }
+
+    ClientServiceThread(Socket s) {
+        client = s;
+    }
+
+    public void run() {
+        Logger logger = null;
+        try {
+            logger = new Logger("src/logger.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BufferedReader in = null;
+        PrintWriter out = null;
+        System.out.println(
+                "Accepted Client Address - " + client.getInetAddress().getHostName());
+        try {
+            in = new BufferedReader(
+                    new InputStreamReader(client.getInputStream()));
+            out = new PrintWriter(
+                    new OutputStreamWriter(client.getOutputStream()));
+
+            while(runState) {
+                String clientCommand = in.readLine();
+                if(clientCommand!=null) {
+                    System.out.println("Client Says :" + clientCommand);
+                    assert logger != null;
+                    logger.writeLog(client.getInetAddress().getHostName() + "(" + new Date() + ") : " + clientCommand);
+                }
+
+                if(!ServerOn) {
+                    System.out.print("Server has already stopped");
+                    out.println("Server has already stopped");
+                    out.flush();
+                    runState = false;
+                }
+                assert clientCommand != null;
+                if(clientCommand.equalsIgnoreCase("quit")) {
+                    runState = false;
+                    System.out.print("Stopping client thread for client : ");
+                    logger.closeLog();
+                } else if(clientCommand.equalsIgnoreCase("END")) {
+                    runState = false;
+                    System.out.print("Stopping client thread for client : ");
+                    ServerOn = false;
+                    System.exit(0);
+                } else {
+                    out.println("Server Says : " + clientCommand);
+                    out.flush();
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                assert in != null;
+                in.close();
+                assert out != null;
+                out.close();
+                client.close();
+                assert logger != null;
+                logger.closeLog();
+                System.out.println("...Stopped");
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
     }
 }
 
@@ -95,68 +174,6 @@ public class SocketPerso {
                     commandes.ecrireEcran(socket.lireSocket());
                 }
             } while (!msg.equals("quit"));
-        }
-    }
-
-
-    static class ClientServiceThread extends Thread {
-        Socket client;
-        boolean runState = true;
-        boolean ServerOn= true;
-        public ClientServiceThread() {
-            super();
-        }
-
-        ClientServiceThread(Socket s) {
-            client = s;
-        }
-
-        public void run() {
-            BufferedReader in = null;
-            PrintWriter out = null;
-            System.out.println(
-                    "Accepted Client Address - " + client.getInetAddress().getHostName());
-            try {
-                in = new BufferedReader(
-                        new InputStreamReader(client.getInputStream()));
-                out = new PrintWriter(
-                        new OutputStreamWriter(client.getOutputStream()));
-
-                while(runState) {
-                    String clientCommand = in.readLine();
-                    System.out.println("Client Says :" + clientCommand);
-
-                    if(!ServerOn) {
-                        System.out.print("Server has already stopped");
-                        out.println("Server has already stopped");
-                        out.flush();
-                        runState = false;
-                    }
-                    if(clientCommand.equalsIgnoreCase("quit")) {
-                        runState = false;
-                        System.out.print("Stopping client thread for client : ");
-                    } else if(clientCommand.equalsIgnoreCase("END")) {
-                        runState = false;
-                        System.out.print("Stopping client thread for client : ");
-                        ServerOn = false;
-                    } else {
-                        out.println("Server Says : " + clientCommand);
-                        out.flush();
-                    }
-                }
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                try {
-                    in.close();
-                    out.close();
-                    client.close();
-                    System.out.println("...Stopped");
-                } catch(IOException ioe) {
-                    ioe.printStackTrace();
-                }
-            }
         }
     }
 
