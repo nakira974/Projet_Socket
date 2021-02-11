@@ -34,20 +34,16 @@ public class Principale {
 
             }else if(msg.equals("serveur")) {
                 Socket_Serveur socket_serveur = new Socket_Serveur(new ServerSocket(5000));
-                Socket client = null;
                 while (!socket_serveur.getServer().isClosed()) {
-                    if (client == null) {
                         try{
-                            client = socket_serveur.acceptClient();
+                            Socket client = socket_serveur.acceptClient();
                             _clientList.add(client);
                             ClientServiceThread cliThread = new ClientServiceThread(client);
                             cliThread.start();
                         }catch(Exception  ex){
                             ex.printStackTrace();
                         }
-
-
-                    }/*else{
+                        /*else{
                         if (!_clientList.isEmpty()) {
                             String response = socket_serveur.lireSocket(client);
                             if (!response.equals("quit")) {
