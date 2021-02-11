@@ -18,6 +18,7 @@ class Socket_Serveur {
         return _srvSocket.accept();
 
 
+
     }
 
     public ServerSocket getServer(){
@@ -94,6 +95,68 @@ public class SocketPerso {
                     commandes.ecrireEcran(socket.lireSocket());
                 }
             } while (!msg.equals("quit"));
+        }
+    }
+
+
+    static class ClientServiceThread extends Thread {
+        Socket client;
+        boolean runState = true;
+        boolean ServerOn= true;
+        public ClientServiceThread() {
+            super();
+        }
+
+        ClientServiceThread(Socket s) {
+            client = s;
+        }
+
+        public void run() {
+            BufferedReader in = null;
+            PrintWriter out = null;
+            System.out.println(
+                    "Accepted Client Address - " + client.getInetAddress().getHostName());
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(client.getInputStream()));
+                out = new PrintWriter(
+                        new OutputStreamWriter(client.getOutputStream()));
+
+                while(runState) {
+                    String clientCommand = in.readLine();
+                    System.out.println("Client Says :" + clientCommand);
+
+                    if(!ServerOn) {
+                        System.out.print("Server has already stopped");
+                        out.println("Server has already stopped");
+                        out.flush();
+                        runState = false;
+                    }
+                    if(clientCommand.equalsIgnoreCase("quit")) {
+                        runState = false;
+                        System.out.print("Stopping client thread for client : ");
+                    } else if(clientCommand.equalsIgnoreCase("END")) {
+                        runState = false;
+                        System.out.print("Stopping client thread for client : ");
+                        ServerOn = false;
+                    } else {
+                        out.println("Server Says : " + clientCommand);
+                        out.flush();
+                    }
+                }
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                try {
+                    in.close();
+                    out.close();
+                    client.close();
+                    System.out.println("...Stopped");
+                } catch(IOException ioe) {
+                    ioe.printStackTrace();
+                }
+            }
         }
     }
 

@@ -37,8 +37,16 @@ public class Principale {
                 Socket client = null;
                 while (!socket_serveur.getServer().isClosed()) {
                     if (client == null) {
-                        client = socket_serveur.acceptClient();
-                        _clientList.add(client);
+                        try{
+                            client = socket_serveur.acceptClient();
+                            _clientList.add(client);
+                            SocketPerso.ClientServiceThread cliThread = new SocketPerso.ClientServiceThread(client);
+                            cliThread.start();
+                        }catch(Exception  ex){
+                            ex.printStackTrace();
+                        }
+
+
                     }else{
                         if (!_clientList.isEmpty()) {
                             String response = socket_serveur.lireSocket(client);
