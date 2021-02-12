@@ -2,20 +2,19 @@ import java.io.*;
 
 public class Logger {
 
-    private FileWriter file;
-    private BufferedWriter output;
+    private static FileWriter file;
 
-    public Logger(String p_fileName) throws IOException {
-
-        // Creates a FileWriter
-        this.file = new FileWriter(p_fileName);
-
-        // Creates a BufferedWriter
-        this.output = new BufferedWriter(this.file);
-
+    static {
+        try {
+            file = new FileWriter("src/logger.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void writeLog(String p_fileData) {
+    private static final BufferedWriter output = new BufferedWriter(file);
+
+    public static void writeLog(String p_fileData) {
         try {
             // Writes the string to the file
             output.append(p_fileData);
@@ -25,9 +24,9 @@ public class Logger {
         }
     }
 
-    public void closeLog() throws IOException {
+    public static void closeLog() throws IOException {
 
-        this.output.close();
+        output.close();
 
     }
 

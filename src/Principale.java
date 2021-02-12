@@ -26,7 +26,12 @@ public class Principale {
                         System.exit(0);
                     }else {
                         socket_client.ecrireSocket(msg);
-                        commandes.ecrireEcran(socket_client.lireSocket());
+                        String val = socket_client.lireSocket();
+                        if(val.equals("END")) {
+                            System.exit(0);
+                        }else{
+                            commandes.ecrireEcran(val);
+                        }
                     }
 
                 } while (true);

@@ -2,9 +2,12 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 class Socket_Serveur {
+
+    public static ArrayList<Socket> sockets = new ArrayList<>();
 
     private ServerSocket _srvSocket;
 
@@ -49,21 +52,15 @@ class ClientServiceThread extends Thread {
     Socket client;
     boolean runState = true;
     boolean ServerOn= true;
-    public ClientServiceThread() {
-        super();
-    }
 
     ClientServiceThread(Socket s) {
+
         client = s;
+        Socket_Serveur.sockets.add(s);
+
     }
 
     public void run() {
-        Logger logger = null;
-        try {
-            logger = new Logger("src/logger.txt");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         BufferedReader in = null;
         PrintWriter out = null;
         System.out.println(
@@ -78,8 +75,7 @@ class ClientServiceThread extends Thread {
                 String clientCommand = in.readLine();
                 if(clientCommand!=null) {
                     System.out.println("Client Says :" + clientCommand);
-                    assert logger != null;
-                    logger.writeLog(client.getInetAddress().getHostName() + "(" + new Date() + ") : " + clientCommand);
+                    Logger.writeLog(client.getInetAddress().getHostName() + "(" + new Date() + ") : " + clientCommand);
                 }
 
                 if(!ServerOn) {
@@ -91,12 +87,19 @@ class ClientServiceThread extends Thread {
                 assert clientCommand != null;
                 if(clientCommand.equalsIgnoreCase("quit")) {
                     runState = false;
+                    Socket_Serveur.sockets.remove(client);
                     System.out.print("Stopping client thread for client : ");
-                    logger.closeLog();
                 } else if(clientCommand.equalsIgnoreCase("END")) {
                     runState = false;
-                    System.out.print("Stopping client thread for client : ");
+                    System.out.print("Stopping server...");
                     ServerOn = false;
+                    for (Socket cl : Socket_Serveur.sockets){
+                        PrintWriter output = new PrintWriter(cl.getOutputStream());
+                        output.println("END");
+                        output.flush();
+                    }
+                    Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
+                    Logger.closeLog();
                     System.exit(0);
                 } else {
                     out.println("Server Says : " + clientCommand);
@@ -113,8 +116,6 @@ class ClientServiceThread extends Thread {
                 assert out != null;
                 out.close();
                 client.close();
-                assert logger != null;
-                logger.closeLog();
                 System.out.println("...Stopped");
             } catch(IOException ioe) {
                 ioe.printStackTrace();
@@ -134,6 +135,10 @@ public class SocketPerso {
         this.socket = socket;
 
 
+    }
+
+    public Socket getSocket(){
+        return this.socket;
     }
 
     public void ecrireSocket(String texte) throws IOException {
