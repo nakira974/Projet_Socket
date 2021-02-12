@@ -2,7 +2,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 class Socket_Serveur {
@@ -14,7 +13,7 @@ class Socket_Serveur {
 
     public Socket_Serveur(java.net.ServerSocket socket) {
 
-        this._srvSocket=socket;
+        this._srvSocket = socket;
 
     }
 
@@ -23,10 +22,9 @@ class Socket_Serveur {
         return _srvSocket.accept();
 
 
-
     }
 
-    public ServerSocket getServer(){
+    public ServerSocket getServer() {
         return this._srvSocket;
     }
 
@@ -47,20 +45,6 @@ class Socket_Serveur {
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
     }
-}
-
-class ClientRecieveThread extends Thread {
-    Socket client;
-    boolean runState = true;
-    boolean ServerOn= true;
-    public ClientRecieveThread(Socket s){
-        client =s;
-    }
-
-    public void run(){
-
-    }
-
 }
 
 class ClientServiceThread extends Thread {
@@ -144,7 +128,6 @@ class ClientServiceThread extends Thread {
 public class SocketPerso {
 
     private Socket socket;
-    public boolean _state;
 
     public SocketPerso(java.net.Socket socket){
 
@@ -168,31 +151,30 @@ public class SocketPerso {
 
     }
 
-    public void chercherDestinataire(String pseudo) throws IOException {
-        PrintWriter out = new PrintWriter(this.socket.getOutputStream());
-        out.println("/SEARCH ");
-        out.flush();
-        out.println(pseudo);
-        out.flush();
-    }
-
     public String lireSocket() throws IOException {
 
         return new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
 
     }
 
-    class Thread_ClientReceive extends Thread {
+    static class Thread_Client_Receive extends Thread {
         SocketPerso client;
-        public Thread_ClientReceive(SocketPerso s){
-            client = s;
+
+        public Thread_Client_Receive(SocketPerso client) {
+            this.client = client;
         }
+
         public void run() {
 
             try{
                 do{
-                    client.lireSocket();
-                }while(_state);
+                    String val = client.lireSocket();
+                    if(val.contains("END")) {
+                        System.exit(0);
+                    }else{
+                        Principale.commandes.ecrireEcran(val);
+                    }
+                }while(client.getSocket().isConnected());
 
             }catch(Exception ex){
                 ex.printStackTrace();
@@ -203,14 +185,14 @@ public class SocketPerso {
 
     }
 
-    class ThreadServiceCLient extends Thread {
+    static class Thread_Client_Send extends Thread {
         String destination;
         SocketPerso socket;
         IOCommandes commandes;
         String msg;
 
-        public ThreadServiceCLient(SocketPerso s){
-            socket =s;
+        public Thread_Client_Send(SocketPerso s){
+            socket = s;
         }
 
         public void run() {

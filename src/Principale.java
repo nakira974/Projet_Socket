@@ -7,9 +7,18 @@ import java.util.ArrayList;
 
 public class Principale {
 
+    public static IOCommandes commandes;
+
+    static {
+        try {
+            commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) throws IOException {
 
-        IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         ArrayList<Socket> _clientList = new ArrayList<>();
         String msg;
         do {
@@ -17,22 +26,19 @@ public class Principale {
             msg = commandes.lireEcran();
             if(msg.equals("client")) {
                 SocketPerso socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
+                SocketPerso.Thread_Client_Receive receiver = new SocketPerso.Thread_Client_Receive(socket_client);
 
+                receiver.start();
 
                 do {
                     msg = commandes.lireEcran();
                     if (msg.equals("quit")) {
                         socket_client.ecrireSocket(msg);
                         System.exit(0);
-                    }else {
+                    }else{
                         socket_client.ecrireSocket(msg);
-                        String val = socket_client.lireSocket();
-                        if(val.contains("END")) {
-                            System.exit(0);
-                        }else{
-                            commandes.ecrireEcran(val);
-                        }
                     }
+
 
                 } while (true);
 
