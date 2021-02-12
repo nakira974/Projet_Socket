@@ -1,9 +1,7 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 class LogUser {
+
 
     public static void login (String[] args) {
         try {
@@ -29,4 +27,6 @@ class LogUser {
 }
 
 public class User {
+    public String username;
+    public Date lastConnection;
 }

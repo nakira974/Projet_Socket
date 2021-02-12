@@ -10,6 +10,7 @@ class Socket_Serveur {
     public static ArrayList<Socket> sockets = new ArrayList<>();
 
     private ServerSocket _srvSocket;
+    private int maxConnection;
 
     public Socket_Serveur(java.net.ServerSocket socket) {
 
@@ -46,6 +47,20 @@ class Socket_Serveur {
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
     }
+}
+
+class ClientRecieveThread extends Thread {
+    Socket client;
+    boolean runState = true;
+    boolean ServerOn= true;
+    public ClientRecieveThread(Socket s){
+        client =s;
+    }
+
+    public void run(){
+
+    }
+
 }
 
 class ClientServiceThread extends Thread {
@@ -101,7 +116,8 @@ class ClientServiceThread extends Thread {
                     Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
                     Logger.closeLog();
                     System.exit(0);
-                } else {
+                }
+                else {
                     out.println("Server Says : " + clientCommand);
                     out.flush();
                 }
@@ -128,6 +144,7 @@ class ClientServiceThread extends Thread {
 public class SocketPerso {
 
     private Socket socket;
+    public boolean _state;
 
     public SocketPerso(java.net.Socket socket){
 
@@ -151,6 +168,14 @@ public class SocketPerso {
 
     }
 
+    public void chercherDestinataire(String pseudo) throws IOException {
+        PrintWriter out = new PrintWriter(this.socket.getOutputStream());
+        out.println("/SEARCH ");
+        out.flush();
+        out.println(pseudo);
+        out.flush();
+    }
+
     public String lireSocket() throws IOException {
 
         return new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
@@ -158,31 +183,56 @@ public class SocketPerso {
     }
 
     class Thread_ClientReceive extends Thread {
-        public void run(Socket socket, BufferedInputStream inputText) throws IOException {
-            do{
-                PrintWriter out = new PrintWriter(socket.getOutputStream());
-                out.println(inputText);
-                out.flush();
-            }while(!inputText.toString().equals("END"));
+        SocketPerso client;
+        public Thread_ClientReceive(SocketPerso s, BufferedReader inputText){
+            client = s;
+        }
+        public void run() {
+
+            try{
+                do{
+                    client.lireSocket();
+                }while(_state);
+
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+
 
         }
     }
 
     class ThreadServiceCLient extends Thread {
+        String destination;
+        SocketPerso socket;
         IOCommandes commandes;
+        String msg;
 
-        public void run(SocketPerso socket) throws IOException {
-            try{}catch(Exception ex){
+        public ThreadServiceCLient(SocketPerso s){
+            socket =s;
+        }
 
-            }
-            String msg;
-            do {
-                msg = commandes.lireEcran();
-                if (!msg.equals("quit")) {
+        public void run() {
+            try{
+            System.out.println("Saisir un destinataire : ");
+                    msg = commandes.lireEcran();
+                    destination = msg;
                     socket.ecrireSocket(msg);
-                    commandes.ecrireEcran(socket.lireSocket());
-                }
-            } while (!msg.equals("quit"));
+                        commandes.ecrireEcran(socket.lireSocket());
+
+                do {
+                    msg = commandes.lireEcran();
+                    if (!msg.equals("quit")) {
+                        socket.ecrireSocket(msg);
+                        commandes.ecrireEcran(socket.lireSocket());
+                    }
+                } while (!msg.equals("quit"));
+
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+
+
         }
     }
 
