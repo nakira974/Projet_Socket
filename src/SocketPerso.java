@@ -168,9 +168,13 @@ public class SocketPerso {
         }
     }
 
-    class Thread_ClientSend extends Thread {
+    class ThreadServiceCLient extends Thread {
+        IOCommandes commandes;
+
         public void run(SocketPerso socket) throws IOException {
-            IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
+            try{}catch(Exception ex){
+
+            }
             String msg;
             do {
                 msg = commandes.lireEcran();
