@@ -21,13 +21,13 @@ public class Principale {
 
                 do {
                     msg = commandes.lireEcran();
-                    if (msg.equals("quit") || msg.equals("END")) {
+                    if (msg.equals("quit")) {
                         socket_client.ecrireSocket(msg);
                         System.exit(0);
                     }else {
                         socket_client.ecrireSocket(msg);
                         String val = socket_client.lireSocket();
-                        if(val.equals("END")) {
+                        if(val.contains("END")) {
                             System.exit(0);
                         }else{
                             commandes.ecrireEcran(val);
