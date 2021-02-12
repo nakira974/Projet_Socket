@@ -184,7 +184,7 @@ public class SocketPerso {
 
     class Thread_ClientReceive extends Thread {
         SocketPerso client;
-        public Thread_ClientReceive(SocketPerso s, BufferedReader inputText){
+        public Thread_ClientReceive(SocketPerso s){
             client = s;
         }
         public void run() {
