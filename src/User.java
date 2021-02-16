@@ -14,7 +14,7 @@ class LogUser {
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("org.mariadb.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/" +
                     "serveur_db?user=ServerMaster&password=Master2004$");
 
@@ -24,7 +24,7 @@ class LogUser {
 
 
                 rs = stmt.executeQuery(
-                        "INSERT INTO users (pseudo, password) VALUES("+ args.get(0)+","+args.get(1)+");");
+                        "INSERT INTO users (`pseudo`, `password`) VALUES('"+ args.get(0)+"','"+args.get(1)+"');");
 
                 if(!rs.wasNull()){
 
