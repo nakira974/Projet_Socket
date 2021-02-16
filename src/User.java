@@ -15,7 +15,7 @@ class LogUser {
 
             rs = stmt.executeQuery(
                     "SELECT pseudo, dt_last_connection " +
-                            "FROM user WHERE password ="+args[1]+ " AND user="+args[0]);
+                            "FROM user WHERE password ="+ args.get(1) + " AND user="+ args.get(0));
             while ( rs.next() ) {
                 String pseudo = rs.getString("pseudo");
                 System.out.println(pseudo);
