@@ -5,11 +5,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 class Socket_Serveur {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
+    public ArrayList<HashMap<User, Socket>> users= new ArrayList<>();
 
     private ServerSocket _srvSocket;
     private int maxConnection;
