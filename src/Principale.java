@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class Principale {
 
+
     public static IOCommandes commandes;
 
     static {
@@ -19,8 +20,25 @@ public class Principale {
 
     public static void main(String[] args) throws IOException {
 
+        ArrayList<String> userInfo = new ArrayList<>();
         ArrayList<Socket> _clientList = new ArrayList<>();
         String msg;
+
+        //LOGIN
+        System.out.println("Nom d'utilisateur : ");
+        msg = commandes.lireEcran();
+        userInfo.add(msg);
+        System.out.println("Mot de passe : ");
+        msg = commandes.lireEcran();
+        userInfo.add(msg);
+        try{
+            LogUser log= new LogUser();
+            log.login(userInfo);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        //FIN LOGIN
+
         do {
 
             msg = commandes.lireEcran();

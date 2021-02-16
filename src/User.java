@@ -1,9 +1,12 @@
 import java.sql.*;
+import java.time.LocalTime;
+import java.util.ArrayList;
 
 class LogUser {
 
+    LogUser(){}
 
-    public static void login (String[] args) {
+    public void login (ArrayList<String> args) {
         try {
             String url = "jdbc:msql://localhost/serveur_db";
             Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
@@ -14,8 +17,9 @@ class LogUser {
                     "SELECT pseudo, dt_last_connection " +
                             "FROM user WHERE password ="+args[1]+ " AND user="+args[0]);
             while ( rs.next() ) {
-                String lastName = rs.getString("pseudo");
-                System.out.println(lastName);
+                String pseudo = rs.getString("pseudo");
+                System.out.println(pseudo);
+                User currentUser = new User(pseudo);
                 //INSTANCIER CLIENT ICI
             }
             conn.close();
@@ -27,6 +31,16 @@ class LogUser {
 }
 
 public class User {
-    public String username;
-    public Date lastConnection;
+
+    User(){}
+    User(String username){
+        _username = username;
+        LocalTime time = LocalTime.now();
+        _lastConnection = time;
+    }
+
+    public String _username;
+    public LocalTime _lastConnection;
+
+
 }
