@@ -87,14 +87,18 @@ class LogUser {
             //Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
 
         } catch (Exception e) {
-            if(socket_client == null){
-                System.err.println("Erreur de connexion au serveur de chat...");
-            }
+
             if(rs == null) {
                 System.err.println("Erreur d'authenfication ! ");
                 System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
                 System.err.println(e.getMessage());
+                return null;
             }
+
+            if(socket_client == null){
+                System.err.println("Erreur de connexion au serveur de chat...");
+            }
+
         }
         return socket_client;
         }
