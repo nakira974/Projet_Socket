@@ -9,6 +9,38 @@ class LogUser {
 
     }
 
+
+    public SocketPerso createUser(ArrayList<String> args){
+        SocketPerso socket_client = null;
+        ResultSet rs = null;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/serveur_db?user=ServerMaster&password=Master2004$"))
+            {
+                System.out.println("connected");
+                Statement stmt = conn.createStatement();
+
+
+                rs = stmt.executeQuery(
+                        "SELECT pseudo, dt_last_connection " +
+                                "FROM user WHERE password ="+ args.get(1) + " AND pseudo="+ args.get(0));
+
+                if(!rs.wasNull()){
+                    socket_client = login(args);
+                }
+            }
+            catch (SQLException ex1){
+                ex1.printStackTrace();
+            }
+        }catch(Exception ex2){
+            ex2.printStackTrace();
+        }
+        return socket_client;
+    }
+
+
+
+
     public SocketPerso login (ArrayList<String> args) throws SQLException {
 
         SocketPerso socket_client = null;
