@@ -25,6 +25,7 @@ class LogUser {
                         "INSERT INTO users (pseudo, password) VALUES("+ args.get(0)+","+args.get(1)+");");
 
                 if(!rs.wasNull()){
+
                     socket_client = login(args);
                 }
                 else{
