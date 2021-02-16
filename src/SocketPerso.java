@@ -4,13 +4,17 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 
 class Socket_Serveur {
 
     public ArrayList<Socket> sockets = new ArrayList<>();
+    //TODO classe User et assignation d'un socket a chaque utilisateur
+    public ArrayList<HashMap<User, Socket>> users = new ArrayList<>();
 
     private ServerSocket _srvSocket;
+    //TODO limiter le nombre de connexions simultanées
     private int maxConnection;
 
     public Socket_Serveur(java.net.ServerSocket socket) {
