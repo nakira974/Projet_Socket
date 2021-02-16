@@ -17,7 +17,8 @@ class LogUser {
             Class.forName("org.mariadb.jdbc.Driver");
             try (Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/serveur_db?user=ServerMaster&password=Master2004$"))
             {
-                System.out.println("connected");
+                System.out.println("Requête de création d'utilisateur en cours d'execution...");
+
                 Statement stmt = conn.createStatement();
 
 
