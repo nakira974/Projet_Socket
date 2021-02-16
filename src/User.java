@@ -14,9 +14,10 @@ class LogUser {
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
-            Class.forName("org.mariadb.jdbc.Driver");
-            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/serveur_db?user=ServerMaster&password=Master2004$"))
-            {
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/" +
+                    "serveur_db?user=ServerMaster&password=Master2004$");
+
                 System.out.println("Requête de création d'utilisateur en cours d'execution...");
 
                 Statement stmt = conn.createStatement();
@@ -31,11 +32,11 @@ class LogUser {
                 }
                 else{
                     return null;}
-            }
-            catch (SQLException ex1){
+
+        } catch (SQLException ex1){
                 ex1.printStackTrace();
             }
-        }catch(Exception ex2){
+        catch(Exception ex2){
             ex2.printStackTrace();
         }
         return socket_client;
@@ -49,6 +50,7 @@ class LogUser {
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
+
             Class.forName("org.mariadb.jdbc.Driver");
             try (Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/serveur_db?user=ServerMaster&password=Master2004$")){
                 System.out.println("connected");
@@ -56,20 +58,21 @@ class LogUser {
 
 
                 rs = stmt.executeQuery(
-                        "SELECT pseudo, dt_last_connection " +
-                                "FROM users WHERE password ="+ args.get(1) + " AND pseudo="+ args.get(0));
+                        "SELECT `pseudo` " +
+                                "FROM users WHERE password ='"+ args.get(1) + "' AND pseudo='"+ args.get(0)+"'");
 
-                while ( rs.next() ) {
-                    String pseudo = rs.getString("pseudo");
-                    System.out.println(pseudo);
 
-                    //INSTANCIER CLIENT ICI
-                }
+                if(!rs.wasNull()){
+                    while ( rs.next() ) {
+                        String pseudo = rs.getString("pseudo");
+                        System.out.println(pseudo);
+
+                        //INSTANCIER CLIENT ICI
                 User currentUser = new User(rs.getString("pseudo"));
                 socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
                 Socket_Serveur.users.put(currentUser, socket_client.getSocket());
                 conn.close();
-            }
+            }}}
 
             //String url = "jdbc:mariadb://localhost:3307/serveur_db";
             //Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");

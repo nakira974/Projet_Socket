@@ -4,7 +4,6 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -13,7 +12,7 @@ class Socket_Serveur {
     public static ArrayList<Socket> sockets = new ArrayList<>();
     public static HashMap<User, Socket> users= new HashMap<User, Socket>();
 
-    private ServerSocket _srvSocket;
+    private final ServerSocket _srvSocket;
     private int maxConnection;
 
     public Socket_Serveur(java.net.ServerSocket socket) {
@@ -132,7 +131,7 @@ class ClientServiceThread extends Thread {
 
 public class SocketPerso {
 
-    private Socket socket;
+    private final Socket socket;
 
     public SocketPerso(java.net.Socket socket){
 
