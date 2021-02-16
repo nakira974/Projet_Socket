@@ -7,21 +7,12 @@ import java.util.ArrayList;
 
 public class Principale {
 
-    public static IOCommandes commandes;
-
-    static {
-        try {
-            commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void main(String[] args) throws IOException {
 
+        IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         ArrayList<Socket> _clientList = new ArrayList<>();
         String msg;
-        do {
 
             msg = commandes.lireEcran();
             if(msg.equals("client")) {
@@ -30,7 +21,11 @@ public class Principale {
 
                 receiver.start();
 
-                do {
+                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client);
+
+                sender.start();
+
+                /*do {
                     msg = commandes.lireEcran();
                     if (msg.equals("quit")) {
                         socket_client.ecrireSocket(msg);
@@ -40,7 +35,7 @@ public class Principale {
                     }
 
 
-                } while (true);
+                } while (true);*/
 
 
             }else if(msg.equals("serveur")) {
@@ -72,6 +67,5 @@ public class Principale {
                 }
 
             }
-        } while (!msg.equals("quit"));
     }
 }
