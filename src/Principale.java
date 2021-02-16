@@ -8,38 +8,10 @@ import java.util.ArrayList;
 public class Principale {
 
 
-    public static IOCommandes commandes;
-
-    static {
-        try {
-            commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) throws IOException {
 
-        ArrayList<String> userInfo = new ArrayList<>();
-        ArrayList<Socket> _clientList = new ArrayList<>();
+        IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         String msg;
-
-        //LOGIN
-        System.out.println("Nom d'utilisateur : ");
-        msg = commandes.lireEcran();
-        userInfo.add(msg);
-        System.out.println("Mot de passe : ");
-        msg = commandes.lireEcran();
-        userInfo.add(msg);
-        try{
-            LogUser log= new LogUser();
-            log.login(userInfo);
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-        //FIN LOGIN
-
-        do {
 
             msg = commandes.lireEcran();
             if(msg.equals("client")) {
@@ -48,17 +20,9 @@ public class Principale {
 
                 receiver.start();
 
-                do {
-                    msg = commandes.lireEcran();
-                    if (msg.equals("quit")) {
-                        socket_client.ecrireSocket(msg);
-                        System.exit(0);
-                    }else{
-                        socket_client.ecrireSocket(msg);
-                    }
+                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client);
 
-
-                } while (true);
+                sender.start();
 
 
             }else if(msg.equals("serveur")) {
@@ -66,30 +30,14 @@ public class Principale {
                 while (!socket_serveur.getServer().isClosed()) {
                         try{
                             Socket client = socket_serveur.acceptClient();
-                            _clientList.add(client);
                             ClientServiceThread cliThread = new ClientServiceThread(client);
                             cliThread.start();
                         }catch(Exception  ex){
                             ex.printStackTrace();
                         }
-                        /*else{
-                        if (!_clientList.isEmpty()) {
-                            String response = socket_serveur.lireSocket(client);
-                            if (!response.equals("quit")) {
-                                logger.writeLog("Reception: " + response);
-                                socket_serveur.ecrireSocket("Serveur> " + response, _clientList);
-                            } else {
-                                logger.closeLog();
-                                System.exit(0);
-                            }
-
-                        }
-
-                    }*/
 
                 }
 
             }
-        } while (!msg.equals("quit"));
     }
 }

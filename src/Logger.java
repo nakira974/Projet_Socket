@@ -1,4 +1,7 @@
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public class Logger {
 
@@ -6,7 +9,7 @@ public class Logger {
 
     static {
         try {
-            file = new FileWriter("src/logger.txt");
+            file = new FileWriter("src/logger(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ").txt");
         } catch (IOException e) {
             e.printStackTrace();
         }

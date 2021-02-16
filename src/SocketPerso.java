@@ -1,8 +1,11 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 class Socket_Serveur {
 
@@ -74,7 +77,7 @@ class ClientServiceThread extends Thread {
                 String clientCommand = in.readLine();
                 if(clientCommand!=null) {
                     System.out.println("Client Says :" + clientCommand);
-                    Logger.writeLog(client.getInetAddress().getHostName() + "(" + new Date() + ") : " + clientCommand);
+                    Logger.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
                 }
 
                 if(!ServerOn) {
@@ -159,9 +162,11 @@ public class SocketPerso {
 
     static class Thread_Client_Receive extends Thread {
         SocketPerso client;
+        IOCommandes commandes;
 
-        public Thread_Client_Receive(SocketPerso client) {
+        public Thread_Client_Receive(SocketPerso client) throws IOException {
             this.client = client;
+            commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         }
 
         public void run() {
@@ -172,7 +177,7 @@ public class SocketPerso {
                     if(val.contains("END")) {
                         System.exit(0);
                     }else{
-                        Principale.commandes.ecrireEcran(val);
+                        commandes.ecrireEcran(val);
                     }
                 }while(client.getSocket().isConnected());
 
@@ -191,27 +196,30 @@ public class SocketPerso {
         IOCommandes commandes;
         String msg;
 
-        public Thread_Client_Send(SocketPerso s){
+        public Thread_Client_Send(SocketPerso s) throws IOException {
             socket = s;
+            commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         }
 
         public void run() {
             try{
-            System.out.println("Saisir un destinataire : ");
+            /*System.out.println("Saisir un destinataire : ");
                     msg = commandes.lireEcran();
                     destination = msg;
-                    socket.ecrireSocket(msg);
-                        commandes.ecrireEcran(socket.lireSocket());
+                    socket.ecrireSocket(msg);*/
+
 
                 do {
                     msg = commandes.lireEcran();
                     if (!msg.equals("quit")) {
                         socket.ecrireSocket(msg);
-                        commandes.ecrireEcran(socket.lireSocket());
                     }
                 } while (!msg.equals("quit"));
 
-            }catch(Exception ex){
+                socket.ecrireSocket(msg);
+                System.exit(0);
+
+            }catch(IOException ex){
                 ex.printStackTrace();
             }
 
