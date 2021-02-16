@@ -27,6 +27,8 @@ class LogUser {
                 if(!rs.wasNull()){
                     socket_client = login(args);
                 }
+                else{
+                    return null;}
             }
             catch (SQLException ex1){
                 ex1.printStackTrace();
