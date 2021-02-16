@@ -4,12 +4,11 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Locale;
 
 class Socket_Serveur {
 
-    public static ArrayList<Socket> sockets = new ArrayList<>();
+    public ArrayList<Socket> sockets = new ArrayList<>();
 
     private ServerSocket _srvSocket;
     private int maxConnection;
@@ -43,6 +42,15 @@ class Socket_Serveur {
 
     }
 
+    public void ecrireSocket(String texte, Socket client) throws IOException {
+
+            PrintWriter out = new PrintWriter(client.getOutputStream());
+            out.println(texte);
+            out.flush();
+
+
+    }
+
     public String lireSocket(Socket client) throws IOException {
 
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
@@ -52,29 +60,24 @@ class Socket_Serveur {
 
 class ClientServiceThread extends Thread {
     Socket client;
+    Socket_Serveur server;
     boolean runState = true;
     boolean ServerOn= true;
 
-    ClientServiceThread(Socket s) {
+    ClientServiceThread(Socket s, Socket_Serveur server) {
 
-        client = s;
-        Socket_Serveur.sockets.add(s);
+        this.client = s;
+        this.server = server;
+        this.server.sockets.add(s);
 
     }
 
     public void run() {
-        BufferedReader in = null;
-        PrintWriter out = null;
-        System.out.println(
-                "Accepted Client Address - " + client.getInetAddress().getHostName());
+        System.out.println("Accepted Client Address - " + client.getInetAddress().getHostName());
         try {
-            in = new BufferedReader(
-                    new InputStreamReader(client.getInputStream()));
-            out = new PrintWriter(
-                    new OutputStreamWriter(client.getOutputStream()));
 
             while(runState) {
-                String clientCommand = in.readLine();
+                String clientCommand = this.server.lireSocket(client);
                 if(clientCommand!=null) {
                     System.out.println("Client Says :" + clientCommand);
                     Logger.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
@@ -82,31 +85,25 @@ class ClientServiceThread extends Thread {
 
                 if(!ServerOn) {
                     System.out.print("Server has already stopped");
-                    out.println("Server has already stopped");
-                    out.flush();
+                    this.server.ecrireSocket("Server has already stopped", client);
                     runState = false;
                 }
                 assert clientCommand != null;
                 if(clientCommand.equalsIgnoreCase("quit")) {
                     runState = false;
-                    Socket_Serveur.sockets.remove(client);
+                    this.server.sockets.remove(client);
                     System.out.print("Stopping client thread for client : ");
                 } else if(clientCommand.equalsIgnoreCase("END")) {
                     runState = false;
                     System.out.print("Stopping server...");
                     ServerOn = false;
-                    for (Socket cl : Socket_Serveur.sockets){
-                        PrintWriter output = new PrintWriter(cl.getOutputStream());
-                        output.println("END");
-                        output.flush();
-                    }
-                    Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
+                    this.server.ecrireSocket("END", this.server.sockets);
+                    this.server.sockets.removeAll(this.server.sockets);
                     Logger.closeLog();
                     System.exit(0);
                 }
                 else {
-                    out.println("Server Says : " + clientCommand);
-                    out.flush();
+                    this.server.ecrireSocket("Server Says : " + clientCommand, client);
                 }
             }
         } catch(Exception e) {
@@ -114,15 +111,11 @@ class ClientServiceThread extends Thread {
         }
         finally {
             try {
-                assert in != null;
-                in.close();
-                assert out != null;
-                out.close();
                 client.close();
-                System.out.println("...Stopped");
-            } catch(IOException ioe) {
-                ioe.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            System.out.println("...Stopped");
         }
     }
 }
@@ -203,15 +196,13 @@ public class SocketPerso {
 
         public void run() {
             try{
-            /*System.out.println("Saisir un destinataire : ");
-                    msg = commandes.lireEcran();
-                    destination = msg;
-                    socket.ecrireSocket(msg);*/
-
+                commandes.ecrireEcran("Saisir un destinataire : ");
+                    destination = commandes.lireEcran();
 
                 do {
                     msg = commandes.lireEcran();
                     if (!msg.equals("quit")) {
+                        //socket.ecrireSocket("{dest:[" + destination + "], msg:[" + msg + "]}");
                         socket.ecrireSocket(msg);
                     }
                 } while (!msg.equals("quit"));
