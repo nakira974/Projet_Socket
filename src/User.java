@@ -1,4 +1,10 @@
+import jdk.internal.access.JavaNetUriAccess;
+
 import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -88,6 +94,7 @@ class LogUser {
 
 public class User {
 
+
     User(){}
     User(String username){
         _username = username;
@@ -98,5 +105,21 @@ public class User {
     public String _username;
     public LocalTime _lastConnection;
 
+    public void getWeather(){
+        try {
+            assert false;
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://community-open-weather-map.p.rapidapi.com/forecast?q=Amiens%20%2C%20fr&units=metric&lang=fr"))
+                    .header("x-rapidapi-key", "8bcb441bf5mshb79ef4191cd9db1p150c6ejsn08a43923b961")
+                    .header("x-rapidapi-host", "community-open-weather-map.p.rapidapi.com")
+                    .method("GET", HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
 
 }
