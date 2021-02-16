@@ -1,5 +1,14 @@
 import jdk.internal.access.JavaNetUriAccess;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.URI;
@@ -9,6 +18,7 @@ import java.net.http.HttpResponse;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class LogUser {
 
@@ -121,13 +131,14 @@ public class User {
         try {
             assert false;
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://community-open-weather-map.p.rapidapi.com/weather?q=Amiens%20%2Cfr&lat=0&lon=0&callback=test&id=2172797&lang=null&units=%22metric%22%20or%20%22imperial%22&mode=xml"))
+                    .uri(URI.create("https://community-open-weather-map.p.rapidapi.com/weather?q=Amiens%20%2Cfr&lat=0&lon=0&id=2172797&lang=fr&units=metric"))
                     .header("x-rapidapi-key", "8bcb441bf5mshb79ef4191cd9db1p150c6ejsn08a43923b961")
                     .header("x-rapidapi-host", "community-open-weather-map.p.rapidapi.com")
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             System.out.println(response.body());
+
         }catch (Exception ex){
             ex.printStackTrace();
         }
