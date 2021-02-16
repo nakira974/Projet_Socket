@@ -1,26 +1,58 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 class Socket_Serveur {
 
-    public ArrayList<Socket> sockets = new ArrayList<>();
-    //TODO classe User et assignation d'un socket a chaque utilisateur
-    public ArrayList<HashMap<User, Socket>> users = new ArrayList<>();
+    public static ArrayList<Socket> sockets = new ArrayList<>();
+    public static ArrayList<Groupe> groupes = new ArrayList<>();
+    //public ArrayList<HashMap<User, Socket>> users = new ArrayList<>();
+    public static HashMap<String, Socket> users= new HashMap<String, Socket>();
 
     private ServerSocket _srvSocket;
-    //TODO limiter le nombre de connexions simultanées
     private int maxConnection;
 
     public Socket_Serveur(java.net.ServerSocket socket) {
 
         this._srvSocket = socket;
 
+    }
+
+
+    public static SocketPerso createUser(ArrayList<String> args){
+        SocketPerso socket_client = null;
+        ResultSet rs = null;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/" +
+                    "serveur_db?user=ServerMaster&password=Master2004$");
+
+            System.out.println("Refreshing client_list.");
+
+            Statement stmt = conn.createStatement();
+
+
+            rs = stmt.executeQuery(
+                    "INSERT INTO users (`pseudo`, `password`) VALUES('"+ args.get(0)+"','"+args.get(1)+"');");
+
+            if(!rs.wasNull()){
+
+
+            }
+            else{
+                return null;}
+
+        } catch (SQLException ex1){
+            ex1.printStackTrace();
+        }
+        catch(Exception ex2){
+            ex2.printStackTrace();
+        }
+        return socket_client;
     }
 
     public Socket acceptClient() throws IOException {
@@ -48,6 +80,7 @@ class Socket_Serveur {
 
     public void ecrireSocket(String texte, Socket client) throws IOException {
 
+
             PrintWriter out = new PrintWriter(client.getOutputStream());
             out.println(texte);
             out.flush();
@@ -57,14 +90,39 @@ class Socket_Serveur {
 
     public String lireSocket(Socket client) throws IOException {
 
+
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
+    }
+
+    public static void ajouter_groupe(Socket client) throws IOException {
+
+        String res = null ;
+        ecrireSocket("Saisir le nom du Groupe : ", client);
+        res= lireSocket(client);
+        Set set = users.entrySet();
+
+        // Get an iterator
+        Iterator iterator = set.iterator();
+
+        // Display elements
+        while(iterator.hasNext()) {
+            if (users.get(iterator) == client) {
+                Map.Entry me = (Map.Entry) iterator.next();
+
+                Groupe currentGroup = new Groupe(res, (String) me.getKey(), (Socket) me.getValue());
+                groupes.add(currentGroup);
+                System.out.println("Groupe @"+currentGroup._name+" a été créé");
+            }
+        }
     }
 }
 
 class ClientServiceThread extends Thread {
+
     Socket client;
     Socket_Serveur server;
+
     boolean runState = true;
     boolean ServerOn= true;
 
@@ -97,7 +155,10 @@ class ClientServiceThread extends Thread {
                     runState = false;
                     this.server.sockets.remove(client);
                     System.out.print("Stopping client thread for client : ");
-                } else if(clientCommand.equalsIgnoreCase("END")) {
+                } else if (clientCommand.equalsIgnoreCase("/create_group")) {
+                    Socket_Serveur.ajouter_groupe(client);
+                }
+                else if(clientCommand.equalsIgnoreCase("END")) {
                     runState = false;
                     System.out.print("Stopping server...");
                     ServerOn = false;
@@ -127,7 +188,7 @@ class ClientServiceThread extends Thread {
 
 public class SocketPerso {
 
-    private Socket socket;
+    private final Socket socket;
 
     public SocketPerso(java.net.Socket socket){
 
@@ -209,6 +270,8 @@ public class SocketPerso {
                         //socket.ecrireSocket("{dest:[" + destination + "], msg:[" + msg + "]}");
                         socket.ecrireSocket(msg);
                     }
+
+
                 } while (!msg.equals("quit"));
 
                 socket.ecrireSocket(msg);
@@ -224,3 +287,8 @@ public class SocketPerso {
 
 
 }
+
+
+
+
+
