@@ -1,6 +1,7 @@
 import jdk.internal.access.JavaNetUriAccess;
 
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -10,6 +11,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 
 class LogUser {
+
 
     LogUser(){
 
@@ -85,9 +87,14 @@ class LogUser {
             //Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
 
         } catch (Exception e) {
-            System.err.println("Erreur d'authenfication ! ");
-            System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
-            System.err.println(e.getMessage());
+            if(socket_client == null){
+                System.err.println("Erreur de connexion au serveur de chat...");
+            }
+            if(rs == null) {
+                System.err.println("Erreur d'authenfication ! ");
+                System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
+                System.err.println(e.getMessage());
+            }
         }
         return socket_client;
         }
@@ -109,9 +116,8 @@ public class User {
     public void getWeather(){
         try {
             assert false;
-
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://community-open-weather-map.p.rapidapi.com/forecast?q=Amiens%20%2C%20fr&units=metric&lang=fr"))
+                    .uri(URI.create("https://community-open-weather-map.p.rapidapi.com/weather?q=Amiens%20%2Cfr&lat=0&lon=0&callback=test&id=2172797&lang=null&units=%22metric%22%20or%20%22imperial%22&mode=xml"))
                     .header("x-rapidapi-key", "8bcb441bf5mshb79ef4191cd9db1p150c6ejsn08a43923b961")
                     .header("x-rapidapi-host", "community-open-weather-map.p.rapidapi.com")
                     .method("GET", HttpRequest.BodyPublishers.noBody())
