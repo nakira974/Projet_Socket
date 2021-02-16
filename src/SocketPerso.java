@@ -11,7 +11,7 @@ import java.util.Locale;
 class Socket_Serveur {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
-    public ArrayList<HashMap<User, Socket>> users= new ArrayList<>();
+    public static HashMap<User, Socket> users= new HashMap<User, Socket>();
 
     private ServerSocket _srvSocket;
     private int maxConnection;
@@ -53,7 +53,7 @@ class Socket_Serveur {
 }
 
 class ClientServiceThread extends Thread {
-    Socket client;
+    public static Socket client;
     boolean runState = true;
     boolean ServerOn= true;
 

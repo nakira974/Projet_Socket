@@ -10,6 +10,7 @@ public class Principale {
 
     public static void main(String[] args) throws IOException {
 
+        SocketPerso socket_client = null;
         IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         String msg;
 
@@ -25,7 +26,7 @@ public class Principale {
         userInfo.add(msg);
         try{
             LogUser log= new LogUser();
-            log.login(userInfo);
+           socket_client = log.login(userInfo);
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -33,7 +34,8 @@ public class Principale {
 
             msg = commandes.lireEcran();
             if(msg.equals("client")) {
-                SocketPerso socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
+                //FAIS SI LE LOGIN EST OK
+                //SocketPerso socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
                 SocketPerso.Thread_Client_Receive receiver = new SocketPerso.Thread_Client_Receive(socket_client);
 
                 receiver.start();
