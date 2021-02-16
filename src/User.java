@@ -19,14 +19,13 @@ import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 class LogUser {
-
 
     LogUser(){
 
     }
-
 
     public SocketPerso createUser(ArrayList<String> args){
         SocketPerso socket_client = null;
@@ -60,9 +59,6 @@ class LogUser {
         return socket_client;
     }
 
-
-
-
     public SocketPerso login (ArrayList<String> args) throws SQLException {
 
         SocketPerso socket_client = null;
@@ -89,7 +85,8 @@ class LogUser {
                 User currentUser = new User(rs.getString("pseudo"));
                 currentUser.getWeather();
                 socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
-                Socket_Serveur.users.put(currentUser, socket_client.getSocket());
+
+
                 conn.close();
             }}}
 
@@ -112,7 +109,10 @@ class LogUser {
         }
         return socket_client;
         }
+
     }
+
+
 
 public class User {
 
@@ -126,8 +126,7 @@ public class User {
 
     public String _username;
     public LocalTime _lastConnection;
-
-    public void getWeather(){
+    void getWeather(){
         try {
             assert false;
             HttpRequest request = HttpRequest.newBuilder()
@@ -144,4 +143,22 @@ public class User {
         }
     }
 
+}
+
+
+class Groupe {
+    public String _name ;
+    private User _administrator;
+    public HashMap<User, Socket> groupeUsers;
+    public Groupe() {
+        _name="test";
+        _administrator= new User();
+    }
+
+    public Groupe(String name, User administrator, Socket admin_sock) {
+        groupeUsers=new HashMap<User,Socket>();
+        _name=name;
+        _administrator=administrator;
+        groupeUsers.put(administrator, admin_sock);
+    }
 }

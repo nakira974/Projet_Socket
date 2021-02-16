@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,6 +20,39 @@ class Socket_Serveur {
 
         this._srvSocket = socket;
 
+    }
+
+
+    public SocketPerso createUser(ArrayList<String> args){
+        SocketPerso socket_client = null;
+        ResultSet rs = null;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/" +
+                    "serveur_db?user=ServerMaster&password=Master2004$");
+
+            System.out.println("Refreshing client_list.");
+
+            Statement stmt = conn.createStatement();
+
+
+            rs = stmt.executeQuery(
+                    "INSERT INTO users (`pseudo`, `password`) VALUES('"+ args.get(0)+"','"+args.get(1)+"');");
+
+            if(!rs.wasNull()){
+
+
+            }
+            else{
+                return null;}
+
+        } catch (SQLException ex1){
+            ex1.printStackTrace();
+        }
+        catch(Exception ex2){
+            ex2.printStackTrace();
+        }
+        return socket_client;
     }
 
     public Socket acceptClient() throws IOException {
@@ -230,3 +264,8 @@ public class SocketPerso {
 
 
 }
+
+
+
+
+
