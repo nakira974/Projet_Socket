@@ -3,7 +3,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class Principale {
 
@@ -53,7 +52,7 @@ public class Principale {
                 while (!socket_serveur.getServer().isClosed()) {
                         try{
                             Socket client = socket_serveur.acceptClient();
-                            ClientServiceThread cliThread = new ClientServiceThread(client);
+                            ClientServiceThread cliThread = new ClientServiceThread(client, socket_serveur);
                             cliThread.start();
                         }catch(Exception  ex){
                             ex.printStackTrace();

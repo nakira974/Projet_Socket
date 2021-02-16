@@ -27,9 +27,7 @@ public class IOCommandes {
 
     public String lireEcran() throws IOException {
 
-        String res = null;
-            res= _lectureEcran.readLine();
-        return res;
+        return _lectureEcran.readLine();
     }
 
 
