@@ -75,6 +75,7 @@ class LogUser {
 
                         //INSTANCIER CLIENT ICI
                 User currentUser = new User(rs.getString("pseudo"));
+                currentUser.getWeather();
                 socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
                 Socket_Serveur.users.put(currentUser, socket_client.getSocket());
                 conn.close();
