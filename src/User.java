@@ -22,8 +22,7 @@ class LogUser {
 
 
                 rs = stmt.executeQuery(
-                        "SELECT pseudo, dt_last_connection " +
-                                "FROM user WHERE password ="+ args.get(1) + " AND pseudo="+ args.get(0));
+                        "INSERT INTO users (pseudo, password) VALUES("+ args.get(0)+","+args.get(1)+");");
 
                 if(!rs.wasNull()){
                     socket_client = login(args);
