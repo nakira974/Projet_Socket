@@ -13,6 +13,24 @@ public class Principale {
         IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         String msg;
 
+        ArrayList<String> userInfo = new ArrayList<>();
+        ArrayList<Socket> _clientList = new ArrayList<>();
+
+        //LOGIN
+        System.out.println("Nom d'utilisateur : ");
+        msg = commandes.lireEcran();
+        userInfo.add(msg);
+        System.out.println("Mot de passe : ");
+        msg = commandes.lireEcran();
+        userInfo.add(msg);
+        try{
+            LogUser log= new LogUser();
+            log.login(userInfo);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+        //FIN LOGIN
+
             msg = commandes.lireEcran();
             if(msg.equals("client")) {
                 SocketPerso socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
