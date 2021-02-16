@@ -4,14 +4,13 @@ import java.net.Socket;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 class Socket_Serveur {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
-    public static HashMap<User, Socket> users= new HashMap<User, Socket>();
+    public static ArrayList<Groupe> groupes = new ArrayList<>();
+    public static HashMap<String, Socket> users= new HashMap<String, Socket>();
 
     private final ServerSocket _srvSocket;
     private int maxConnection;
@@ -23,7 +22,7 @@ class Socket_Serveur {
     }
 
 
-    public SocketPerso createUser(ArrayList<String> args){
+    public static SocketPerso createUser(ArrayList<String> args){
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
@@ -78,10 +77,40 @@ class Socket_Serveur {
 
     }
 
-    public String lireSocket(Socket client) throws IOException {
+    public static void ecrireSocket(String texte, Socket client) throws IOException {
+
+            PrintWriter out = new PrintWriter(client.getOutputStream());
+            out.println(texte);
+            out.flush();
+
+    }
+
+    public static String lireSocket(Socket client) throws IOException {
 
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
+    }
+
+    public static void ajouter_groupe(Socket client) throws IOException {
+
+        String res = null ;
+        ecrireSocket("Saisir le nom du Groupe : ", client);
+        res= lireSocket(client);
+        Set set = users.entrySet();
+
+        // Get an iterator
+        Iterator iterator = set.iterator();
+
+        // Display elements
+        while(iterator.hasNext()) {
+            if (users.get(iterator) == client) {
+                Map.Entry me = (Map.Entry) iterator.next();
+
+                Groupe currentGroup = new Groupe(res, (String) me.getKey(), (Socket) me.getValue());
+                groupes.add(currentGroup);
+                System.out.println("Groupe @"+currentGroup._name+" a été créé");
+            }
+        }
     }
 }
 
@@ -126,7 +155,10 @@ class ClientServiceThread extends Thread {
                     runState = false;
                     Socket_Serveur.sockets.remove(client);
                     System.out.print("Stopping client thread for client : ");
-                } else if(clientCommand.equalsIgnoreCase("END")) {
+                } else if (clientCommand.equalsIgnoreCase("/create_group")) {
+                    Socket_Serveur.ajouter_groupe(client);
+                }
+                else if(clientCommand.equalsIgnoreCase("END")) {
                     runState = false;
                     System.out.print("Stopping server...");
                     ServerOn = false;
@@ -249,6 +281,8 @@ public class SocketPerso {
                     if (!msg.equals("quit")) {
                         socket.ecrireSocket(msg);
                     }
+
+
                 } while (!msg.equals("quit"));
 
                 socket.ecrireSocket(msg);

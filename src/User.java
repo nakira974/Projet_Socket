@@ -148,15 +148,15 @@ public class User {
 
 class Groupe {
     public String _name ;
-    private User _administrator;
-    public HashMap<User, Socket> groupeUsers;
+    private String _administrator;
+    public HashMap<String, Socket> groupeUsers;
     public Groupe() {
         _name="test";
-        _administrator= new User();
+        _administrator= "root";
     }
 
-    public Groupe(String name, User administrator, Socket admin_sock) {
-        groupeUsers=new HashMap<User,Socket>();
+    public Groupe(String name, String administrator, Socket admin_sock) {
+        groupeUsers=new HashMap<String,Socket>();
         _name=name;
         _administrator=administrator;
         groupeUsers.put(administrator, admin_sock);
