@@ -11,7 +11,6 @@ public class Principale {
     public static void main(String[] args) throws IOException {
 
         IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
-        ArrayList<Socket> _clientList = new ArrayList<>();
         String msg;
 
             msg = commandes.lireEcran();
@@ -25,44 +24,17 @@ public class Principale {
 
                 sender.start();
 
-                /*do {
-                    msg = commandes.lireEcran();
-                    if (msg.equals("quit")) {
-                        socket_client.ecrireSocket(msg);
-                        System.exit(0);
-                    }else{
-                        socket_client.ecrireSocket(msg);
-                    }
-
-
-                } while (true);*/
-
 
             }else if(msg.equals("serveur")) {
                 Socket_Serveur socket_serveur = new Socket_Serveur(new ServerSocket(5000));
                 while (!socket_serveur.getServer().isClosed()) {
                         try{
                             Socket client = socket_serveur.acceptClient();
-                            _clientList.add(client);
                             ClientServiceThread cliThread = new ClientServiceThread(client);
                             cliThread.start();
                         }catch(Exception  ex){
                             ex.printStackTrace();
                         }
-                        /*else{
-                        if (!_clientList.isEmpty()) {
-                            String response = socket_serveur.lireSocket(client);
-                            if (!response.equals("quit")) {
-                                logger.writeLog("Reception: " + response);
-                                socket_serveur.ecrireSocket("Serveur> " + response, _clientList);
-                            } else {
-                                logger.closeLog();
-                                System.exit(0);
-                            }
-
-                        }
-
-                    }*/
 
                 }
 
