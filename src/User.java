@@ -13,7 +13,8 @@ class LogUser {
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
-            String url = "jdbc:msql://localhost/serveur_db";
+
+            String url = "jdbc:mariadb://localhost:3307/serveur_db";
             Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
             Statement stmt = conn.createStatement();
 
