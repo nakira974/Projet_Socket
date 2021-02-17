@@ -32,7 +32,10 @@ public class Principale {
                 userInfo.add(msg);
                 try{
                     LogUser log= new LogUser();
-                    socket_client = log.login(userInfo);
+                    do{
+                        socket_client = log.login(userInfo);
+
+                    }while(socket_client != null);
                 }catch(Exception ex){
                     ex.printStackTrace();
                 }

@@ -1,16 +1,5 @@
-import jdk.internal.access.JavaNetUriAccess;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,7 +7,6 @@ import java.net.http.HttpResponse;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 class LogUser {
@@ -98,8 +86,7 @@ class LogUser {
             if(rs == null) {
                 System.err.println("Erreur d'authenfication ! ");
                 System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
-                System.err.println(e.getMessage());
-                return null;
+               return null;
             }
 
             if(socket_client == null){
@@ -136,6 +123,8 @@ public class User {
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+
             System.out.println(response.body());
 
         }catch (Exception ex){
