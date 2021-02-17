@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Principale {
 
@@ -14,7 +15,6 @@ public class Principale {
         String msg;
 
         ArrayList<String> userInfo = new ArrayList<>();
-        ArrayList<Socket> _clientList = new ArrayList<>();
 
 
 
@@ -32,10 +32,10 @@ public class Principale {
                 userInfo.add(msg);
                 try{
                     LogUser log= new LogUser();
-                    do{
+                    //do{
                         socket_client = log.login(userInfo);
 
-                    }while(socket_client != null);
+                    //}while(socket_client != null);
                 }catch(Exception ex){
                     ex.printStackTrace();
                 }
