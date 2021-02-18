@@ -97,7 +97,7 @@ class ClientServiceThread extends Thread {
 
         this.client = s;
         this.server = server;
-        this.server.sockets.add(s);
+        Socket_Serveur.sockets.add(s);
 
 
     }
@@ -106,13 +106,13 @@ class ClientServiceThread extends Thread {
 
 
         System.out.println("Accepted Client Address - " + client.getInetAddress().getHostName());
-        System.out.println("Client : "+ Socket_Serveur.users.size());
+        System.out.println("Client(s) : "+ Socket_Serveur.users.size());
         String clientUsername = null;
 
         try {
 
             while(runState) {
-                String clientCommand = this.server.lireSocket(client);
+                String clientCommand = Socket_Serveur.lireSocket(client);
                 if(clientCommand!=null) {
                     System.out.println("Client Says :" + clientCommand);
                     Logger.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
@@ -120,14 +120,28 @@ class ClientServiceThread extends Thread {
 
                 if(!ServerOn) {
                     System.out.print("Server has already stopped");
-                    this.server.ecrireSocket("Server has already stopped", client);
+                    Socket_Serveur.ecrireSocket("Server has already stopped", client);
                     runState = false;
                 }
                 assert clientCommand != null;
                 if(clientCommand.equalsIgnoreCase("quit")) {
                     runState = false;
-                    this.server.sockets.remove(client);
-                    System.out.print("Stopping client thread for client : ");
+                    Socket_Serveur.sockets.remove(client);
+                    System.out.print("Stopping client thread for client :`\n ");
+                    for(int i = 0; i< Socket_Serveur.users.size(); i++){
+                        //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
+                        if(Socket_Serveur.users.get(i).containsKey(client)){
+                            System.out.println("Client : " + Socket_Serveur.users.get(i).toString()
+                                    +" Disconnected");
+                        }
+                    }
+
+                    for(int i = 0; i< Socket_Serveur.users.size(); i++){
+                        //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
+                        Socket_Serveur.users.get(i).remove(client);
+                    }
+
+                    System.out.println("Client(s) : "+ Socket_Serveur.users.size());
                 } else if(clientCommand.equalsIgnoreCase("/weather")){
                     //User currentUser = (User) Socket_Serveur.users.get(Socket_Serveur.users.indexOf(client)).entrySet();
                     //currentUser.getWeather();
@@ -140,13 +154,13 @@ class ClientServiceThread extends Thread {
                     runState = false;
                     System.out.print("Stopping server...");
                     ServerOn = false;
-                    this.server.ecrireSocket("END", this.server.sockets);
-                    this.server.sockets.removeAll(this.server.sockets);
+                    this.server.ecrireSocket("END", Socket_Serveur.sockets);
+                    Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
                     Logger.closeLog();
                     System.exit(0);
                 }
                 else {
-                    this.server.ecrireSocket("Server Says : " + clientCommand, client);
+                    Socket_Serveur.ecrireSocket("Server Says : " + clientCommand, client);
                 }
             }
         } catch(Exception e) {
