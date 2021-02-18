@@ -88,7 +88,7 @@ class LogUser {
                     ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
                     //ENVOI DU HASHMAP SUR LE SRV
-                    objectOutputStream.writeObject(Socket_Serveur.users.add(user));
+                    objectOutputStream.writeObject(user);
                     //currentUser.getWeather();
 
 

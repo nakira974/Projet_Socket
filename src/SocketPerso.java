@@ -104,22 +104,7 @@ class ClientServiceThread extends Thread {
     public void run() {
 
         System.out.println("Accepted Client Address - " + client.getInetAddress().getHostName());
-        // RECEVOIR OBJET USER
-        InputStream inputStream = null;
-        try {
-            inputStream = this.server.acceptClient().getInputStream();
-
-            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-
-            // RECEPTION DE L'OBJET HASHMAP AVEC LE SOCKET ET LE USER
-            var o_user = (HashMap<Socket, User>) objectInputStream.readObject();
-            Socket_Serveur.users.add(o_user);
-            System.out.println("Received [" + o_user.size() + "] messages from: " + client);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Client : "+ Socket_Serveur.users.size());
+             System.out.println("Client : "+ Socket_Serveur.users.size());
         try {
 
             while(runState) {

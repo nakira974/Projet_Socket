@@ -1,8 +1,8 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Principale {
 
@@ -50,7 +50,17 @@ public class Principale {
             }else if(msg.equals("serveur")) {
                 Socket_Serveur socket_serveur = new Socket_Serveur(new ServerSocket(5000));
                 while (!socket_serveur.getServer().isClosed()) {
-                        try{
+                    InputStream inputStream = null;
+                    try{
+                        //REVOIR OBJET USER AU ACCEPT
+                            inputStream = socket_serveur.acceptClient().getInputStream();
+
+                            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+                             //RECEPTION DE L'OBJET HASHMAP AVEC LE SOCKET ET LE USER
+                            var o_user = (Object) objectInputStream.readObject();
+                            Socket_Serveur.users.add((HashMap<Socket, User>) o_user);
+                            System.out.println("Received [" + ((HashMap<?, ?>) o_user).size() + "] messages from: " + inputStream);
                             Socket client = socket_serveur.acceptClient();
                             ClientServiceThread cliThread = new ClientServiceThread(client, socket_serveur);
                             cliThread.start();
@@ -63,3 +73,5 @@ public class Principale {
             }
     }
 }
+
+
