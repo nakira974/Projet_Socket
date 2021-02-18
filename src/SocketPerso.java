@@ -10,8 +10,8 @@ class Socket_Serveur {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
     public static ArrayList<Groupe> groupes = new ArrayList<>();
-    //public ArrayList<HashMap<User, Socket>> users = new ArrayList<>();
-    public static HashMap<String, Socket> users= new HashMap<String, Socket>();
+    public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
+    //public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
 
     private ServerSocket _srvSocket;
     private int maxConnection;
@@ -20,39 +20,6 @@ class Socket_Serveur {
 
         this._srvSocket = socket;
 
-    }
-
-
-    public static SocketPerso createUser(ArrayList<String> args){
-        SocketPerso socket_client = null;
-        ResultSet rs = null;
-        try {
-            Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/" +
-                    "serveur_db?user=ServerMaster&password=Master2004$");
-
-            System.out.println("Refreshing client_list.");
-
-            Statement stmt = conn.createStatement();
-
-
-            rs = stmt.executeQuery(
-                    "INSERT INTO users (`pseudo`, `password`) VALUES('"+ args.get(0)+"','"+args.get(1)+"');");
-
-            if(!rs.wasNull()){
-
-
-            }
-            else{
-                return null;}
-
-        } catch (SQLException ex1){
-            ex1.printStackTrace();
-        }
-        catch(Exception ex2){
-            ex2.printStackTrace();
-        }
-        return socket_client;
     }
 
     public Socket acceptClient() throws IOException {
@@ -78,7 +45,7 @@ class Socket_Serveur {
 
     }
 
-    public void ecrireSocket(String texte, Socket client) throws IOException {
+    public static void ecrireSocket(String texte, Socket client) throws IOException {
 
 
             PrintWriter out = new PrintWriter(client.getOutputStream());
@@ -88,14 +55,14 @@ class Socket_Serveur {
 
     }
 
-    public String lireSocket(Socket client) throws IOException {
+    public static String lireSocket(Socket client) throws IOException {
 
 
         return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
 
     }
 
-    public static void ajouter_groupe(Socket client) throws IOException {
+    /*public static void ajouter_groupe(Socket client) throws IOException {
 
         String res = null ;
         ecrireSocket("Saisir le nom du Groupe : ", client);
@@ -115,7 +82,7 @@ class Socket_Serveur {
                 System.out.println("Groupe @"+currentGroup._name+" a été créé");
             }
         }
-    }
+    }*/
 }
 
 class ClientServiceThread extends Thread {
@@ -135,7 +102,24 @@ class ClientServiceThread extends Thread {
     }
 
     public void run() {
+
         System.out.println("Accepted Client Address - " + client.getInetAddress().getHostName());
+        // RECEVOIR OBJET USER
+        InputStream inputStream = null;
+        try {
+            inputStream = this.server.acceptClient().getInputStream();
+
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+            // RECEPTION DE L'OBJET HASHMAP AVEC LE SOCKET ET LE USER
+            var o_user = (HashMap<Socket, User>) objectInputStream.readObject();
+            Socket_Serveur.users.add(o_user);
+            System.out.println("Received [" + o_user.size() + "] messages from: " + client);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Client : "+ Socket_Serveur.users.size());
         try {
 
             while(runState) {
@@ -155,9 +139,14 @@ class ClientServiceThread extends Thread {
                     runState = false;
                     this.server.sockets.remove(client);
                     System.out.print("Stopping client thread for client : ");
-                } else if (clientCommand.equalsIgnoreCase("/create_group")) {
-                    Socket_Serveur.ajouter_groupe(client);
+                } else if(clientCommand.equalsIgnoreCase("/weather")){
+                    User currentUser = (User) Socket_Serveur.users.get(Socket_Serveur.users.indexOf(client)).entrySet();
+                    currentUser.getWeather();
                 }
+
+                /*else if (clientCommand.equalsIgnoreCase("/create_group")) {
+                    Socket_Serveur.ajouter_groupe(client);
+                }*/
                 else if(clientCommand.equalsIgnoreCase("END")) {
                     runState = false;
                     System.out.print("Stopping server...");
@@ -253,6 +242,7 @@ public class SocketPerso {
         SocketPerso socket;
         IOCommandes commandes;
         String msg;
+        User currentUser;
 
         public Thread_Client_Send(SocketPerso s) throws IOException {
             socket = s;

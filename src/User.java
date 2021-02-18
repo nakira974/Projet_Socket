@@ -1,16 +1,7 @@
-import jdk.internal.access.JavaNetUriAccess;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -18,100 +9,116 @@ import java.net.http.HttpResponse;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 class LogUser {
 
-    LogUser(){
+    public static User currentUser;
+
+    LogUser() {
 
     }
 
-    public SocketPerso createUser(ArrayList<String> args){
+    public SocketPerso createUser(ArrayList<String> args) {
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/" +
-                    "serveur_db?user=ServerMaster&password=Master2004$");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
+                    "serveur_db?user=serveur&password=Master2004$");
 
-                System.out.println("Requête de création d'utilisateur en cours d'execution...");
+            System.out.println("Requête de création d'utilisateur en cours d'execution...");
 
-                Statement stmt = conn.createStatement();
+            Statement stmt = conn.createStatement();
 
 
-                rs = stmt.executeQuery(
-                        "INSERT INTO users (`pseudo`, `password`) VALUES('"+ args.get(0)+"','"+args.get(1)+"');");
+            rs = stmt.executeQuery(
+                    "INSERT INTO users (`pseudo`, `password`) VALUES('" + args.get(0) + "','" + args.get(1) + "');");
 
-                if(!rs.wasNull()){
+            if (!rs.wasNull()) {
 
-                    socket_client = login(args);
-                }
-                else{
-                    return null;}
-
-        } catch (SQLException ex1){
-                ex1.printStackTrace();
+                socket_client = login(args);
+            } else {
+                return null;
             }
-        catch(Exception ex2){
+
+        } catch (SQLException ex1) {
+            ex1.printStackTrace();
+        } catch (Exception ex2) {
             ex2.printStackTrace();
         }
         return socket_client;
     }
 
-    public SocketPerso login (ArrayList<String> args) throws SQLException {
+    public SocketPerso login(ArrayList<String> args) throws SQLException {
 
         SocketPerso socket_client = null;
         ResultSet rs = null;
+        String pseudo = null;
         try {
 
             Class.forName("org.mariadb.jdbc.Driver");
-            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://localhost:3307/serveur_db?user=ServerMaster&password=Master2004$")){
+            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
+                    "serveur_db?user=serveur&password=Master2004$")) {
                 System.out.println("connected");
                 Statement stmt = conn.createStatement();
 
 
                 rs = stmt.executeQuery(
                         "SELECT `pseudo` " +
-                                "FROM users WHERE password ='"+ args.get(1) + "' AND pseudo='"+ args.get(0)+"'");
+                                "FROM users WHERE password ='" + args.get(1) + "' AND pseudo='" + args.get(0) + "'");
 
 
-                if(!rs.wasNull()){
-                    while ( rs.next() ) {
-                        String pseudo = rs.getString("pseudo");
+                if (!rs.wasNull()) {
+                    while (rs.next()) {
+                        pseudo = rs.getString("pseudo");
                         System.out.println(pseudo);
-
-                        //INSTANCIER CLIENT ICI
-                User currentUser = new User(rs.getString("pseudo"));
-                currentUser.getWeather();
-                socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
+                    }
 
 
-                conn.close();
-            }}}
+                    //INSTANCIER CLIENT ICI
+                    socket_client = new SocketPerso(new Socket("127.0.0.1", 5000));
+                    currentUser = new User(pseudo);
+                    HashMap<Socket, User> user = new HashMap<Socket, User>();
+                    user.put(socket_client.getSocket(),currentUser);
 
-            //String url = "jdbc:mariadb://localhost:3307/serveur_db";
-            //Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
+                    // get the output stream from the socket.
+                    OutputStream outputStream = socket_client.getSocket().getOutputStream();
+                    // create an object output stream from the output stream so we can send an object through it
+                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
-        } catch (Exception e) {
+                    //ENVOI DU HASHMAP SUR LE SRV
+                    objectOutputStream.writeObject(Socket_Serveur.users.add(user));
+                    //currentUser.getWeather();
 
-            if(rs == null) {
-                System.err.println("Erreur d'authenfication ! ");
-                System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
-                System.err.println(e.getMessage());
-                return null;
+
+                    conn.close();
+                }
+
+                //String url = "jdbc:mariadb://localhost:3307/serveur_db";
+                //Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
+
+            } catch (Exception e) {
+
+                if (rs == null) {
+                    System.err.println("Erreur d'authenfication ! ");
+                    System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
+                    return null;
+                }
+
+                if (socket_client == null) {
+                    System.err.println("Erreur de connexion au serveur de chat...");
+                }
+
             }
 
-            if(socket_client == null){
-                System.err.println("Erreur de connexion au serveur de chat...");
-            }
-
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         return socket_client;
-        }
 
     }
-
+}
 
 
 public class User {
@@ -136,6 +143,8 @@ public class User {
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+
             System.out.println(response.body());
 
         }catch (Exception ex){
