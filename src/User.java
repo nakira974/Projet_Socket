@@ -106,7 +106,6 @@ public class User {
     public String _username;
     public LocalTime _lastConnection;
 
-
     public double getWeather(){
         try {
             assert false;
