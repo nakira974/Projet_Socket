@@ -64,7 +64,7 @@ public class Principale {
                     //do{
                     log.createUser(userInfo);
                     System.out.println("Utilisateur : "+userInfo.get(0)+" enregistré dans la base.\n");
-                    System.out.println("Auto-login");
+                    System.out.println("[Auto-login]");
                     for(int i=0; i<3 ;i ++){
                         sleep(500);
                         System.out.println("....");
