@@ -22,13 +22,13 @@ class Socket_Serveur {
     private static int nb_socket;
 
 
-    public static void createServer(java.net.ServerSocket socket){
+    public static void createServer(java.net.ServerSocket socket) {
         _srvSocket = socket;
         maxConnection = 20;
         nb_socket = 0;
     }
 
-    public static int getMaxConnection(){
+    public static int getMaxConnection() {
         return maxConnection;
     }
 
@@ -41,11 +41,11 @@ class Socket_Serveur {
 
     }
 
-    public static int getNbSocket(){
+    public static int getNbSocket() {
         return nb_socket;
     }
 
-    public static void quit(){
+    public static void quit() {
         nb_socket--;
     }
 
@@ -69,9 +69,9 @@ class Socket_Serveur {
     public static void ecrireSocket(String texte, Socket client) throws IOException {
 
 
-            PrintWriter out = new PrintWriter(client.getOutputStream());
-            out.println(texte);
-            out.flush();
+        PrintWriter out = new PrintWriter(client.getOutputStream());
+        out.println(texte);
+        out.flush();
 
 
     }
@@ -90,7 +90,7 @@ class ClientServiceThread extends Thread {
     Socket client;
 
     boolean runState = true;
-    boolean ServerOn= true;
+    boolean ServerOn = true;
 
     ClientServiceThread(Socket s) {
 
@@ -104,57 +104,55 @@ class ClientServiceThread extends Thread {
 
 
         System.out.println("Accepted Client Address - " + client.getInetAddress().getHostName());
-        System.out.println("Client(s) : "+ Socket_Serveur.users.size());
+        System.out.println("Client(s) : " + Socket_Serveur.users.size());
         String clientUsername = null;
 
         try {
 
-            while(runState) {
+            while (runState) {
                 String clientCommand = Socket_Serveur.lireSocket(client);
-                if(clientCommand!=null) {
+                if (clientCommand != null) {
                     System.out.println("[BROADCAST] Client Says :" + clientCommand);
                     Logger.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
                 }
 
-                if(!ServerOn) {
+                if (!ServerOn) {
                     System.out.print("Server has already stopped");
                     Socket_Serveur.ecrireSocket("Server has already stopped", client);
                     runState = false;
                 }
                 assert clientCommand != null;
-                if(clientCommand.equalsIgnoreCase("quit")) {
+                if (clientCommand.equalsIgnoreCase("quit")) {
                     runState = false;
                     Socket_Serveur.sockets.remove(client);
                     System.out.print("Stopping client thread for client :`\n ");
-                    for(int i = 0; i< Socket_Serveur.users.size(); i++){
+                    for (int i = 0; i < Socket_Serveur.users.size(); i++) {
                         //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
-                        if(Socket_Serveur.users.get(i).containsKey(client)){
+                        if (Socket_Serveur.users.get(i).containsKey(client)) {
                             Socket_Serveur.quit();
                             System.out.println("[BROADCAST] Client : " + Socket_Serveur.users.get(i).toString()
-                                    +" Disconnected");
+                                    + " Disconnected");
                         }
                     }
 
-                    for(int i = 0; i< Socket_Serveur.users.size(); i++){
+                    for (int i = 0; i < Socket_Serveur.users.size(); i++) {
                         //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
                         Socket_Serveur.users.get(i).remove(client);
                     }
 
-                    System.out.println("Client(s) : "+ Socket_Serveur.users.size());
-                } else if(clientCommand.equalsIgnoreCase("/weather")){
+                    System.out.println("Client(s) : " + Socket_Serveur.users.size());
+                } else if (clientCommand.equalsIgnoreCase("/weather")) {
                     Socket_Serveur.users.stream() //stream out of arraylist
                             .forEach(map -> map.entrySet().stream()
                                     .filter(entry -> entry.getKey().equals(client))
                                     .forEach(username -> {
                                         try {
-                                            Socket_Serveur.ecrireSocket (username.getValue()._username + " : " + username.getValue().getWeather() + "°C", Socket_Serveur.sockets);
+                                            Socket_Serveur.ecrireSocket(username.getValue()._username + " : " + username.getValue().getWeather() + "°C", Socket_Serveur.sockets);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
                                     }));
-                }
-
-                else if(clientCommand.contains("/@")){
+                } else if (clientCommand.contains("/@")) {
                     String[] text = clientCommand.split(":");
                     String destination = text[0].replace("/@", "");
                     String msg = text[1];
@@ -170,45 +168,42 @@ class ClientServiceThread extends Thread {
                                     .filter(entry -> entry.getValue()._username.equals(destination))
                                     .forEach(username -> {
                                         try {
-                                            Socket_Serveur.ecrireSocket (Arrays.toString(sender) + " : " + msg, username.getKey());
+                                            Socket_Serveur.ecrireSocket(Arrays.toString(sender) + " : " + msg, username.getKey());
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
                                     }));
-                }
-
-                else if(clientCommand.contains("/G")){
+                } else if (clientCommand.contains("/G")) {
                     String[] text = clientCommand.split(":");
                     String groupe = text[0].replace("/G", "");
                     String msg = text[1];
                     final String[] sender = {null};
 
-                    for(Groupe current_grp : Socket_Serveur.groupes) {
-                        if (current_grp._name.equals(groupe)){
+                    for (Groupe current_grp : Socket_Serveur.groupes) {
+                        if (current_grp._name.equals(groupe)) {
                             Socket_Serveur.users //stream out of arraylist
                                     .forEach(map -> map.entrySet().stream()
                                             .filter(entry1 -> entry1.getKey().equals(client))
                                             .forEach(username -> {
                                                 sender[0] = String.valueOf(username.getValue()._username);
                                             }));
-                        current_grp.groupeUsers //stream out of arraylist
-                                .forEach(map -> map.entrySet()
-                                        .forEach(username -> {
-                                            try {
-                                                Socket_Serveur.ecrireSocket("[" + current_grp._name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }));
-                    }
+                            current_grp.groupeUsers //stream out of arraylist
+                                    .forEach(map -> map.entrySet()
+                                            .forEach(username -> {
+                                                try {
+                                                    Socket_Serveur.ecrireSocket("[" + current_grp._name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }));
                         }
                     }
-                else if (clientCommand.contains("/JG")) {
+                } else if (clientCommand.contains("/JG")) {
                     final User[] current = {null};
                     Groupe current_grp = null;
                     String[] text = clientCommand.split(":");
                     String groupe = text[1];
-                    for(Groupe curr : Socket_Serveur.groupes) {
+                    for (Groupe curr : Socket_Serveur.groupes) {
                         if (curr._name.equals(groupe)) {
                             current_grp = curr;
                         }
@@ -223,9 +218,7 @@ class ClientServiceThread extends Thread {
                     user.put(client, current[0]);
                     Socket_Serveur.groupes.get(Socket_Serveur.groupes.indexOf(current_grp)).groupeUsers.add(user);
                     //System.out.println("Group : " + current_grp._name + " has been created by : " + current[0]._username);
-                }
-
-                else if (clientCommand.contains("/CG")) {
+                } else if (clientCommand.contains("/CG")) {
                     final User[] current_usr = {null};
                     Groupe current_grp = null;
                     String[] text = clientCommand.split(":");
@@ -236,14 +229,10 @@ class ClientServiceThread extends Thread {
                                     .forEach(username -> {
                                         current_usr[0] = username.getValue();
                                     }));
-                    current_grp = new Groupe(groupe, current_usr[0], client );
+                    current_grp = new Groupe(groupe, current_usr[0], client);
                     Socket_Serveur.groupes.add(current_grp);
                     System.out.println("Group : " + current_grp._name + " has been created by : " + current_usr[0]._username);
-                }
-
-
-
-                else if(clientCommand.equalsIgnoreCase("END")) {
+                } else if (clientCommand.equalsIgnoreCase("END")) {
                     runState = false;
                     System.out.print("Stopping server...");
                     ServerOn = false;
@@ -251,7 +240,7 @@ class ClientServiceThread extends Thread {
                     Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
                     Logger.closeLog();
                     System.exit(0);
-                }else {
+                } else {
 
 
                     //LAMBDA POUR AFFICHER LES MESSAGES GENERAUX
@@ -271,10 +260,9 @@ class ClientServiceThread extends Thread {
                 }
 
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             try {
                 client.close();
             } catch (IOException e) {
@@ -291,7 +279,7 @@ public class SocketPerso {
     private final Socket socket;
     private String _username;
 
-    public SocketPerso(java.net.Socket socket){
+    public SocketPerso(java.net.Socket socket) {
 
 
         this.socket = socket;
@@ -299,21 +287,21 @@ public class SocketPerso {
 
     }
 
-    public SocketPerso(java.net.Socket socket, String p_userName){
+    public SocketPerso(java.net.Socket socket, String p_userName) {
 
 
-        this._username= p_userName;
+        this._username = p_userName;
         this.socket = socket;
 
 
     }
 
-    public String getUserName(){
+    public String getUserName() {
 
         return this._username;
     }
 
-    public Socket getSocket(){
+    public Socket getSocket() {
         return this.socket;
     }
 
@@ -354,17 +342,17 @@ public class SocketPerso {
 
         public void run() {
 
-            try{
-                do{
+            try {
+                do {
                     String val = client.lireSocket();
-                    if(val.contains("END")) {
+                    if (val.contains("END")) {
                         System.exit(0);
-                    }else{
+                    } else {
                         commandes.ecrireEcran(val);
                     }
-                }while(client.getSocket().isConnected());
+                } while (client.getSocket().isConnected());
 
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
 
@@ -386,10 +374,10 @@ public class SocketPerso {
         }
 
         public void run() {
-            try{
+            try {
                 socket.envoyerPseudo(socket._username);
                 commandes.ecrireEcran("Connexion au serveur: " + socket._username);
-                    //destination = commandes.lireEcran();
+                //destination = commandes.lireEcran();
 
                 do {
                     msg = commandes.lireEcran();
@@ -404,7 +392,7 @@ public class SocketPerso {
                 socket.ecrireSocket(msg);
                 System.exit(0);
 
-            }catch(IOException ex){
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
 

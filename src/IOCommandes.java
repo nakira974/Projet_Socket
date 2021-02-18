@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
 
 public class IOCommandes {
 
@@ -21,17 +20,14 @@ public class IOCommandes {
     public IOCommandes() {
     }
 
-    public void ecrireEcran(String texte){
-           _ecritureEcran.println(texte);
+    public void ecrireEcran(String texte) {
+        _ecritureEcran.println(texte);
     }
 
     public String lireEcran() throws IOException {
 
         return _lectureEcran.readLine();
     }
-
-
-
 
 
 }

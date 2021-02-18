@@ -8,6 +8,7 @@ import java.util.Locale;
 public class Logger {
 
     private static FileWriter file;
+    private static final BufferedWriter output = new BufferedWriter(file);
 
     static {
         try {
@@ -16,8 +17,6 @@ public class Logger {
             e.printStackTrace();
         }
     }
-
-    private static final BufferedWriter output = new BufferedWriter(file);
 
     public static void writeLog(String p_fileData) {
         try {

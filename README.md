@@ -10,6 +10,7 @@
 
 •Gestion de l’authentification des clients (login/mots de passe, stockés dans une base de données)
 
-•Le client qui se connecte peut choisir sa langue. Le serveur traduit les messages dans la langue de l’utilisateur (Cf. API YANDEX)
+•Le client qui se connecte peut choisir sa langue. Le serveur traduit les messages dans la langue de l’utilisateur (Cf.
+API YANDEX)
 
 •Services supplémentaires par mots clef: date/heure, meteo ville (Cf. OpenWeatherMap)
