@@ -1,7 +1,7 @@
 -- phpMyAdmin SQL Dump
 -- version 5.0.2
 -- https://www.phpmyadmin.net/
---
+-- ******* creators : nakira974 && Weefle -- *******
 -- Hôte : 127.0.0.1:3306
 -- Généré le : jeu. 11 fév. 2021 à 09:45
 -- Version du serveur :  8.0.21

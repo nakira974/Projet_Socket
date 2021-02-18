@@ -1,3 +1,7 @@
+/*
+--- creators : nakira974 && Weefle  ----
+*/
+
 # Projet_Socket
 
 •Les clients s’identifient avant d’arriver sur le chat (choix d’un login, unique)
