@@ -9,7 +9,7 @@ import java.util.*;
 class Socket_Serveur {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
-    public static ArrayList<Groupe> groupes = new ArrayList<>();
+    //public static ArrayList<Groupe> groupes = new ArrayList<>();
     public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
     //public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
 
