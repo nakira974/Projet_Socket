@@ -1,7 +1,3 @@
-/*
- --- creators : nakira974 && Weefle  ----
- */
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -24,7 +20,7 @@ class LogUser {
 
     }
 
-    public SocketPerso createUser(ArrayList<String> args) {
+    public void createUser(ArrayList<String> args) {
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
@@ -39,19 +35,14 @@ class LogUser {
 
 
             rs = stmt.executeQuery(
-                    "INSERT INTO users (`pseudo`, `password`, `email`) VALUES('" + args.get(0) + "','" + args.get(1) + "', '"+args.get(2)+"');");
+                    "INSERT INTO users (`pseudo`, `password`, `email`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '"+ args.get(2) +"')");
 
-            if (!rs.wasNull()) {
 
-                socket_client = login(args);
-            } else {
-                return null;
-            }
-
+            System.out.println("You've been registered on : "+ conn);
         } catch (Exception ex1) {
             ex1.printStackTrace();
         }
-        return socket_client;
+
     }
 
     public SocketPerso login(ArrayList<String> args) throws SQLException {
@@ -100,18 +91,17 @@ class LogUser {
 public class User {
 
 
-    public String _username;
-    public LocalTime _lastConnection;
-
-    User() {
-    }
-    User(String username) {
+    User(){}
+    User(String username){
         _username = username;
         LocalTime time = LocalTime.now();
         _lastConnection = time;
     }
 
-    public String translateMessage(String message) {
+    public String _username;
+    public LocalTime _lastConnection;
+
+    public String translateMessage(String message){
         try {
             assert false;
             HttpRequest request = HttpRequest.newBuilder()
@@ -137,13 +127,13 @@ public class User {
             return (String) translate.get("translatedText");
             //System.out.println(response.body());
 
-        } catch (Exception ex) {
+        }catch (Exception ex){
             ex.printStackTrace();
         }
         return "Impossible de traduire!";
     }
 
-    public double getWeather() {
+    public double getWeather(){
         try {
             assert false;
             HttpRequest request = HttpRequest.newBuilder()
@@ -162,7 +152,7 @@ public class User {
             return (double) jsonMain.get("temp");
             //System.out.println(response.body());
 
-        } catch (Exception ex) {
+        }catch (Exception ex){
             ex.printStackTrace();
         }
         return 0.0;
@@ -172,21 +162,20 @@ public class User {
 
 
 class Groupe {
+    public String _name ;
     public static User _administrator;
-    public String _name;
-    public ArrayList<HashMap<Socket, User>> groupeUsers;
-
+    public  ArrayList<HashMap<Socket, User> >groupeUsers;
     public Groupe() {
-        _name = "";
-        _administrator = new User();
+        _name="";
+        _administrator= new User();
     }
 
     public Groupe(String name, User administrator, Socket admin_sock) {
-        groupeUsers = new ArrayList<>(10);
+        groupeUsers=new ArrayList<>(10);
         HashMap<Socket, User> currentHash = new HashMap<>();
         currentHash.put(admin_sock, administrator);
-        _name = name;
-        _administrator = administrator;
+        _name=name;
+        _administrator=administrator;
         groupeUsers.add(currentHash);
     }
 }
