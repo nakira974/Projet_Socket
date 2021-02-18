@@ -1,3 +1,6 @@
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -114,6 +117,11 @@ public class User {
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
+
+            Object obj = JSONValue.parse(response.body());
+            JSONObject jsonObject = (JSONObject) obj;
+
+            String name = (String) jsonObject.get("name");
 
             return response.body();
             //System.out.println(response.body());
