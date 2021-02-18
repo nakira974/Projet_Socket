@@ -40,13 +40,18 @@ public class Principale {
                 }
                 //FIN LOGIN
 
+                if(socket_client!=null) {
                 SocketPerso.Thread_Client_Receive receiver = new SocketPerso.Thread_Client_Receive(socket_client);
 
                 receiver.start();
 
-                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client, socket_client._username);
 
-                sender.start();
+                    SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client);
+
+                    sender.start();
+                }else{
+                    commandes.ecrireEcran("L'utilisateur n'existe pas!");
+                }
 
 
             }else if(msg.equals("serveur")) {
@@ -60,7 +65,7 @@ public class Principale {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        HashMap<Socket, User> currentUser = new HashMap<Socket, User>();
+                        HashMap<Socket, User> currentUser = new HashMap<>();
                         currentUser.put(client, new User(clientUsername));
                         Socket_Serveur.users.add(currentUser);
                         ClientServiceThread cliThread = new ClientServiceThread(client, socket_serveur);

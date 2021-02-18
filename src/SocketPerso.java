@@ -143,8 +143,39 @@ class ClientServiceThread extends Thread {
 
                     System.out.println("Client(s) : "+ Socket_Serveur.users.size());
                 } else if(clientCommand.equalsIgnoreCase("/weather")){
-                    //User currentUser = (User) Socket_Serveur.users.get(Socket_Serveur.users.indexOf(client)).entrySet();
-                    //currentUser.getWeather();
+                    Socket_Serveur.users.stream() //stream out of arraylist
+                            .forEach(map -> map.entrySet().stream()
+                                    .filter(entry -> entry.getKey().equals(client))
+                                    .forEach(username -> {
+                                        try {
+                                            Socket_Serveur.ecrireSocket (username.getValue()._username + " : " + username.getValue().getWeather(), this.server.sockets);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }));
+                }
+
+                else if(clientCommand.contains("/@")){
+                    String[] text = clientCommand.split(":");
+                    String destination = text[0].replace("/@", "");
+                    String msg = text[1];
+                    final String[] sender = {null};
+                    Socket_Serveur.users //stream out of arraylist
+                            .forEach(map -> map.entrySet().stream()
+                                    .filter(entry1 -> entry1.getKey().equals(client))
+                                    .forEach(username -> {
+                                        sender[0] = String.valueOf(username.getValue()._username);
+                                    }));
+                    Socket_Serveur.users //stream out of arraylist
+                            .forEach(map -> map.entrySet().stream()
+                                    .filter(entry -> entry.getValue()._username.equals(destination))
+                                    .forEach(username -> {
+                                        try {
+                                            Socket_Serveur.ecrireSocket (Arrays.toString(sender) + " : " + msg, username.getKey());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }));
                 }
 
                 /*else if (clientCommand.equalsIgnoreCase("/create_group")) {
@@ -158,11 +189,25 @@ class ClientServiceThread extends Thread {
                     Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
                     Logger.closeLog();
                     System.exit(0);
+                }else {
+
+
+                    //LAMBDA POUR AFFICHER LES MESSAGES GENERAUX
+                    Socket_Serveur.users.stream() //stream out of arraylist
+                            .forEach(map -> map.entrySet().stream()
+                                    .filter(entry -> entry.getKey().equals(client))
+                                    .forEach(username -> {
+                                        try {
+                                            Socket_Serveur.ecrireSocket(username.getValue()._username + " : " + clientCommand, this.server.sockets);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }));
+                    //FIN LAMBDA
+
+
                 }
-                else {
-                    Socket_Serveur.ecrireSocket("Server Says : " + clientCommand, this.server.sockets);
-                    //Socket_Serveur.ecrireSocket("Server Says : " + clientCommand, client);
-                }
+
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -182,7 +227,7 @@ class ClientServiceThread extends Thread {
 public class SocketPerso {
 
     private final Socket socket;
-    public  String _username;
+    private String _username;
 
     public SocketPerso(java.net.Socket socket){
 
@@ -195,10 +240,15 @@ public class SocketPerso {
     public SocketPerso(java.net.Socket socket, String p_userName){
 
 
-        _username= p_userName;
+        this._username= p_userName;
         this.socket = socket;
 
 
+    }
+
+    public String getUserName(){
+
+        return this._username;
     }
 
     public Socket getSocket(){
@@ -262,22 +312,22 @@ public class SocketPerso {
     }
 
     static class Thread_Client_Send extends Thread {
-        String destination;
+        //String destination;
         SocketPerso socket;
         IOCommandes commandes;
         String msg;
         String username;
 
-        public Thread_Client_Send(SocketPerso s, String pseudo) throws IOException {
+        public Thread_Client_Send(SocketPerso s) throws IOException {
             socket = s;
             commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         }
 
         public void run() {
             try{
-                socket.envoyerPseudo(username);
-                commandes.ecrireEcran("Saisir un destinataire : ");
-                    destination = commandes.lireEcran();
+                socket.envoyerPseudo(socket._username);
+                commandes.ecrireEcran("Bienvenue sur le serveur " + socket._username);
+                    //destination = commandes.lireEcran();
 
                 do {
                     msg = commandes.lireEcran();
