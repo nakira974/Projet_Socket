@@ -24,7 +24,7 @@ class Socket_Serveur {
 
     public static void createServer(java.net.ServerSocket socket){
         _srvSocket = socket;
-        maxConnection = 10;
+        maxConnection = 20;
         nb_socket = 0;
     }
 

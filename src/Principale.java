@@ -76,7 +76,6 @@ public class Principale {
                                 cliThread.start();
                             }
                         }
-                        commandes.ecrireEcran("Vous n'avez pas pu vous connecter car le serveur est plein!");
 
                     }catch(Exception  ex){
                         ex.printStackTrace();
