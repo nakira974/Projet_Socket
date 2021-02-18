@@ -99,12 +99,16 @@ class ClientServiceThread extends Thread {
         this.server = server;
         this.server.sockets.add(s);
 
+
     }
 
     public void run() {
 
+
         System.out.println("Accepted Client Address - " + client.getInetAddress().getHostName());
-             System.out.println("Client : "+ Socket_Serveur.users.size());
+        System.out.println("Client : "+ Socket_Serveur.users.size());
+        String clientUsername = null;
+
         try {
 
             while(runState) {
@@ -125,8 +129,8 @@ class ClientServiceThread extends Thread {
                     this.server.sockets.remove(client);
                     System.out.print("Stopping client thread for client : ");
                 } else if(clientCommand.equalsIgnoreCase("/weather")){
-                    User currentUser = (User) Socket_Serveur.users.get(Socket_Serveur.users.indexOf(client)).entrySet();
-                    currentUser.getWeather();
+                    //User currentUser = (User) Socket_Serveur.users.get(Socket_Serveur.users.indexOf(client)).entrySet();
+                    //currentUser.getWeather();
                 }
 
                 /*else if (clientCommand.equalsIgnoreCase("/create_group")) {
@@ -163,10 +167,20 @@ class ClientServiceThread extends Thread {
 public class SocketPerso {
 
     private final Socket socket;
+    public  String _username;
 
     public SocketPerso(java.net.Socket socket){
 
 
+        this.socket = socket;
+
+
+    }
+
+    public SocketPerso(java.net.Socket socket, String p_userName){
+
+
+        _username= p_userName;
         this.socket = socket;
 
 
@@ -181,6 +195,16 @@ public class SocketPerso {
 
         PrintWriter out = new PrintWriter(this.socket.getOutputStream());
         out.println(texte);
+        out.flush();
+
+
+    }
+
+    public void envoyerPseudo(String pseudo) throws IOException {
+
+
+        PrintWriter out = new PrintWriter(this.socket.getOutputStream());
+        out.println(pseudo);
         out.flush();
 
 
@@ -227,15 +251,16 @@ public class SocketPerso {
         SocketPerso socket;
         IOCommandes commandes;
         String msg;
-        User currentUser;
+        String username;
 
-        public Thread_Client_Send(SocketPerso s) throws IOException {
+        public Thread_Client_Send(SocketPerso s, String pseudo) throws IOException {
             socket = s;
             commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
         }
 
         public void run() {
             try{
+                socket.envoyerPseudo(username);
                 commandes.ecrireEcran("Saisir un destinataire : ");
                     destination = commandes.lireEcran();
 

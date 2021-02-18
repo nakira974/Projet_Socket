@@ -77,18 +77,18 @@ class LogUser {
 
 
                     //INSTANCIER CLIENT ICI
-                    socket_client = new SocketPerso(new Socket("127.0.0.1", 5000));
-                    currentUser = new User(pseudo);
-                    HashMap<Socket, User> user = new HashMap<Socket, User>();
-                    user.put(socket_client.getSocket(),currentUser);
+                    socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), pseudo);
+                    //currentUser = new User(pseudo);
+                   // HashMap<Socket, User> user = new HashMap<Socket, User>();
+                    //user.put(socket_client.getSocket(),currentUser);
 
                     // get the output stream from the socket.
-                    OutputStream outputStream = socket_client.getSocket().getOutputStream();
+                    //OutputStream outputStream = socket_client.getSocket().getOutputStream();
                     // create an object output stream from the output stream so we can send an object through it
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                    //ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
 
                     //ENVOI DU HASHMAP SUR LE SRV
-                    objectOutputStream.writeObject(user);
+                    //objectOutputStream.writeObject(user);
                     //currentUser.getWeather();
 
 
