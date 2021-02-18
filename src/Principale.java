@@ -26,23 +26,50 @@ public class Principale {
         if (msg.equals("client")) {
             //FAIS SI LE LOGIN EST OK
             //SocketPerso socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
+            System.out.println(" (1) Se connecter || (2) S'enregistrer \n");
+            msg = commandes.lireEcran();
 
             //LOGIN
-            System.out.println("Nom d'utilisateur : ");
-            msg = commandes.lireEcran();
-            userInfo.add(msg);
-            System.out.println("Mot de passe : ");
-            msg = commandes.lireEcran();
-            userInfo.add(msg);
-            try {
-                LogUser log = new LogUser();
-                //do{
-                socket_client = log.login(userInfo);
+            if (msg.equals("1")){
+                System.out.println("Nom d'utilisateur : ");
+                msg = commandes.lireEcran();
+                userInfo.add(msg);
+                System.out.println("Mot de passe : ");
+                msg = commandes.lireEcran();
+                userInfo.add(msg);
+                try {
+                    LogUser log = new LogUser();
+                    //do{
+                    socket_client = log.login(userInfo);
 
-                //}while(socket_client != null);
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                    //}while(socket_client != null);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                //CREATE USER
+            }else if(msg.equals("2")){
+                System.out.println("Nom d'utilisateur : ");
+                msg = commandes.lireEcran();
+                userInfo.add(msg);
+                System.out.println("Mot de passe : ");
+                msg = commandes.lireEcran();
+                userInfo.add(msg);
+                System.out.println("Adresse email : ");
+                msg = commandes.lireEcran();
+                userInfo.add(msg);
+                try {
+                    LogUser log = new LogUser();
+                    //do{
+                    log.createUser(userInfo);
+                    System.out.println("Utilisateur : "+userInfo.get(0)+" enregistré dans la base.\n");
+                    socket_client = log.login(userInfo);
+
+                    //}while(socket_client != null);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+
             //FIN LOGIN
 
             if (socket_client != null) {

@@ -39,7 +39,7 @@ class LogUser {
 
 
             rs = stmt.executeQuery(
-                    "INSERT INTO users (`pseudo`, `password`) VALUES('" + args.get(0) + "','" + args.get(1) + "');");
+                    "INSERT INTO users (`pseudo`, `password`, `email`) VALUES('" + args.get(0) + "','" + args.get(1) + "', '"+args.get(2)+"');");
 
             if (!rs.wasNull()) {
 
