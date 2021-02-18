@@ -117,7 +117,6 @@ public class User {
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-
             Object obj = JSONValue.parse(response.body());
             JSONObject jsonObject = (JSONObject) obj;
 
