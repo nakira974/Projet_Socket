@@ -1,15 +1,20 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
 
 class Socket_Serveur {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
-    //public static ArrayList<Groupe> groupes = new ArrayList<>();
+    public static ArrayList<Groupe> groupes = new ArrayList<>();
     public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
     //public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
 
@@ -114,7 +119,7 @@ class ClientServiceThread extends Thread {
             while(runState) {
                 String clientCommand = Socket_Serveur.lireSocket(client);
                 if(clientCommand!=null) {
-                    System.out.println("Client Says :" + clientCommand);
+                    System.out.println("[BROADCAST] Client Says :" + clientCommand);
                     Logger.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
                 }
 
@@ -131,7 +136,7 @@ class ClientServiceThread extends Thread {
                     for(int i = 0; i< Socket_Serveur.users.size(); i++){
                         //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
                         if(Socket_Serveur.users.get(i).containsKey(client)){
-                            System.out.println("Client : " + Socket_Serveur.users.get(i).toString()
+                            System.out.println("[BROADCAST] Client : " + Socket_Serveur.users.get(i).toString()
                                     +" Disconnected");
                         }
                     }
@@ -178,9 +183,42 @@ class ClientServiceThread extends Thread {
                                     }));
                 }
 
-                /*else if (clientCommand.equalsIgnoreCase("/create_group")) {
-                    Socket_Serveur.ajouter_groupe(client);
-                }*/
+                else if(clientCommand.contains("/G")){
+                    Groupe v_current_grp = null;
+                    String[] text = clientCommand.split(":");
+                    String groupe = text[0].replace("/G", "");
+                    String msg = text[1];
+                    final String[] sender = {null};
+
+                    //ON PARCOURT LES GROUPES
+                    for(Groupe current_grp : Socket_Serveur.groupes){
+                        if(current_grp._name.equals(groupe)){
+                            current_grp.groupeUsers //stream out of arraylist
+                                    .forEach(map -> map.entrySet()
+                                            .forEach(username -> {
+                                                sender[0] = String.valueOf(username.getValue()._username);
+                                            }));
+                        }
+                    }
+                }
+                else if (clientCommand.contains("/CG")) {
+                    final User[] current_usr = {null};
+                    Groupe current_grp = null;
+                    String[] text = clientCommand.split(":");
+                    String groupe = text[1];
+                    Socket_Serveur.users //stream out of arraylist
+                            .forEach(map -> map.entrySet().stream()
+                                    .filter(entry1 -> entry1.getKey().equals(client))
+                                    .forEach(username -> {
+                                        current_usr[0] = username.getValue();
+                                    }));
+                    current_grp = new Groupe(groupe, current_usr[0], client );
+                    Socket_Serveur.groupes.add(current_grp);
+                    System.out.println("Group : " + current_grp._name + " has been created by : " + current_usr[0]._username);
+                }
+
+
+
                 else if(clientCommand.equalsIgnoreCase("END")) {
                     runState = false;
                     System.out.print("Stopping server...");
