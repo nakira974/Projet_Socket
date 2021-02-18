@@ -1,9 +1,8 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Principale {
 
@@ -45,24 +44,35 @@ public class Principale {
 
                 receiver.start();
 
-                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client);
+                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client, socket_client._username);
 
                 sender.start();
 
 
             }else if(msg.equals("serveur")) {
+                String clientUsername = null;
                 Socket_Serveur socket_serveur = new Socket_Serveur(new ServerSocket(5000));
                 while (!socket_serveur.getServer().isClosed()) {
-                        try{
-                            Socket client = socket_serveur.acceptClient();
-                            ClientServiceThread cliThread = new ClientServiceThread(client, socket_serveur);
-                            cliThread.start();
-                        }catch(Exception  ex){
-                            ex.printStackTrace();
+                    try{
+                        Socket client = socket_serveur.acceptClient();
+                        try {
+                            clientUsername = socket_serveur.lireSocket(client);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
+                        HashMap<Socket, User> currentUser = new HashMap<Socket, User>();
+                        currentUser.put(client, new User(clientUsername));
+                        Socket_Serveur.users.add(currentUser);
+                        ClientServiceThread cliThread = new ClientServiceThread(client, socket_serveur);
+                        cliThread.start();
+                    }catch(Exception  ex){
+                        ex.printStackTrace();
+                    }
 
                 }
 
             }
     }
 }
+
+

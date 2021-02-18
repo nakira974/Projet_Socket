@@ -1,4 +1,3 @@
-
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -27,6 +26,7 @@ class LogUser {
 
             System.out.println("Requête de création d'utilisateur en cours d'execution...");
 
+
             Statement stmt = conn.createStatement();
 
 
@@ -52,6 +52,7 @@ class LogUser {
 
         SocketPerso socket_client = null;
         ResultSet rs = null;
+        String pseudo = null;
         try {
 
             Class.forName("org.mariadb.jdbc.Driver");
@@ -68,17 +69,26 @@ class LogUser {
 
                 if (!rs.wasNull()) {
                     while (rs.next()) {
-                        String pseudo = rs.getString("pseudo");
+
+                        pseudo = rs.getString("pseudo");
+
                         System.out.println(pseudo);
                     }
 
 
                     //INSTANCIER CLIENT ICI
-                    socket_client = new SocketPerso(new Socket("127.0.0.1", 5000));
-                    currentUser = new User(rs.getString("pseudo"));
-                    HashMap<User, Socket> user = new HashMap<User, Socket>();
-                    user.put(currentUser, socket_client.getSocket());
-                    Socket_Serveur.users.add(user);
+                    socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), pseudo);
+                    //currentUser = new User(pseudo);
+                   // HashMap<Socket, User> user = new HashMap<Socket, User>();
+                    //user.put(socket_client.getSocket(),currentUser);
+
+                    // get the output stream from the socket.
+                    //OutputStream outputStream = socket_client.getSocket().getOutputStream();
+                    // create an object output stream from the output stream so we can send an object through it
+                    //ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+
+                    //ENVOI DU HASHMAP SUR LE SRV
+                    //objectOutputStream.writeObject(user);
                     //currentUser.getWeather();
 
 
@@ -87,7 +97,6 @@ class LogUser {
 
                 //String url = "jdbc:mariadb://localhost:3307/serveur_db";
                 //Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
-
             } catch (Exception e) {
 
                 if (rs == null) {
