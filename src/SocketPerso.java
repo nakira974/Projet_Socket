@@ -33,7 +33,7 @@ class Socket_Serveur {
         return this._srvSocket;
     }
 
-    public void ecrireSocket(String texte, ArrayList<Socket> clients) throws IOException {
+    public static void ecrireSocket(String texte, ArrayList<Socket> clients) throws IOException {
 
         for (Socket socket : clients) {
 
