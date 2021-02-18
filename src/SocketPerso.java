@@ -16,27 +16,42 @@ class Socket_Serveur {
     public static ArrayList<Socket> sockets = new ArrayList<>();
     public static ArrayList<Groupe> groupes = new ArrayList<>();
     public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
-    //public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
 
-    private ServerSocket _srvSocket;
-    private int maxConnection;
+    private static ServerSocket _srvSocket;
+    private static int maxConnection;
+    private static int nb_socket;
 
-    public Socket_Serveur(java.net.ServerSocket socket) {
 
-        this._srvSocket = socket;
-
+    public static void createServer(java.net.ServerSocket socket){
+        _srvSocket = socket;
+        maxConnection = 10;
+        nb_socket = 0;
     }
 
-    public Socket acceptClient() throws IOException {
+    public static int getMaxConnection(){
+        return maxConnection;
+    }
+
+    public static Socket acceptClient() throws IOException {
+
+        nb_socket++;
 
         return _srvSocket.accept();
 
 
     }
 
+    public static int getNbSocket(){
+        return nb_socket;
+    }
 
-    public ServerSocket getServer() {
-        return this._srvSocket;
+    public static void quit(){
+        nb_socket--;
+    }
+
+
+    public static ServerSocket getServer() {
+        return _srvSocket;
     }
 
     public static void ecrireSocket(String texte, ArrayList<Socket> clients) throws IOException {
@@ -68,41 +83,18 @@ class Socket_Serveur {
 
     }
 
-    /*public static void ajouter_groupe(Socket client) throws IOException {
-
-        String res = null ;
-        ecrireSocket("Saisir le nom du Groupe : ", client);
-        res= lireSocket(client);
-        Set set = users.entrySet();
-
-        // Get an iterator
-        Iterator iterator = set.iterator();
-
-        // Display elements
-        while(iterator.hasNext()) {
-            if (users.get(iterator) == client) {
-                Map.Entry me = (Map.Entry) iterator.next();
-
-                Groupe currentGroup = new Groupe(res, (String) me.getKey(), (Socket) me.getValue());
-                groupes.add(currentGroup);
-                System.out.println("Groupe @"+currentGroup._name+" a été créé");
-            }
-        }
-    }*/
 }
 
 class ClientServiceThread extends Thread {
 
     Socket client;
-    Socket_Serveur server;
 
     boolean runState = true;
     boolean ServerOn= true;
 
-    ClientServiceThread(Socket s, Socket_Serveur server) {
+    ClientServiceThread(Socket s) {
 
         this.client = s;
-        this.server = server;
         Socket_Serveur.sockets.add(s);
 
 
@@ -137,6 +129,7 @@ class ClientServiceThread extends Thread {
                     for(int i = 0; i< Socket_Serveur.users.size(); i++){
                         //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
                         if(Socket_Serveur.users.get(i).containsKey(client)){
+                            Socket_Serveur.quit();
                             System.out.println("[BROADCAST] Client : " + Socket_Serveur.users.get(i).toString()
                                     +" Disconnected");
                         }
@@ -154,7 +147,7 @@ class ClientServiceThread extends Thread {
                                     .filter(entry -> entry.getKey().equals(client))
                                     .forEach(username -> {
                                         try {
-                                            Socket_Serveur.ecrireSocket (username.getValue()._username + " : " + username.getValue().getWeather() + "°C", this.server.sockets);
+                                            Socket_Serveur.ecrireSocket (username.getValue()._username + " : " + username.getValue().getWeather() + "°C", Socket_Serveur.sockets);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
@@ -185,23 +178,53 @@ class ClientServiceThread extends Thread {
                 }
 
                 else if(clientCommand.contains("/G")){
-                    Groupe v_current_grp = null;
                     String[] text = clientCommand.split(":");
                     String groupe = text[0].replace("/G", "");
                     String msg = text[1];
                     final String[] sender = {null};
 
-                    //ON PARCOURT LES GROUPES
-                    for(Groupe current_grp : Socket_Serveur.groupes){
-                        if(current_grp._name.equals(groupe)){
-                            current_grp.groupeUsers //stream out of arraylist
-                                    .forEach(map -> map.entrySet()
+                    for(Groupe current_grp : Socket_Serveur.groupes) {
+                        if (current_grp._name.equals(groupe)){
+                            Socket_Serveur.users //stream out of arraylist
+                                    .forEach(map -> map.entrySet().stream()
+                                            .filter(entry1 -> entry1.getKey().equals(client))
                                             .forEach(username -> {
                                                 sender[0] = String.valueOf(username.getValue()._username);
                                             }));
+                        current_grp.groupeUsers //stream out of arraylist
+                                .forEach(map -> map.entrySet()
+                                        .forEach(username -> {
+                                            try {
+                                                Socket_Serveur.ecrireSocket("[" + current_grp._name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }));
+                    }
                         }
                     }
+                else if (clientCommand.contains("/JG")) {
+                    final User[] current = {null};
+                    Groupe current_grp = null;
+                    String[] text = clientCommand.split(":");
+                    String groupe = text[1];
+                    for(Groupe curr : Socket_Serveur.groupes) {
+                        if (curr._name.equals(groupe)) {
+                            current_grp = curr;
+                        }
+                    }
+                    Socket_Serveur.users //stream out of arraylist
+                            .forEach(map -> map.entrySet().stream()
+                                    .filter(entry1 -> entry1.getKey().equals(client))
+                                    .forEach(username -> {
+                                        current[0] = username.getValue();
+                                    }));
+                    HashMap<Socket, User> user = new HashMap<Socket, User>();
+                    user.put(client, current[0]);
+                    Socket_Serveur.groupes.get(Socket_Serveur.groupes.indexOf(current_grp)).groupeUsers.add(user);
+                    //System.out.println("Group : " + current_grp._name + " has been created by : " + current[0]._username);
                 }
+
                 else if (clientCommand.contains("/CG")) {
                     final User[] current_usr = {null};
                     Groupe current_grp = null;
@@ -224,7 +247,7 @@ class ClientServiceThread extends Thread {
                     runState = false;
                     System.out.print("Stopping server...");
                     ServerOn = false;
-                    this.server.ecrireSocket("END", Socket_Serveur.sockets);
+                    Socket_Serveur.ecrireSocket("END", Socket_Serveur.sockets);
                     Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
                     Logger.closeLog();
                     System.exit(0);
@@ -237,7 +260,7 @@ class ClientServiceThread extends Thread {
                                     .filter(entry -> entry.getKey().equals(client))
                                     .forEach(username -> {
                                         try {
-                                            Socket_Serveur.ecrireSocket(username.getValue()._username + " : " + clientCommand, this.server.sockets);
+                                            Socket_Serveur.ecrireSocket(username.getValue()._username + " : " + clientCommand, Socket_Serveur.sockets);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
@@ -365,7 +388,7 @@ public class SocketPerso {
         public void run() {
             try{
                 socket.envoyerPseudo(socket._username);
-                commandes.ecrireEcran("Bienvenue sur le serveur " + socket._username);
+                commandes.ecrireEcran("Connexion au serveur: " + socket._username);
                     //destination = commandes.lireEcran();
 
                 do {

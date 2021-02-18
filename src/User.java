@@ -171,7 +171,7 @@ class Groupe {
     public static User _administrator;
     public  ArrayList<HashMap<Socket, User> >groupeUsers;
     public Groupe() {
-        _name="test";
+        _name="";
         _administrator= new User();
     }
 

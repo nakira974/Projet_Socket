@@ -56,20 +56,28 @@ public class Principale {
 
             }else if(msg.equals("serveur")) {
                 String clientUsername = null;
-                Socket_Serveur socket_serveur = new Socket_Serveur(new ServerSocket(5000));
-                while (!socket_serveur.getServer().isClosed()) {
+                Socket_Serveur.createServer(new ServerSocket(5000));
+                while (!Socket_Serveur.getServer().isClosed()) {
                     try{
-                        Socket client = socket_serveur.acceptClient();
-                        try {
-                            clientUsername = socket_serveur.lireSocket(client);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        Socket client;
+                        while(Socket_Serveur.getNbSocket()<Socket_Serveur.getMaxConnection()){
+                            client = Socket_Serveur.acceptClient();
+                            if(client!=null) {
+                                try {
+                                    clientUsername = Socket_Serveur.lireSocket(client);
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                HashMap<Socket, User> currentUser = new HashMap<>();
+                                currentUser.put(client, new User(clientUsername));
+                                Socket_Serveur.users.add(currentUser);
+                                ClientServiceThread cliThread = new ClientServiceThread(client);
+                                cliThread.start();
+                            }
                         }
-                        HashMap<Socket, User> currentUser = new HashMap<>();
-                        currentUser.put(client, new User(clientUsername));
-                        Socket_Serveur.users.add(currentUser);
-                        ClientServiceThread cliThread = new ClientServiceThread(client, socket_serveur);
-                        cliThread.start();
+                        commandes.ecrireEcran("Vous n'avez pas pu vous connecter car le serveur est plein!");
+
                     }catch(Exception  ex){
                         ex.printStackTrace();
                     }
