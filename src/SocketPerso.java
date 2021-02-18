@@ -148,7 +148,7 @@ class ClientServiceThread extends Thread {
                                     .filter(entry -> entry.getKey().equals(client))
                                     .forEach(username -> {
                                         try {
-                                            Socket_Serveur.ecrireSocket (username.getValue()._username + " : " + username.getValue().getWeather(), this.server.sockets);
+                                            Socket_Serveur.ecrireSocket (username.getValue()._username + " : " + username.getValue().getWeather() + "°C", this.server.sockets);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }

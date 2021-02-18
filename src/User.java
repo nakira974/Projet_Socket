@@ -1,3 +1,4 @@
+import jdk.internal.access.JavaIOFileDescriptorAccess;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -106,7 +107,7 @@ public class User {
     public LocalTime _lastConnection;
 
 
-    public String getWeather(){
+    public double getWeather(){
         try {
             assert false;
             HttpRequest request = HttpRequest.newBuilder()
@@ -120,15 +121,17 @@ public class User {
             Object obj = JSONValue.parse(response.body());
             JSONObject jsonObject = (JSONObject) obj;
 
-            String name = (String) jsonObject.get("name");
+            JSONObject jsonMain = (JSONObject) jsonObject.get("main");
 
-            return response.body();
+            double temp = (double) jsonMain.get("temp");
+
+            return temp;
             //System.out.println(response.body());
 
         }catch (Exception ex){
             ex.printStackTrace();
         }
-        return "Pas de réponse!";
+        return 0.0;
     }
 
 }
