@@ -1,4 +1,3 @@
-import jdk.internal.access.JavaIOFileDescriptorAccess;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -136,19 +135,21 @@ public class User {
 }
 
 
-/*class Groupe {
+class Groupe {
     public String _name ;
-    private String _administrator;
-    public HashMap<String, Socket> groupeUsers;
+    public static User _administrator;
+    public  ArrayList<HashMap<Socket, User> >groupeUsers;
     public Groupe() {
         _name="test";
-        _administrator= "root";
+        _administrator= new User();
     }
 
-    public Groupe(String name, String administrator, Socket admin_sock) {
-        groupeUsers=new HashMap<String,Socket>();
+    public Groupe(String name, User administrator, Socket admin_sock) {
+        groupeUsers=new ArrayList<>(10);
+        HashMap<Socket, User> currentHash = new HashMap<>();
+        currentHash.put(admin_sock, administrator);
         _name=name;
         _administrator=administrator;
-        groupeUsers.put(administrator, admin_sock);
+        groupeUsers.add(currentHash);
     }
-}*/
+}
