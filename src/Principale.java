@@ -14,7 +14,6 @@ public class Principale {
         String msg;
 
         ArrayList<String> userInfo = new ArrayList<>();
-        ArrayList<Socket> _clientList = new ArrayList<>();
 
 
 
@@ -32,7 +31,10 @@ public class Principale {
                 userInfo.add(msg);
                 try{
                     LogUser log= new LogUser();
-                    socket_client = log.login(userInfo);
+                    //do{
+                        socket_client = log.login(userInfo);
+
+                    //}while(socket_client != null);
                 }catch(Exception ex){
                     ex.printStackTrace();
                 }

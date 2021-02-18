@@ -160,7 +160,8 @@ class ClientServiceThread extends Thread {
                     System.exit(0);
                 }
                 else {
-                    Socket_Serveur.ecrireSocket("Server Says : " + clientCommand, client);
+                    Socket_Serveur.ecrireSocket("Server Says : " + clientCommand, this.server.sockets);
+                    //Socket_Serveur.ecrireSocket("Server Says : " + clientCommand, client);
                 }
             }
         } catch(Exception e) {

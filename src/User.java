@@ -1,6 +1,3 @@
-
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -28,6 +25,7 @@ class LogUser {
                     "serveur_db?user=serveur&password=Master2004$");
 
             System.out.println("Requête de création d'utilisateur en cours d'execution...");
+
 
             Statement stmt = conn.createStatement();
 
@@ -71,7 +69,9 @@ class LogUser {
 
                 if (!rs.wasNull()) {
                     while (rs.next()) {
+
                         pseudo = rs.getString("pseudo");
+
                         System.out.println(pseudo);
                     }
 
@@ -97,7 +97,6 @@ class LogUser {
 
                 //String url = "jdbc:mariadb://localhost:3307/serveur_db";
                 //Connection conn = DriverManager.getConnection(url,"ServerMaster","Master2004$");
-
             } catch (Exception e) {
 
                 if (rs == null) {
