@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static java.lang.Thread.sleep;
+
 public class Principale {
 
 
@@ -62,6 +64,12 @@ public class Principale {
                     //do{
                     log.createUser(userInfo);
                     System.out.println("Utilisateur : "+userInfo.get(0)+" enregistré dans la base.\n");
+                    System.out.println("Auto-login...");
+                    for(int i=0; i<3 ;i ++){
+                        sleep(500);
+                        System.out.println("....");
+                    }
+
                     socket_client = log.login(userInfo);
 
                     //}while(socket_client != null);
