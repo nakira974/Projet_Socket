@@ -7,6 +7,7 @@ import java.util.HashMap;
 public class Principale {
 
 
+
     public static void main(String[] args) throws IOException {
 
         SocketPerso socket_client = null;
