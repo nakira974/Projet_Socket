@@ -158,7 +158,21 @@ class ClientServiceThread extends Thread {
                                             e.printStackTrace();
                                         }
                                     }));
-                } else if (clientCommand.contains("/@")) {
+                }
+                else if (clientCommand.contains("/translate:")) {
+                    String[] text = clientCommand.split(":");
+                    String msg = text[1];
+                    Socket_Serveur.users.stream() //stream out of arraylist
+                            .forEach(map -> map.entrySet().stream()
+                                    .filter(entry -> entry.getKey().equals(client))
+                                    .forEach(username -> {
+                                        try {
+                                            Socket_Serveur.ecrireSocket(username.getValue()._username + " : " + username.getValue().translateMessage(msg), Socket_Serveur.sockets);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }));
+                }else if (clientCommand.contains("/@")) {
                     String[] text = clientCommand.split(":");
                     String destination = text[0].replace("/@", "");
                     String msg = text[1];

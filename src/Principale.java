@@ -24,7 +24,7 @@ public class Principale {
 
                 System.out.println("-(1) S'authentifier || S'enregistrer (2)-");
                 msg = commandes.lireEcran();
-                if(msg.equals("1")){
+                if(msg.equals("2")){
                     LogUser logger = new LogUser();
                     System.out.println("Nom d'utilisateur : ");
                     msg = commandes.lireEcran();
