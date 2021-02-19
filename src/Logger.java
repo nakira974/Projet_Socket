@@ -11,30 +11,36 @@ import java.util.Locale;
 
 public class Logger {
 
-    private static FileWriter file;
-    private static final BufferedWriter output = new BufferedWriter(file);
 
-    static {
-        try {
-            file = new FileWriter("src/logger(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ").txt");
-        } catch (IOException e) {
-            e.printStackTrace();
+    private  FileWriter file;
+    public BufferedWriter output ;
+
+    public Logger() {
+
+        {
+            try {
+                this.file = new FileWriter("src/logger(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ").txt");
+                output =new BufferedWriter(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public static void writeLog(String p_fileData) {
+
+    public void writeLog(String p_fileData) {
         try {
             // Writes the string to the file
-            output.append(p_fileData);
-            output.newLine();
+            this.output.append(p_fileData);
+            this.output.newLine();
         } catch (Exception e) {
             e.getStackTrace();
         }
     }
 
-    public static void closeLog() throws IOException {
+    public void closeLog() throws IOException {
 
-        output.close();
+        this.output.close();
 
     }
 

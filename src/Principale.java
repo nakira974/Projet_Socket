@@ -93,6 +93,7 @@ public class Principale {
                                 Socket_Serveur.users.add(currentUser);
                                 ClientServiceThread cliThread = new ClientServiceThread(client);
                                 cliThread.start();
+
                             }
                         }
 

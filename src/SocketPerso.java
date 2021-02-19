@@ -95,11 +95,12 @@ class ClientServiceThread extends Thread {
 
     boolean runState = true;
     boolean ServerOn = true;
-
+    Logger log ;
     ClientServiceThread(Socket s) {
 
         this.client = s;
         Socket_Serveur.sockets.add(s);
+         log = new Logger();
 
 
     }
@@ -111,13 +112,14 @@ class ClientServiceThread extends Thread {
         System.out.println("Client(s) : " + Socket_Serveur.users.size());
         String clientUsername = null;
 
+
         try {
 
             while (runState) {
                 String clientCommand = Socket_Serveur.lireSocket(client);
                 if (clientCommand != null) {
                     System.out.println("[BROADCAST] Client Says :" + clientCommand);
-                    Logger.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
+                    log.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
                 }
 
                 if (!ServerOn) {
@@ -242,7 +244,7 @@ class ClientServiceThread extends Thread {
                     ServerOn = false;
                     Socket_Serveur.ecrireSocket("END", Socket_Serveur.sockets);
                     Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
-                    Logger.closeLog();
+                    log.closeLog();
                     System.exit(0);
                 } else {
 
