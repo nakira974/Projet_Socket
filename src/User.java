@@ -20,7 +20,7 @@ class LogUser {
 
     }
 
-    public void createUser(ArrayList<String> args) {
+    public void createUser(ArrayList<String> args) throws ClassNotFoundException {
         SocketPerso socket_client = null;
         ResultSet rs = null;
         try {
@@ -39,8 +39,13 @@ class LogUser {
 
 
             System.out.println("You've been registered on : "+ conn);
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
+        } catch (SQLException ex1 ) {
+            int code = ex1.getErrorCode();
+            if(code != 1062){
+                ex1.printStackTrace();
+                return;
+            }
+            System.out.println("Nom d'utilisateur déjà pris.");
         }
 
     }
@@ -177,5 +182,9 @@ class Groupe {
         _name=name;
         _administrator=administrator;
         groupeUsers.add(currentHash);
+    }
+
+    public void insertGroupe(){
+
     }
 }

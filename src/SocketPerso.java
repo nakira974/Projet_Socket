@@ -119,7 +119,7 @@ class ClientServiceThread extends Thread {
                 String clientCommand = Socket_Serveur.lireSocket(client);
                 if (clientCommand != null) {
                     System.out.println("[BROADCAST] Client Says :" + clientCommand);
-                    log.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
+                    log.writeLog(client.getInetAddress().getHostName().toString() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand.toString());
                 }
 
                 if (!ServerOn) {

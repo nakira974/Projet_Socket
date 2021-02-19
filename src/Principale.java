@@ -8,7 +8,7 @@ public class Principale {
 
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         SocketPerso socket_client = null;
         IOCommandes commandes = new IOCommandes(new BufferedReader(new InputStreamReader(System.in)), System.out);
@@ -25,6 +25,7 @@ public class Principale {
                 System.out.println("-(1) S'authentifier || S'enregistrer (2)-");
                 msg = commandes.lireEcran();
                 if(msg.equals("2")){
+                    System.out.println("------REGISTER-----");
                     LogUser logger = new LogUser();
                     System.out.println("Nom d'utilisateur : ");
                     msg = commandes.lireEcran();
@@ -42,6 +43,7 @@ public class Principale {
 
 
                 //LOGIN
+                System.out.println("------LOGIN-----");
                 System.out.println("Nom d'utilisateur : ");
                 msg = commandes.lireEcran();
                 userInfo.add(msg);
