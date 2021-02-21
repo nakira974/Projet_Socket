@@ -280,11 +280,9 @@ class ClientServiceThread extends Thread {
 
     public void run() {
 
-
         System.out.println("Accepted Client Address - " + client.getInetAddress().getHostName());
         System.out.println("Client(s) : " + Socket_Serveur.users.size());
         String clientUsername = null;
-
 
         try {
 
