@@ -6,6 +6,22 @@ import java.util.HashMap;
 
 public class Principale {
 
+    static String _str;
+
+    static void register(ArrayList<String> args, IOCommandes command) throws IOException {
+        System.out.println("------REGISTER-----");
+        LogUser logger = new LogUser();
+        System.out.println("Nom d'utilisateur : ");
+        _str = command.lireEcran();
+        args.add(_str);
+        System.out.println("Mot de passe : ");
+        _str= command.lireEcran();
+        args.add(_str);
+        System.out.println("email : ");
+        _str = command.lireEcran();
+        args.add(_str);
+    }
+
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -25,20 +41,7 @@ public class Principale {
                 System.out.println("-(1) S'authentifier || S'enregistrer (2)-");
                 msg = commandes.lireEcran();
                 if(msg.equals("2")){
-                    System.out.println("------REGISTER-----");
-                    LogUser logger = new LogUser();
-                    System.out.println("Nom d'utilisateur : ");
-                    msg = commandes.lireEcran();
-                    userInfo.add(msg);
-                    System.out.println("Mot de passe : ");
-                    msg = commandes.lireEcran();
-                    userInfo.add(msg);
-                    System.out.println("email : ");
-                    msg = commandes.lireEcran();
-                    userInfo.add(msg);
-
-                    logger.createUser(userInfo);
-
+                   register(userInfo, commandes);
                 }
 
 
