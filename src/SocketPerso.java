@@ -263,12 +263,12 @@ class ClientServiceThread extends Thread {
         runState = false;
     }
 
+    final private Socket client;
+    final private Logger log ;
+    private boolean runState = true;
+    private boolean ServerOn = true;
 
-    Socket client;
 
-    boolean runState = true;
-    boolean ServerOn = true;
-    Logger log ;
     ClientServiceThread(Socket s) {
 
         this.client = s;
@@ -387,8 +387,8 @@ public class SocketPerso {
     }
 
     static class Thread_Client_Receive extends Thread {
-        SocketPerso client;
-        IOCommandes commandes;
+        private final SocketPerso client;
+        private final IOCommandes commandes;
 
         public Thread_Client_Receive(SocketPerso client) throws IOException {
             this.client = client;
@@ -418,10 +418,9 @@ public class SocketPerso {
 
     static class Thread_Client_Send extends Thread {
         //String destination;
-        SocketPerso socket;
-        IOCommandes commandes;
-        String msg;
-        String username;
+        private final SocketPerso socket;
+        private final IOCommandes commandes;
+        private String username;
 
         public Thread_Client_Send(SocketPerso s) throws IOException {
             socket = s;
@@ -429,6 +428,7 @@ public class SocketPerso {
         }
 
         public void run() {
+            String msg;
             try {
                 socket.envoyerPseudo(socket._username);
                 commandes.ecrireEcran("Connexion au serveur: " + socket._username);
