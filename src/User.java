@@ -35,6 +35,43 @@ class LogUser {
 
 
             rs = stmt.executeQuery(
+                    "INSERT INTO users (`pseudo`, `password`, `email`,`isConnected`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '"+ args.get(2) +"',1)");
+
+
+            System.out.println("You've been registered on : "+ conn);
+        } catch (SQLException ex1 ) {
+            int code = ex1.getErrorCode();
+            if(code != 1062){
+                ex1.printStackTrace();
+                return;
+            }
+            System.out.println("Nom d'utilisateur déjà pris.");
+        }
+
+    }
+
+    //TO DO
+    /*
+    INSERT INTO GroupesMembres(groupe, membre) VALUES (
+                        (SELECT groupe_uuid FROM groupes WHERE nom = 1804),
+                        (SELECT user_uuid FROM users WHERE pseudo = 'nakiradu77'));
+
+     */
+    public void joinGroup(ArrayList<String> args) throws ClassNotFoundException {
+        SocketPerso socket_client = null;
+        ResultSet rs = null;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
+                    "serveur_db?user=serveur&password=Master2004$");
+
+            System.out.println("Requête de création d'utilisateur en cours d'execution...");
+
+
+            Statement stmt = conn.createStatement();
+
+
+            rs = stmt.executeQuery(
                     "INSERT INTO users (`pseudo`, `password`, `email`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '"+ args.get(2) +"')");
 
 
@@ -70,6 +107,7 @@ class LogUser {
                         pseudo = rs.getString("pseudo");
                         //System.out.println(pseudo);
                         socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), pseudo);
+                        stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='"+ args.get(0)+"'");
                     }
 
                     conn.close();
@@ -184,7 +222,10 @@ class Groupe {
         groupeUsers.add(currentHash);
     }
 
-    public void insertGroupe(){
+    /*
+    INSERT INTO groupes  (nom, administrator)  VALUES (1804,5);
+     */
+    public void createGroup(){
 
     }
 }

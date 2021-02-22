@@ -8,7 +8,7 @@ public class Principale {
 
     static String _str;
 
-    static void register(ArrayList<String> args, IOCommandes command) throws IOException {
+    static void register(ArrayList<String> args, IOCommandes command) throws IOException, ClassNotFoundException {
         System.out.println("------REGISTER-----");
         LogUser logger = new LogUser();
         System.out.println("Nom d'utilisateur : ");
@@ -20,6 +20,7 @@ public class Principale {
         System.out.println("email : ");
         _str = command.lireEcran();
         args.add(_str);
+        logger.createUser(args);
     }
 
 

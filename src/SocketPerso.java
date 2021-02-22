@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -91,6 +92,28 @@ class Socket_Serveur {
 
 class ClientServiceThread extends Thread {
 
+    private void setUserDown(){
+            int rs ;
+            try {
+                Class.forName("org.mariadb.jdbc.Driver");
+                Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
+                        "serveur_db?user=serveur&password=Master2004$");
+
+                System.out.println("[SQL] Exiting users...");
+
+
+                Statement stmt = conn.createStatement();
+
+
+                rs = stmt.executeUpdate("UPDATE users SET isConnected= 0 where isConnected =1");
+
+                System.out.println("You've been registered on : "+ conn);
+            } catch (SQLException | ClassNotFoundException ex1 ) {
+                ex1.printStackTrace();
+        }
+
+    }
+
     private void printBroadcast(String clientCommand){
         if (clientCommand != null) {
             System.out.println("[BROADCAST] Client Says :" + clientCommand);
@@ -114,6 +137,7 @@ class ClientServiceThread extends Thread {
     private void endProcess(Logger log) throws IOException {
         runState = false;
         System.out.print("Stopping server...");
+        setUserDown();
         ServerOn = false;
         Socket_Serveur.ecrireSocket("END", Socket_Serveur.sockets);
         Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
@@ -401,6 +425,7 @@ public class SocketPerso {
                 do {
                     String val = client.lireSocket();
                     if (val.contains("END")) {
+
                         System.exit(0);
                     } else {
                         commandes.ecrireEcran(val);
