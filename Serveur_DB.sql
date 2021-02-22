@@ -4,10 +4,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql-serveur
--- Generation Time: Feb 22, 2021 at 02:23 AM
+-- Generation Time: Feb 22, 2021 at 10:35 PM
 -- Server version: 10.5.8-MariaDB
 -- PHP Version: 7.2.29
-
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -35,18 +34,12 @@ USE `serveur_db`;
 DROP TABLE IF EXISTS `groupes`;
 CREATE TABLE IF NOT EXISTS `groupes` (
     `groupe_uuid` int(11) NOT NULL AUTO_INCREMENT,
-    `nom` int(11) NOT NULL DEFAULT 11,
+    `nom` varchar(512) NOT NULL,
     `administrator` int(11) NOT NULL DEFAULT 11,
     PRIMARY KEY (`groupe_uuid`),
     UNIQUE KEY `groupes_administrator_uindex` (`administrator`),
     UNIQUE KEY `groupes_nom_uindex` (`nom`)
     ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `groupes`
---
-
-
 
 -- --------------------------------------------------------
 
@@ -63,11 +56,6 @@ CREATE TABLE IF NOT EXISTS `GroupesMembres` (
     KEY `GroupesMembres_groupes_groupe_uuid_fk` (`groupe`),
     KEY `GroupesMembres_users_user_uuid_fk` (`membre`)
     ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `GroupesMembres`
---
-
 
 --
 -- Triggers `GroupesMembres`
@@ -92,7 +80,7 @@ DELIMITER ;
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
     `user_uuid` int(11) NOT NULL AUTO_INCREMENT,
-    `pseudo` varchar(16) DEFAULT NULL,
+    `pseudo` varchar(512) DEFAULT NULL,
     `password` varchar(255) NOT NULL,
     `email` varchar(255) NOT NULL,
     `dt_last_connection` date DEFAULT NULL,
@@ -100,13 +88,15 @@ CREATE TABLE IF NOT EXISTS `users` (
     PRIMARY KEY (`user_uuid`),
     UNIQUE KEY `user_uuid_uindex` (`user_uuid`),
     UNIQUE KEY `user_pseudo` (`pseudo`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
 --
 
-
+INSERT INTO `users` (`user_uuid`, `pseudo`, `password`, `email`, `dt_last_connection`, `isConnected`) VALUES
+(36, 'f2b0c1c1b30125e247f520eebfaae6e4', 'U2FsdGVkX1807J51BelY6KEsGw3REZBjvKEQcbETEdQ=', 'nakiraranger@gmail.com', NULL, 1),
+(37, 'c8857c26bc5db685812b7a91b3c5471d', 'U2FsdGVkX1+oHcQJxt01cms0TJ0U4CSze3rCM50f3e0=', 'mrweefle@gmail.com', NULL, 1);
 
 --
 -- Constraints for dumped tables

@@ -11,10 +11,7 @@ import java.net.Socket;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 class Socket_Serveur {
 
@@ -92,7 +89,7 @@ class Socket_Serveur {
 
 class ClientServiceThread extends Thread {
 
-    private void setUserDown(){
+    private void setUsersDown(){
             int rs ;
             try {
                 Class.forName("org.mariadb.jdbc.Driver");
@@ -110,6 +107,38 @@ class ClientServiceThread extends Thread {
                 System.out.println("You've been registered on : "+ conn);
             } catch (SQLException | ClassNotFoundException ex1 ) {
                 ex1.printStackTrace();
+        }
+
+    }
+
+    private void setUserDown(){
+
+        final String[] currentUser = {null};
+
+
+        Socket_Serveur.users //stream out of arraylist
+                .forEach(map -> map.entrySet().stream()
+                        .filter(entry1 -> entry1.getKey().equals(client))
+                        .forEach(username -> {
+                            currentUser[0] = String.valueOf(username.getValue());;
+                        }));
+        ResultSet rs ;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
+                    "serveur_db?user=serveur&password=Master2004$");
+
+            System.out.println("[SQL] Exiting users...");
+
+
+            Statement stmt = conn.createStatement();
+
+
+            rs = stmt.executeQuery("UPDATE users SET isConnected= 0 where isConnected =1 AND pseudo="+currentUser[0]);
+
+            System.out.println("You've been registered on : "+ conn);
+        } catch (SQLException | ClassNotFoundException ex1 ) {
+            ex1.printStackTrace();
         }
 
     }
@@ -137,7 +166,7 @@ class ClientServiceThread extends Thread {
     private void endProcess(Logger log) throws IOException {
         runState = false;
         System.out.print("Stopping server...");
-        setUserDown();
+        setUsersDown();
         ServerOn = false;
         Socket_Serveur.ecrireSocket("END", Socket_Serveur.sockets);
         Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
@@ -159,6 +188,26 @@ class ClientServiceThread extends Thread {
         current_grp = new Groupe(groupe, current_usr[0], client);
         Socket_Serveur.groupes.add(current_grp);
         System.out.println("Group : " + current_grp._name + " has been created by : " + current_usr[0]._username);
+    }
+
+
+    private void writePrivate(String[] sender, String destination, String msg) throws IOException {
+        Socket_Serveur.users //stream out of arraylist
+                .forEach(map -> map.entrySet().stream()
+                        .filter(entry1 -> entry1.getKey().equals(client))
+                        .forEach(dest -> {
+                            sender[0] = String.valueOf(dest.getValue()._username);
+                        }));
+        Socket_Serveur.users //stream out of arraylist
+                .forEach(map -> map.entrySet().stream()
+                        .filter(entry -> entry.getValue()._username.equals(destination))
+                        .forEach(src -> {
+                            try {
+                                Socket_Serveur.ecrireSocket(Arrays.toString(sender) + " : " + msg, src.getKey());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }));
     }
 
     private void joinGroup(String clientCommand){
@@ -275,6 +324,7 @@ class ClientServiceThread extends Thread {
 
         for (int i = 0; i < Socket_Serveur.users.size(); i++) {
             //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
+            setUserDown();
             Socket_Serveur.users.get(i).remove(client);
         }
 

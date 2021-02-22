@@ -2,11 +2,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -18,6 +22,35 @@ class LogUser {
 
     LogUser() {
 
+    }
+
+    private static String toHexString(byte[] hash)
+    {
+        // Convert byte array into signum representation
+        BigInteger number = new BigInteger(1, hash);
+
+        // Convert message digest into hex value
+        StringBuilder hexString = new StringBuilder(number.toString(16));
+
+        // Pad with leading zeros
+        while (hexString.length() < 32)
+        {
+            hexString.insert(0, '0');
+        }
+
+        return hexString.toString();
+    }
+
+
+    public static byte[] getSHA(String input) throws NoSuchAlgorithmException
+    {
+        // Static getInstance method is called with hashing SHA
+        MessageDigest md = MessageDigest.getInstance("MD5");
+
+        // digest() method called
+        // to calculate message digest of an input
+        // and return array of byte
+        return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
     public void createUser(ArrayList<String> args) throws ClassNotFoundException {
@@ -108,6 +141,57 @@ class LogUser {
                         //System.out.println(pseudo);
                         socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), pseudo);
                         stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='"+ args.get(0)+"'");
+                    }
+
+                    conn.close();
+                }
+
+            } catch (Exception e) {
+                if (rs == null) {
+                    System.err.println("Erreur d'authenfication ! ");
+                    System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
+                    return null;
+                }
+                if (socket_client == null) {
+                    System.err.println("Erreur de connexion au serveur de chat...");
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return socket_client;
+    }
+
+    public SocketPerso newLogin(ArrayList<String> args) throws Exception {
+        byte[] sha256;
+        String str_sha;
+        String str_aes;
+        sha256=getSHA(args.get(0));
+        str_sha=toHexString(sha256);
+        str_aes=AES_Perso.encrypt(args.get(1),str_sha);
+        SocketPerso socket_client = null;
+        ResultSet rs = null;
+        String pseudo = null;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
+                    "serveur_db?user=serveur&password=Master2004$")) {
+                //System.out.println("connected");
+                Statement stmt = conn.createStatement();
+
+                rs = stmt.executeQuery(
+                        "SELECT `password` " +
+                                "FROM users WHERE pseudo ='" + str_sha +"'");
+
+                if (!rs.wasNull()) {
+                    while (rs.next()) {
+                        String passwd = rs.getString("password");
+                        if(AES_Perso.decrypt(passwd, str_sha).equals(args.get(1))){
+                            //System.out.println(pseudo);
+                            socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), args.get(0));
+                            stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='"+ args.get(0)+"'");
+                        }
+
                     }
 
                     conn.close();
