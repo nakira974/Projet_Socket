@@ -181,8 +181,8 @@ class LogUser {
                 rs = stmt.executeQuery(
                         "SELECT `password` " +
                                 "FROM users WHERE pseudo ='" + str_sha +"'");
-
                 if (!rs.wasNull()) {
+
                     while (rs.next()) {
                         String passwd = rs.getString("password");
                         if(AES_Perso.decrypt(passwd, str_sha).equals(args.get(1))){
