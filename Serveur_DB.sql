@@ -1,9 +1,10 @@
+-- Author nakira974
 -- phpMyAdmin SQL Dump
 -- version 4.7.9
 -- https://www.phpmyadmin.net/
 --
--- Host: mysql-serveur.alwaysdata.net
--- Generation Time: Feb 19, 2021 at 08:22 PM
+-- Host: mysql-serveur
+-- Generation Time: Feb 22, 2021 at 02:23 AM
 -- Server version: 10.5.8-MariaDB
 -- PHP Version: 7.2.29
 
@@ -31,19 +32,55 @@ USE `serveur_db`;
 --
 
 DROP TABLE IF EXISTS `groupes`;
-CREATE TABLE `groupes` (
-                           `groupe_uuid` int(11) NOT NULL,
-                           `nom` int(11) NOT NULL,
-                           `nb_user_online` int(11) DEFAULT NULL,
-                           `user_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS `groupes` (
+    `groupe_uuid` int(11) NOT NULL AUTO_INCREMENT,
+    `nom` int(11) NOT NULL DEFAULT 11,
+    `administrator` int(11) NOT NULL DEFAULT 11,
+    PRIMARY KEY (`groupe_uuid`),
+    UNIQUE KEY `groupes_administrator_uindex` (`administrator`),
+    UNIQUE KEY `groupes_nom_uindex` (`nom`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `groupes`
 --
 
-INSERT INTO `groupes` (`groupe_uuid`, `nom`, `nb_user_online`, `user_id`) VALUES
-(1, 1804, NULL, 5);
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `GroupesMembres`
+--
+
+DROP TABLE IF EXISTS `GroupesMembres`;
+CREATE TABLE IF NOT EXISTS `GroupesMembres` (
+    `membre_uuid` int(11) NOT NULL AUTO_INCREMENT,
+    `groupe` int(11) NOT NULL,
+    `membre` int(11) NOT NULL,
+    PRIMARY KEY (`membre_uuid`),
+    KEY `GroupesMembres_groupes_groupe_uuid_fk` (`groupe`),
+    KEY `GroupesMembres_users_user_uuid_fk` (`membre`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `GroupesMembres`
+--
+
+
+--
+-- Triggers `GroupesMembres`
+--
+DROP TRIGGER IF EXISTS `MembreDuplicate`;
+DELIMITER $$
+CREATE TRIGGER `MembreDuplicate` BEFORE INSERT ON `GroupesMembres` FOR EACH ROW BEGIN
+    IF (SELECT COUNT(membre) FROM GroupesMembres WHERE groupe = NEW.groupe AND membre = NEW.membre)  > 0 THEN
+        signal sqlstate '45000'
+        set message_text='Erreurr! Utilisateur déjà dans le groupe !';
+END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -52,53 +89,23 @@ INSERT INTO `groupes` (`groupe_uuid`, `nom`, `nb_user_online`, `user_id`) VALUES
 --
 
 DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
-                         `user_uuid` int(11) NOT NULL,
-                         `pseudo` varchar(16) DEFAULT NULL,
-                         `password` varchar(255) NOT NULL,
-                         `email` varchar(255) NOT NULL,
-                         `dt_last_connection` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS `users` (
+    `user_uuid` int(11) NOT NULL AUTO_INCREMENT,
+    `pseudo` varchar(16) DEFAULT NULL,
+    `password` varchar(255) NOT NULL,
+    `email` varchar(255) NOT NULL,
+    `dt_last_connection` date DEFAULT NULL,
+    `isConnected` tinyint(1) NOT NULL,
+    PRIMARY KEY (`user_uuid`),
+    UNIQUE KEY `user_uuid_uindex` (`user_uuid`),
+    UNIQUE KEY `user_pseudo` (`pseudo`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
 --
 
---
--- Indexes for dumped tables
---
 
---
--- Indexes for table `groupes`
---
-ALTER TABLE `groupes`
-    ADD PRIMARY KEY (`groupe_uuid`),
-  ADD UNIQUE KEY `groupe_nom` (`nom`),
-  ADD KEY `groupes_user_fk` (`user_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-    ADD PRIMARY KEY (`user_uuid`),
-  ADD UNIQUE KEY `user_uuid_uindex` (`user_uuid`);
-ADD UNIQUE KEY `user_pseudo`(`pseudo`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `groupes`
---
-ALTER TABLE `groupes`
-    MODIFY `groupe_uuid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-    MODIFY `user_uuid` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Constraints for dumped tables
@@ -108,7 +115,14 @@ ALTER TABLE `users`
 -- Constraints for table `groupes`
 --
 ALTER TABLE `groupes`
-    ADD CONSTRAINT `groupes_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_uuid`) ON DELETE CASCADE;
+    ADD CONSTRAINT `groupes_users_user_uuid_fk` FOREIGN KEY (`administrator`) REFERENCES `users` (`user_uuid`);
+
+--
+-- Constraints for table `GroupesMembres`
+--
+ALTER TABLE `GroupesMembres`
+    ADD CONSTRAINT `GroupesMembres_groupes_groupe_uuid_fk` FOREIGN KEY (`groupe`) REFERENCES `groupes` (`groupe_uuid`),
+  ADD CONSTRAINT `GroupesMembres_users_user_uuid_fk` FOREIGN KEY (`membre`) REFERENCES `users` (`user_uuid`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
