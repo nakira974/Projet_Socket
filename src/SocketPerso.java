@@ -201,7 +201,7 @@ class ClientServiceThread extends Thread {
                         }));
         current_grp = new Groupe(groupe, current_usr[0], client);
         Socket_Serveur.groupes.add(current_grp);
-        System.out.println("Group : " + current_grp._name + " has been created by : " + current_usr[0]._username);
+        System.out.println("[GROUP] : " + current_grp._name + " has been created by : " + current_usr[0]._username);
     }
 
     private void writePrivate(String[] sender, String destination, String msg) throws IOException {
