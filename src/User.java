@@ -42,8 +42,7 @@ class LogUser {
     }
 
 
-    public static byte[] getSHA(String input) throws NoSuchAlgorithmException
-    {
+    public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
         MessageDigest md = MessageDigest.getInstance("MD5");
 
@@ -189,7 +188,7 @@ class LogUser {
                         if(AES_Perso.decrypt(passwd, str_sha).equals(args.get(1))){
                             //System.out.println(pseudo);
                             socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), args.get(0));
-                            stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='"+ args.get(0)+"'");
+                            stmt.executeQuery("UPDATE users SET isConnected=1 WHERE pseudo='"+ str_sha+"'");
                         }
 
                     }

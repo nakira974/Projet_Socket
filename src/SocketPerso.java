@@ -6,12 +6,19 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
 
 class Socket_Serveur {
 
@@ -102,26 +109,32 @@ class ClientServiceThread extends Thread {
                 Statement stmt = conn.createStatement();
 
 
-                rs = stmt.executeUpdate("UPDATE users SET isConnected= 0 where isConnected =1");
+                stmt.executeUpdate("UPDATE users SET isConnected= 0 where isConnected =1");
 
-                System.out.println("You've been registered on : "+ conn);
+                System.out.println("[SQL] User has been disconnected from : "+ conn);
             } catch (SQLException | ClassNotFoundException ex1 ) {
                 ex1.printStackTrace();
         }
 
     }
 
-    private void setUserDown(){
+    private void setUserDown() throws NoSuchAlgorithmException {
 
+        byte[] sha256;
         final String[] currentUser = {null};
+        String result="";
 
 
         Socket_Serveur.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
                         .forEach(username -> {
-                            currentUser[0] = String.valueOf(username.getValue());;
+                            currentUser[0] = username.getValue()._username;
+
                         }));
+        sha256=getSHA(currentUser[0]);
+        currentUser[0]=toHexString(sha256);
+        result=currentUser[0];
         ResultSet rs ;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -134,9 +147,10 @@ class ClientServiceThread extends Thread {
             Statement stmt = conn.createStatement();
 
 
-            rs = stmt.executeQuery("UPDATE users SET isConnected= 0 where isConnected =1 AND pseudo="+currentUser[0]);
 
-            System.out.println("You've been registered on : "+ conn);
+            stmt.executeUpdate( "UPDATE users SET isConnected=0 WHERE pseudo='"+ result+"'");
+
+            System.out.println("[SQL] User has been disconnected on : "+ conn);
         } catch (SQLException | ClassNotFoundException ex1 ) {
             ex1.printStackTrace();
         }
@@ -189,7 +203,6 @@ class ClientServiceThread extends Thread {
         Socket_Serveur.groupes.add(current_grp);
         System.out.println("Group : " + current_grp._name + " has been created by : " + current_usr[0]._username);
     }
-
 
     private void writePrivate(String[] sender, String destination, String msg) throws IOException {
         Socket_Serveur.users //stream out of arraylist
@@ -309,7 +322,7 @@ class ClientServiceThread extends Thread {
                         }));
     }
 
-    private void clientExit(String clientCommand){
+    private void clientExit(String clientCommand) throws NoSuchAlgorithmException {
         runState = false;
         Socket_Serveur.sockets.remove(client);
         System.out.print("Stopping client thread for client :`\n ");
@@ -322,14 +335,48 @@ class ClientServiceThread extends Thread {
             }
         }
 
-        for (int i = 0; i < Socket_Serveur.users.size(); i++) {
             //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
-            setUserDown();
-            Socket_Serveur.users.get(i).remove(client);
+        for(int i=0; i<Socket_Serveur.users.size();i++){
+            if(Socket_Serveur.users.get(i).containsKey(client)){
+                setUserDown();
+                try{
+                    Socket_Serveur.users.remove(i);
+                }catch(IndexOutOfBoundsException ex){
+                    ex.printStackTrace();
+                }
+            }
         }
+
 
         System.out.println("Client(s) : " + Socket_Serveur.users.size());
     }
+
+    private static String toHexString(byte[] hash) {
+        // Convert byte array into signum representation
+        BigInteger number = new BigInteger(1, hash);
+
+        // Convert message digest into hex value
+        StringBuilder hexString = new StringBuilder(number.toString(16));
+
+        // Pad with leading zeros
+        while (hexString.length() < 32)
+        {
+            hexString.insert(0, '0');
+        }
+
+        return hexString.toString();
+    }
+
+    public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
+        // Static getInstance method is called with hashing SHA
+        MessageDigest md = MessageDigest.getInstance("MD5");
+
+        // digest() method called
+        // to calculate message digest of an input
+        // and return array of byte
+        return md.digest(input.getBytes(StandardCharsets.UTF_8));
+    }
+
 
     private void serverStop() throws IOException {
         System.out.print("Server has already stopped");
