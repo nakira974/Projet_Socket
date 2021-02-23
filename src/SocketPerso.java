@@ -477,6 +477,7 @@ public class SocketPerso {
         return this._username;
     }
 
+
     public Socket getSocket() {
         return this.socket;
     }
