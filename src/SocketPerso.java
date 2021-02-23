@@ -330,7 +330,7 @@ class ClientServiceThread extends Thread {
             //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
             if (Socket_Serveur.users.get(i).containsKey(client)) {
                 Socket_Serveur.quit();
-                System.out.println("[BROADCAST] Client : " + Socket_Serveur.users.get(i).toString()
+                System.out.println("[CLIENT EXIT] Client : " + Socket_Serveur.users.get(i).toString()
                         + " Disconnected");
             }
         }
