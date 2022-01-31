@@ -57,8 +57,8 @@ class LogUser {
         ResultSet rs = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
-                    "serveur_db?user=serveur&password=Master2004$");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("Requête de création d'utilisateur en cours d'execution...");
 
@@ -94,8 +94,8 @@ class LogUser {
         ResultSet rs = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
-                    "serveur_db?user=serveur&password=Master2004$");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("Requête de création d'utilisateur en cours d'execution...");
 
@@ -125,8 +125,8 @@ class LogUser {
         String pseudo = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
-                    "serveur_db?user=serveur&password=Master2004$")) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123")) {
                 //System.out.println("connected");
                 Statement stmt = conn.createStatement();
 
@@ -173,8 +173,8 @@ class LogUser {
         String pseudo = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
-                    "serveur_db?user=serveur&password=Master2004$")) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123")) {
                 //System.out.println("connected");
                 Statement stmt = conn.createStatement();
 

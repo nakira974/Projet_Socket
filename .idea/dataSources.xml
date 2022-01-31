@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="serveur_db@mysql-serveur.alwaysdata.net" uuid="1df03445-5dcf-48d8-99dd-428a4805b990">
+    <data-source source="LOCAL" name="wizle_test@mysql-wizle.alwaysdata.net" uuid="37d53508-8361-4ca9-a68c-cbc2cd594586">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mariadb://mysql-serveur.alwaysdata.net:3306/serveur_db</jdbc-url>
+      <jdbc-url>jdbc:mariadb://mysql-wizle.alwaysdata.net:3306/wizle_test</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

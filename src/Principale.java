@@ -40,12 +40,15 @@ public class Principale {
 
     static String _str;
 
-    private static void register(ArrayList<String> args, IOCommandes command) throws Exception {
+    private static ArrayList<String> register(ArrayList<String> args, IOCommandes command) throws Exception {
         byte[] sha256;
+
+        ArrayList<String> result = new ArrayList<>();
         System.out.println("------REGISTER-----");
         LogUser logger = new LogUser();
         System.out.println("Nom d'utilisateur : ");
         _str = command.lireEcran();
+        result.add(_str);
         //ON ENCRYPTE LE NOM USER EN SHA256
         sha256=getSHA(_str);
         _str=toHexString(sha256);
@@ -53,14 +56,18 @@ public class Principale {
         //FIN ENCRYPTAGE
         System.out.println("Mot de passe : ");
         _str= command.lireEcran();
+        result.add(_str);
         //ON ENCRYPTE LE MDP EN AES256(mdp, pseudo_en_sha256)
         _str=AES_Perso.encrypt(_str , toHexString(sha256));
         args.add(_str);
         //FIN AES 256
         System.out.println("email : ");
         _str = command.lireEcran();
+        result.add(_str);
         args.add(_str);
         logger.createUser(args);
+
+        return result;
     }
 
 
@@ -81,19 +88,18 @@ public class Principale {
 
                 System.out.println("-(1) S'authentifier || S'enregistrer (2)-");
                 msg = commandes.lireEcran();
-                if(msg.equals("2")){
-                   register(userInfo, commandes);
+                if(msg.equals("1")){
+                    //LOGIN
+                    System.out.println("------LOGIN-----");
+                    System.out.println("Nom d'utilisateur : ");
+                    msg = commandes.lireEcran();
+                    userInfo.add(msg);
+                    System.out.println("Mot de passe : ");
+                    msg = commandes.lireEcran();
+                    userInfo.add(msg);
+                }else if(msg.equals("2")){
+                    userInfo = register(userInfo, commandes);
                 }
-
-
-                //LOGIN
-                System.out.println("------LOGIN-----");
-                System.out.println("Nom d'utilisateur : ");
-                msg = commandes.lireEcran();
-                userInfo.add(msg);
-                System.out.println("Mot de passe : ");
-                msg = commandes.lireEcran();
-                userInfo.add(msg);
                 try{
                     LogUser log= new LogUser();
                     //do{

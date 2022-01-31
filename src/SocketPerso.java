@@ -100,8 +100,8 @@ class ClientServiceThread extends Thread {
             int rs ;
             try {
                 Class.forName("org.mariadb.jdbc.Driver");
-                Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
-                        "serveur_db?user=serveur&password=Master2004$");
+                Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                        "wizle_test?user=wizle&password=projettest123");
 
                 System.out.println("[SQL] Exiting users...");
 
@@ -138,8 +138,8 @@ class ClientServiceThread extends Thread {
         ResultSet rs ;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-serveur.alwaysdata.net/" +
-                    "serveur_db?user=serveur&password=Master2004$");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("[SQL] Exiting users...");
 
