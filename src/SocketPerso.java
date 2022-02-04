@@ -83,13 +83,7 @@ class Socket_Serveur {
     }
 
     public void ecrireFichierSocket(String path, Socket client) throws IOException {
-        /*File myFile = new File(path);
-        byte[] mybytearray = new byte[(int) myFile.length()];
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
-        bis.read(mybytearray, 0, mybytearray.length);
-        OutputStream os = this.socket.getOutputStream();
-        os.write(mybytearray, 0, mybytearray.length);
-        os.flush();*/
+
         OutputStreamWriter writer = new OutputStreamWriter(client.getOutputStream(), "UTF-8");
 
 
@@ -101,13 +95,7 @@ class Socket_Serveur {
     }
 
     public void ecrireFichierSocket(String path, ArrayList<Socket> clients) throws IOException {
-        /*File myFile = new File(path);
-        byte[] mybytearray = new byte[(int) myFile.length()];
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
-        bis.read(mybytearray, 0, mybytearray.length);
-        OutputStream os = this.socket.getOutputStream();
-        os.write(mybytearray, 0, mybytearray.length);
-        os.flush();*/
+
         for (Socket socket : clients) {
             OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
 
@@ -573,21 +561,22 @@ public class SocketPerso {
 
     }
 
-    public void ecrireFichierSocket(String path) throws IOException {
-        /*File myFile = new File(path);
-        byte[] mybytearray = new byte[(int) myFile.length()];
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
-        bis.read(mybytearray, 0, mybytearray.length);
-        OutputStream os = this.socket.getOutputStream();
-        os.write(mybytearray, 0, mybytearray.length);
-        os.flush();*/
-        OutputStreamWriter writer = new OutputStreamWriter(this.socket.getOutputStream(), "UTF-8");
+    public void ecrireFichierSocket(String filename) throws IOException {
+
+        File myFile = new File(filename);
+        byte[] bFile = new byte[(int) myFile.length()];
+        FileInputStream fileInputStream = new FileInputStream(myFile);
+        fileInputStream.read(bFile);
+        fileInputStream.close();
+            OutputStreamWriter writer = new OutputStreamWriter(this.socket.getOutputStream(), "UTF-8");
 
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("test", path);
-        writer.write(jsonObject.toString());
-        writer.flush();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name", filename);
+            jsonObject.put("size", Files.size(myFile.toPath())/1024);
+            jsonObject.put("content", bFile);
+            writer.write(jsonObject.toString());
+            writer.flush();
 
     }
 
@@ -655,19 +644,6 @@ public class SocketPerso {
             return line;
         }
 
-        //jsonObject.put("test", "test");
-        //writer.write(jsonObject.toString());
-
-
-        /*byte[] mybytearray = new byte[1024];
-        InputStream is = this.socket.getInputStream();
-        FileOutputStream fos = new FileOutputStream("s.pdf");
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        int bytesRead = is.read(mybytearray, 0, mybytearray.length);
-        bos.write(mybytearray, 0, bytesRead);
-        bos.close();
-        return new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();*/
-
     }
 
     static class Thread_Client_Receive extends Thread {
@@ -683,8 +659,8 @@ public class SocketPerso {
 
             try {
                 do {
-                    String val = client.lireFichierSocket();
-                    //String val = client.lireSocket();
+                    //String val = client.lireFichierSocket();
+                    String val = client.lireSocket();
                     if (val.contains("END")) {
 
                         System.exit(0);
@@ -726,7 +702,8 @@ public class SocketPerso {
                         //socket.ecrireSocket("{dest:[" + destination + "], msg:[" + msg + "]}");
                         if(msg.contains("/file:")){
                             String[] test = msg.split(":");
-                            checkFilesFromServer();
+                            //TODO terminer le check des fichiers
+                            //checkFilesFromServer();
                             socket.ecrireFichierSocket(test[1]);
                         }
                         socket.ecrireSocket(msg);
