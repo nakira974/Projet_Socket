@@ -1,13 +1,13 @@
-
 import java.util.Base64;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
-public class AES_Perso extends Abstract_AES_Perso
-{
+public class AES_Perso extends Abstract_AES_Perso {
     /**
      * Encrypt text with the passphrase
-     * @param input Input text to encrypt
+     *
+     * @param input      Input text to encrypt
      * @param passphrase The passphrase
      * @return A base64 encoded string containing the encrypted data
      * @throws Exception Throws exceptions
@@ -18,7 +18,8 @@ public class AES_Perso extends Abstract_AES_Perso
 
     /**
      * Encrypt text in bytes with the passphrase
-     * @param input Input data in bytes to encrypt
+     *
+     * @param input      Input data in bytes to encrypt
      * @param passphrase The passphrase in bytes
      * @return A base64 encoded bytes containing the encrypted data
      * @throws Exception Throws exceptions
@@ -29,7 +30,8 @@ public class AES_Perso extends Abstract_AES_Perso
 
     /**
      * Decrypt encrypted base64 encoded text in bytes
-     * @param crypted Text in bytes to decrypt
+     *
+     * @param crypted    Text in bytes to decrypt
      * @param passphrase The passphrase in bytes
      * @return Decrypted data in bytes
      * @throws Exception Throws exceptions
@@ -40,7 +42,8 @@ public class AES_Perso extends Abstract_AES_Perso
 
     /**
      * Decrypt encrypted base64 encoded text in bytes
-     * @param crypted Text in bytes to decrypt
+     *
+     * @param crypted    Text in bytes to decrypt
      * @param passphrase The passphrase in bytes
      * @return Decrypted data in bytes
      * @throws Exception Throws exceptions
