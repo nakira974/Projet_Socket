@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="wizle_test@mysql-wizle.alwaysdata.net" uuid="37d53508-8361-4ca9-a68c-cbc2cd594586">
+    <data-source source="LOCAL" name="MariaDB - wizle_test@mysql-wizle.alwaysdata.net" uuid="37d53508-8361-4ca9-a68c-cbc2cd594586">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
