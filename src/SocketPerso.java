@@ -3,6 +3,8 @@
  */
 
 import org.json.JSONArray;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -20,7 +22,10 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Locale;
 
 class Socket_Serveur {
 
@@ -78,8 +83,16 @@ class Socket_Serveur {
     }
 
     public void ecrireFichierSocket(String path, Socket client) throws IOException {
-
+        /*File myFile = new File(path);
+        byte[] mybytearray = new byte[(int) myFile.length()];
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
+        bis.read(mybytearray, 0, mybytearray.length);
+        OutputStream os = this.socket.getOutputStream();
+        os.write(mybytearray, 0, mybytearray.length);
+        os.flush();*/
         OutputStreamWriter writer = new OutputStreamWriter(client.getOutputStream(), "UTF-8");
+
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("test", path);
         writer.write(jsonObject.toString());
@@ -88,8 +101,17 @@ class Socket_Serveur {
     }
 
     public void ecrireFichierSocket(String path, ArrayList<Socket> clients) throws IOException {
+        /*File myFile = new File(path);
+        byte[] mybytearray = new byte[(int) myFile.length()];
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
+        bis.read(mybytearray, 0, mybytearray.length);
+        OutputStream os = this.socket.getOutputStream();
+        os.write(mybytearray, 0, mybytearray.length);
+        os.flush();*/
         for (Socket socket : clients) {
             OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+
+
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("test", path);
             writer.write(jsonObject.toString());
@@ -559,19 +581,56 @@ public class SocketPerso {
 
     }
 
-    public void ecrireFichierSocket(String filename) throws IOException {
-        File myFile = new File(filename);
-        byte[] bFile = new byte[(int) myFile.length()];
-            FileInputStream fileInputStream = new FileInputStream(myFile);
-            fileInputStream.read(bFile);
-            fileInputStream.close();
+    public void ecrireFichierSocket(String path) throws IOException {
+        /*File myFile = new File(path);
+        byte[] mybytearray = new byte[(int) myFile.length()];
+        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
+        bis.read(mybytearray, 0, mybytearray.length);
+        OutputStream os = this.socket.getOutputStream();
+        os.write(mybytearray, 0, mybytearray.length);
+        os.flush();*/
         OutputStreamWriter writer = new OutputStreamWriter(this.socket.getOutputStream(), "UTF-8");
+
+
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", filename);
-        jsonObject.put("size", Files.size(myFile.toPath())/1024);
-        jsonObject.put("content", bFile);
+        jsonObject.put("test", path);
         writer.write(jsonObject.toString());
         writer.flush();
+
+    }
+
+    @Contract(pure = true)
+    public static @NotNull
+    String getRootPath(){
+        return "C:\\temp\\CdProject";
+    }
+
+    public static File[] getRootFiles(String location){
+        //Creating a File object for directory
+        File directoryPath = new File(location);
+        //List of all files and directories
+        return directoryPath.listFiles();
+    }
+
+    public static void checkFilesFromServer(){
+        File[] remoteFiles = null;
+        File[] missingFiles = new File[]{};
+        int count = 0;
+        //TODO récupérer la liste des fichiers sur le serveur
+
+        var localFiles = getRootFiles(getRootPath());
+        for(var localFile : localFiles){
+            for(var remoteFile : remoteFiles){
+                count = !localFile.getPath().equals(remoteFile.getPath()) ? count++ : count;
+                Arrays.stream(missingFiles).toList().add(localFile);
+            }
+        }
+
+        if(missingFiles.length == 0) return;
+        for(var i = 0; i < count; i++){
+            //TODO télécharger les fichiers manquants
+
+        }
 
     }
 
@@ -604,6 +663,19 @@ public class SocketPerso {
             return line;
         }
 
+        //jsonObject.put("test", "test");
+        //writer.write(jsonObject.toString());
+
+
+        /*byte[] mybytearray = new byte[1024];
+        InputStream is = this.socket.getInputStream();
+        FileOutputStream fos = new FileOutputStream("s.pdf");
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        int bytesRead = is.read(mybytearray, 0, mybytearray.length);
+        bos.write(mybytearray, 0, bytesRead);
+        bos.close();
+        return new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();*/
+
     }
 
     static class Thread_Client_Receive extends Thread {
@@ -619,8 +691,8 @@ public class SocketPerso {
 
             try {
                 do {
-                    //String val = client.lireFichierSocket();
-                    String val = client.lireSocket();
+                    String val = client.lireFichierSocket();
+                    //String val = client.lireSocket();
                     if (val.contains("END")) {
 
                         System.exit(0);
@@ -662,10 +734,10 @@ public class SocketPerso {
                         //socket.ecrireSocket("{dest:[" + destination + "], msg:[" + msg + "]}");
                         if(msg.contains("/file:")){
                             String[] test = msg.split(":");
+                            checkFilesFromServer();
                             socket.ecrireFichierSocket(test[1]);
                         }
-                            socket.ecrireSocket(msg);
-
+                        socket.ecrireSocket(msg);
                     }
 
 
