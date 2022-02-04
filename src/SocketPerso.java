@@ -2,6 +2,8 @@
  --- creators : nakira974 && Weefle  ----
  */
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -570,6 +572,41 @@ public class SocketPerso {
 
     }
 
+    @Contract(pure = true)
+    public static @NotNull
+    String getRootPath(){
+        return "C:\\temp\\CdProject";
+    }
+
+    public static File[] getRootFiles(String location){
+        //Creating a File object for directory
+        File directoryPath = new File(location);
+        //List of all files and directories
+        return directoryPath.listFiles();
+    }
+
+    public static void checkFilesFromServer(){
+        File[] remoteFiles = null;
+        File[] missingFiles = new File[]{};
+        int count = 0;
+        //TODO récupérer la liste des fichiers sur le serveur
+
+        var localFiles = getRootFiles(getRootPath());
+        for(var localFile : localFiles){
+            for(var remoteFile : remoteFiles){
+                count = !localFile.getPath().equals(remoteFile.getPath()) ? count++ : count;
+                Arrays.stream(missingFiles).toList().add(localFile);
+            }
+        }
+
+        if(missingFiles.length == 0) return;
+        for(var i = 0; i < count; i++){
+            //TODO télécharger les fichiers manquants
+
+        }
+
+    }
+
     public void envoyerPseudo(String pseudo) throws IOException {
 
 
@@ -670,6 +707,7 @@ public class SocketPerso {
                         //socket.ecrireSocket("{dest:[" + destination + "], msg:[" + msg + "]}");
                         if(msg.contains("/file:")){
                             String[] test = msg.split(":");
+                            checkFilesFromServer();
                             socket.ecrireFichierSocket(test[1]);
                         }
                         socket.ecrireSocket(msg);
