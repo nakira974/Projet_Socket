@@ -2,22 +2,25 @@
  --- creators : nakira974 && Weefle  ----
  */
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 class Socket_Serveur {
 
@@ -75,16 +78,8 @@ class Socket_Serveur {
     }
 
     public void ecrireFichierSocket(String path, Socket client) throws IOException {
-        /*File myFile = new File(path);
-        byte[] mybytearray = new byte[(int) myFile.length()];
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
-        bis.read(mybytearray, 0, mybytearray.length);
-        OutputStream os = this.socket.getOutputStream();
-        os.write(mybytearray, 0, mybytearray.length);
-        os.flush();*/
+
         OutputStreamWriter writer = new OutputStreamWriter(client.getOutputStream(), "UTF-8");
-
-
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("test", path);
         writer.write(jsonObject.toString());
@@ -93,17 +88,8 @@ class Socket_Serveur {
     }
 
     public void ecrireFichierSocket(String path, ArrayList<Socket> clients) throws IOException {
-        /*File myFile = new File(path);
-        byte[] mybytearray = new byte[(int) myFile.length()];
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
-        bis.read(mybytearray, 0, mybytearray.length);
-        OutputStream os = this.socket.getOutputStream();
-        os.write(mybytearray, 0, mybytearray.length);
-        os.flush();*/
         for (Socket socket : clients) {
             OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
-
-
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("test", path);
             writer.write(jsonObject.toString());
@@ -129,15 +115,36 @@ class Socket_Serveur {
         String line = reader.readLine();
         if(line.contains("{") && line.contains("}")){
             JSONObject jsonObject = new JSONObject(line);
+            String name = (String) jsonObject.get("name");
+            int size = (int) jsonObject.get("size");
+            JSONArray content = jsonObject.getJSONArray("content");
+            byte[] data = new byte[content.length()];
+            for (int i=0;i<content.length();i++){
+                data[i] = ((Integer)content.get(i)).byteValue();
+            }
+            FileOutputStream out = new FileOutputStream(name+"_");
+            out.write(data);
+            out.close();
+
             return jsonObject.toString();
         }else{
             return line;
         }
-        //return new BufferedReader(new InputStreamReader(client.getInputStream())).readLine();
+
 
     }
-
+    public static int[] convertIntegers(List<Integer> integers)
+    {
+        int[] ret = new int[integers.size()];
+        for (int i=0; i < ret.length; i++)
+        {
+            ret[i] = integers.get(i).intValue();
+        }
+        return ret;
+    }
 }
+
+
 
 class ClientServiceThread extends Thread {
 
@@ -552,19 +559,17 @@ public class SocketPerso {
 
     }
 
-    public void ecrireFichierSocket(String path) throws IOException {
-        /*File myFile = new File(path);
-        byte[] mybytearray = new byte[(int) myFile.length()];
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(myFile));
-        bis.read(mybytearray, 0, mybytearray.length);
-        OutputStream os = this.socket.getOutputStream();
-        os.write(mybytearray, 0, mybytearray.length);
-        os.flush();*/
+    public void ecrireFichierSocket(String filename) throws IOException {
+        File myFile = new File(filename);
+        byte[] bFile = new byte[(int) myFile.length()];
+            FileInputStream fileInputStream = new FileInputStream(myFile);
+            fileInputStream.read(bFile);
+            fileInputStream.close();
         OutputStreamWriter writer = new OutputStreamWriter(this.socket.getOutputStream(), "UTF-8");
-
-
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("test", path);
+        jsonObject.put("name", filename);
+        jsonObject.put("size", Files.size(myFile.toPath())/1024);
+        jsonObject.put("content", bFile);
         writer.write(jsonObject.toString());
         writer.flush();
 
@@ -599,19 +604,6 @@ public class SocketPerso {
             return line;
         }
 
-        //jsonObject.put("test", "test");
-        //writer.write(jsonObject.toString());
-
-
-        /*byte[] mybytearray = new byte[1024];
-        InputStream is = this.socket.getInputStream();
-        FileOutputStream fos = new FileOutputStream("s.pdf");
-        BufferedOutputStream bos = new BufferedOutputStream(fos);
-        int bytesRead = is.read(mybytearray, 0, mybytearray.length);
-        bos.write(mybytearray, 0, bytesRead);
-        bos.close();
-        return new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();*/
-
     }
 
     static class Thread_Client_Receive extends Thread {
@@ -627,8 +619,8 @@ public class SocketPerso {
 
             try {
                 do {
-                    String val = client.lireFichierSocket();
-                    //String val = client.lireSocket();
+                    //String val = client.lireFichierSocket();
+                    String val = client.lireSocket();
                     if (val.contains("END")) {
 
                         System.exit(0);
@@ -672,7 +664,8 @@ public class SocketPerso {
                             String[] test = msg.split(":");
                             socket.ecrireFichierSocket(test[1]);
                         }
-                        socket.ecrireSocket(msg);
+                            socket.ecrireSocket(msg);
+
                     }
 
 
