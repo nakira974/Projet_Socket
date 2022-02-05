@@ -1,3 +1,5 @@
+package Projet_Socket;
+
 import java.io.*;
 
 public class SerializationUtil {

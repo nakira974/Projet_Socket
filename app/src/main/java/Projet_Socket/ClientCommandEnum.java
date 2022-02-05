@@ -1,3 +1,5 @@
+package Projet_Socket;
+
 public enum ClientCommandEnum {
     CreateSharingSpace("/createSharingSpace"),
     Quit("quit"),

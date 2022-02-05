@@ -1,4 +1,4 @@
-/*
+package Projet_Socket;/*
  --- creators : nakira974 && Weefle  ----
  */
 
@@ -135,7 +135,6 @@ class Socket_Serveur {
                 currentGroup.name = rs.getString("nom");
                 results.add(currentGroup);
             }
-            System.out.println("[SQL] User has been disconnected from : " + conn);
         } catch (SQLException | ClassNotFoundException ex1) {
             ex1.printStackTrace();
         }
@@ -168,7 +167,6 @@ class Socket_Serveur {
             }
 
             Socket_Serveur.groupes.addAll(results);
-            System.out.println("[SQL] User has been disconnected from : " + conn);
         } catch (SQLException | ClassNotFoundException ex1) {
             ex1.printStackTrace();
         }
@@ -182,7 +180,7 @@ class Socket_Serveur {
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("[SQL] CLOUD SPACE CREATION REQUEST for "+ groupeName+ "...");
+            System.out.println("[SQL] GET GROUP ID REQUEST REQUEST for "+ groupeName+ "...");
 
 
             Statement stmt = conn.createStatement();
@@ -194,7 +192,6 @@ class Socket_Serveur {
                 groupId = rs.getInt("groupe_uuid");
             }
 
-            System.out.println("[SQL] User has been disconnected from : " + conn);
         } catch (SQLException | ClassNotFoundException ex1) {
             ex1.printStackTrace();
         }
@@ -209,7 +206,7 @@ class Socket_Serveur {
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("[SQL] CLOUD SPACE IDENTIFY PROCESS for "+ userMail+ "...");
+            System.out.println("[SQL] GET USER ID for "+ userMail+ "...");
 
 
             Statement stmt = conn.createStatement();
@@ -221,7 +218,7 @@ class Socket_Serveur {
                 userId = rs.getInt("user_uuid");
             }
 
-            System.out.println("[SQL] User has been disconnected from : " + conn);
+            System.out.println("[SQL] USER "+userMail+" is : " + userId);
         } catch (SQLException | ClassNotFoundException ex1) {
             ex1.printStackTrace();
         }

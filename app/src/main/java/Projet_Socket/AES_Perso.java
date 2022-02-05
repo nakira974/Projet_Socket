@@ -1,3 +1,5 @@
+package Projet_Socket;
+
 import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;

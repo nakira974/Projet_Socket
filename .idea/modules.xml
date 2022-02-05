@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Projet_Socket.iml" filepath="$PROJECT_DIR$/Projet_Socket.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Projet_Socket.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Projet_Socket.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Projet_Socket.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Projet_Socket.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Projet_Socket.app.test.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Projet_Socket.app.test.iml" />
     </modules>
   </component>
 </project>
