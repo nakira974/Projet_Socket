@@ -1,3 +1,5 @@
+package Projet_Socket;
+
 public class FileObject {
 
     private String name;
