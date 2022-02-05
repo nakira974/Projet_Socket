@@ -71,38 +71,9 @@ public class FileServer extends Thread {
         _isServerRunning = false;
     }
 
-    public void CreateCloudSubscription(int currentGroupeId) throws Exception {
-        String path = "C:\\temp\\"+currentGroupeId+"\\";
-        //Creating a File object
-        File file = new File(path);
-        //Creating the directory
-        boolean bool = file.mkdir();
-        int groupId=0;
-        SocketPerso socket_client = null;
-        ResultSet rs = null;
-        String pseudo = null;
-        Statement stmt = null;
-        try {
-            Class.forName("org.mariadb.jdbc.Driver");
-            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
-                    "wizle_test?user=wizle&password=projettest123")) {
-                //System.out.println("connected");
-                stmt = conn.createStatement();
 
-                rs = stmt.executeQuery(
-                        "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES ('" + groupId + "','" + path + "');");
 
-            } catch (Exception e) {
-                if (rs == null) {
-                    System.err.println("Erreur de création d'un groupe de partage ! ");
-                    System.err.println("Erreur :\n" + (stmt != null ? stmt.getWarnings().getSQLState() : null));
-                }
-                System.err.println("Erreur de connexion au serveur de fichier...");
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
+
 
 
 }

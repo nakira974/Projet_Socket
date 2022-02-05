@@ -8,10 +8,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Principale {
 
+    public static final int FactoryPort = 5000;
     public static final String RootDirectory = "C:\\temp\\";
     static String _str;
 
@@ -63,6 +65,7 @@ public class Principale {
         //FIN AES 256
         System.out.println("email : ");
         _str = command.readKey();
+
         result.add(_str);
         args.add(_str);
         logger.createUser(args);
@@ -73,6 +76,7 @@ public class Principale {
 
     public static void main(String[] args) throws Exception {
 
+        String userMail = "";
         SocketPerso socket_client = null;
         Console console = new Console(new BufferedReader(new InputStreamReader(System.in)), System.out);
         String msg;
@@ -102,7 +106,9 @@ public class Principale {
             try {
                 LogUser log = new LogUser();
                 //do{
-                socket_client = log.newLogin(userInfo);
+                var hashtable = log.newLogin(userInfo);
+                socket_client = hashtable.keys().nextElement();
+                userMail = hashtable.get(socket_client);
 
                 //}while(socket_client != null);
             } catch (Exception ex) {
@@ -116,7 +122,7 @@ public class Principale {
                 receiver.start();
 
 
-                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client);
+                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client, userMail);
 
                 sender.start();
             } else {
@@ -128,12 +134,15 @@ public class Principale {
 
 
             String clientUsername = null;
-            Socket_Serveur.createServer(new ServerSocket(5000));
+            String clientMail = null;
+            Socket_Serveur.createServer(new ServerSocket(FactoryPort));
             //Si le msg contient %file% alors on lance un serveur de ficher en plus des autres services
             FileServer fileServerThread = msg.toUpperCase().contains("FILE") ?
                     new FileServer(RootDirectory ,console)
                     : null;
 
+            Socket_Serveur.getGroups();
+            System.out.printf("[INFO] Server has started at : %s port :%d%n", Socket_Serveur._srvSocket.getInetAddress().getHostAddress(), FactoryPort);
             while (!Socket_Serveur.getServer().isClosed()) {
                 try {
                     Socket client;
@@ -141,14 +150,32 @@ public class Principale {
                         client = Socket_Serveur.acceptClient();
                         if (client != null) {
                             try {
-                                clientUsername = Socket_Serveur.readClientStream(client);
+
+                                String hello_request = Socket_Serveur.readClientStream(client);
+                                final User[] current_usr = {null};
+                                String[] text = hello_request.split(",");
+                                clientUsername = text[0];
+                                clientMail = text[1];
+                                HashMap<Socket, User> currentUser = new HashMap<>();
+                                currentUser.put(client, new User(clientUsername));
+                                Socket_Serveur.users.add(currentUser);
+                                int userId = Socket_Serveur.getUserId(clientMail);
+                                currentUser.get(client).Id = userId;
+                                currentUser.get(client).userMail = clientMail;
+                                currentUser.get(client).Groups = Socket_Serveur.getUserGroups(userId);
+                                Socket finalClient = client;
+                                Socket_Serveur.groupes.forEach(groupe -> {
+                                    currentUser.get(finalClient).Groups.forEach(usrGroup ->{
+                                        if(usrGroup.Id == groupe.Id)
+                                            groupe.groupeUsers.add(currentUser);
+                                    } );
+
+                                });
 
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-                            HashMap<Socket, User> currentUser = new HashMap<>();
-                            currentUser.put(client, new User(clientUsername));
-                            Socket_Serveur.users.add(currentUser);
+
                             ClientServiceThread cliThread = new ClientServiceThread(client);
 
 

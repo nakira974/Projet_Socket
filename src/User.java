@@ -15,6 +15,7 @@ import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 class LogUser {
 
@@ -87,35 +88,7 @@ class LogUser {
                         (SELECT user_uuid FROM users WHERE pseudo = 'nakiradu77'));
 
      */
-    public void joinGroup(ArrayList<String> args) throws ClassNotFoundException {
-        SocketPerso socket_client = null;
-        ResultSet rs = null;
-        try {
-            Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
-                    "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("Requête de création d'utilisateur en cours d'execution...");
-
-
-            Statement stmt = conn.createStatement();
-
-
-            rs = stmt.executeQuery(
-                    "INSERT INTO users (`pseudo`, `password`, `email`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '" + args.get(2) + "')");
-
-
-            System.out.println("You've been registered on : " + conn);
-        } catch (SQLException ex1) {
-            int code = ex1.getErrorCode();
-            if (code != 1062) {
-                ex1.printStackTrace();
-                return;
-            }
-            System.out.println("Nom d'utilisateur déjà pris.");
-        }
-
-    }
 
     public SocketPerso login(ArrayList<String> args) throws SQLException {
         SocketPerso socket_client = null;
@@ -159,7 +132,9 @@ class LogUser {
         return socket_client;
     }
 
-    public SocketPerso newLogin(ArrayList<String> args) throws Exception {
+    public Hashtable<SocketPerso, String> newLogin(ArrayList<String> args) throws Exception {
+        Hashtable<SocketPerso, String> result = new Hashtable<>();
+        String email = "";
         byte[] sha256;
         String str_sha;
         String str_aes;
@@ -177,7 +152,7 @@ class LogUser {
                 Statement stmt = conn.createStatement();
 
                 rs = stmt.executeQuery(
-                        "SELECT `password` " +
+                        "SELECT `password` ,`email` " +
                                 "FROM users WHERE pseudo ='" + str_sha + "'");
                 if (!rs.wasNull()) {
 
@@ -187,6 +162,7 @@ class LogUser {
                             //System.out.println(pseudo);
                             socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), args.get(0));
                             stmt.executeQuery("UPDATE users SET isConnected=1 WHERE pseudo='" + str_sha + "'");
+                            email = rs.getString("email");
                         }
 
                     }
@@ -207,23 +183,26 @@ class LogUser {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return socket_client;
+        result.put(socket_client, email);
+        return result;
     }
 }
 
 
 public class User {
 
-
+    public int Id;
+    public String userMail;
     public String _username;
     public LocalTime _lastConnection;
-
+    public ArrayList<Groupe> Groups;
     User() {
     }
     User(String username) {
         _username = username;
         LocalTime time = LocalTime.now();
         _lastConnection = time;
+        Groups = new ArrayList<>();
     }
 
     public String translateMessage(String message) {
@@ -287,21 +266,24 @@ public class User {
 
 
 class Groupe {
-    public static User _administrator;
-    public String _name;
+    public int Id;
+    public User administrator;
+    public int administratorId;
+    public String name;
     public ArrayList<HashMap<Socket, User>> groupeUsers;
 
     public Groupe() {
-        _name = "";
-        _administrator = new User();
+        name = "";
+        administrator = new User();
     }
 
     public Groupe(String name, User administrator, Socket admin_sock) {
+        administratorId = administrator.Id;
         groupeUsers = new ArrayList<>(10);
         HashMap<Socket, User> currentHash = new HashMap<>();
         currentHash.put(admin_sock, administrator);
-        _name = name;
-        _administrator = administrator;
+        this.name = name;
+        this.administrator = administrator;
         groupeUsers.add(currentHash);
     }
 

@@ -2,8 +2,6 @@
  --- creators : nakira974 && Weefle  ----
  */
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -18,17 +16,14 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
 class Socket_Serveur {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
     public static ArrayList<Groupe> groupes = new ArrayList<>();
     public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
-    private static ServerSocket _srvSocket;
+    public static ServerSocket _srvSocket;
     private static int maxConnection;
     private static int nb_socket;
 
@@ -110,6 +105,128 @@ class Socket_Serveur {
         }
 
 
+    }
+
+    public static ArrayList<Groupe> getUserGroups(int userId){
+        int groupId = 0;
+        ArrayList<Groupe> results = new ArrayList<>();
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
+
+            System.out.println("[SQL] SETTING GROUPS FOR USER ID N° "+ userId+ "...");
+
+
+            Statement stmt = conn.createStatement();
+
+
+            ResultSet rs  = stmt.executeQuery("SELECT groupId FROM group_users WHERE userId='" + userId + "'");
+
+            while (rs.next()) {
+                groupId = rs.getInt("groupId");
+            }
+
+            rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes WHERE groupe_uuid ="+groupId);
+            while (rs.next()) {
+                Groupe currentGroup = new Groupe();
+                currentGroup.Id =  rs.getInt("groupe_uuid");
+                currentGroup.administratorId =  rs.getInt("administrator");
+                currentGroup.name = rs.getString("nom");
+                results.add(currentGroup);
+            }
+            System.out.println("[SQL] User has been disconnected from : " + conn);
+        } catch (SQLException | ClassNotFoundException ex1) {
+            ex1.printStackTrace();
+        }
+        return results;
+    }
+
+    public static ArrayList<Groupe> getGroups(){
+        int groupId = 0;
+        ArrayList<Groupe> results = new ArrayList<>();
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
+
+            System.out.println("[SQL] FETCHING GROUPS FROM DATABASE...");
+
+
+            Statement stmt = conn.createStatement();
+
+
+            ResultSet rs  = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes");
+
+            while (rs.next()) {
+                Groupe currentGroup = new Groupe();
+                currentGroup.Id =  rs.getInt("groupe_uuid");
+                currentGroup.administratorId =  rs.getInt("administrator");
+                currentGroup.name = rs.getString("nom");
+                currentGroup.groupeUsers = new ArrayList<>();
+                results.add(currentGroup);
+            }
+
+            Socket_Serveur.groupes.addAll(results);
+            System.out.println("[SQL] User has been disconnected from : " + conn);
+        } catch (SQLException | ClassNotFoundException ex1) {
+            ex1.printStackTrace();
+        }
+        return results;
+    }
+
+    public static int getGroupId(String groupeName) {
+        int groupId = 0;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
+
+            System.out.println("[SQL] CLOUD SPACE CREATION REQUEST for "+ groupeName+ "...");
+
+
+            Statement stmt = conn.createStatement();
+
+
+            ResultSet rs  = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom='" + groupeName + "'");
+
+            while (rs.next()) {
+                groupId = rs.getInt("groupe_uuid");
+            }
+
+            System.out.println("[SQL] User has been disconnected from : " + conn);
+        } catch (SQLException | ClassNotFoundException ex1) {
+            ex1.printStackTrace();
+        }
+
+        return groupId;
+    }
+
+    public static int getUserId(String userMail) {
+        int userId = 0;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
+
+            System.out.println("[SQL] CLOUD SPACE IDENTIFY PROCESS for "+ userMail+ "...");
+
+
+            Statement stmt = conn.createStatement();
+
+
+            ResultSet rs  = stmt.executeQuery("SELECT user_uuid FROM users WHERE email='" + userMail + "'");
+
+            while (rs.next()) {
+                userId = rs.getInt("user_uuid");
+            }
+
+            System.out.println("[SQL] User has been disconnected from : " + conn);
+        } catch (SQLException | ClassNotFoundException ex1) {
+            ex1.printStackTrace();
+        }
+
+        return userId;
     }
 
     public void sendFileBroadcast(String path, Socket client) throws IOException {
@@ -279,11 +396,15 @@ class ClientServiceThread extends Thread {
         System.exit(0);
     }
 
+
+
     private void createGroup(String clientCommand) {
         final User[] current_usr = {null};
         Groupe current_grp = null;
         String[] text = clientCommand.split(":");
-        String groupe = text[1];
+        String groupe = text[0];
+
+
         Socket_Serveur.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
@@ -292,7 +413,31 @@ class ClientServiceThread extends Thread {
                         }));
         current_grp = new Groupe(groupe, current_usr[0], client);
         Socket_Serveur.groupes.add(current_grp);
-        System.out.println("[GROUP] : " + current_grp._name + " has been created by : " + current_usr[0]._username);
+        try{
+
+            int administrator = current_usr[0].Id;
+            Statement stmt = null;
+            ResultSet rs = null;
+            Class.forName("org.mariadb.jdbc.Driver");
+            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123")) {
+                stmt = conn.createStatement();
+
+                rs = stmt.executeQuery(
+                        "INSERT INTO groupes(nom, administrator) VALUES ('" + groupe + "','" + administrator  + "');");
+                rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom="+groupe);
+                while (rs.next()){
+                    current_grp.Id = rs.getInt("groupe_uuid");
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        System.out.println("[GROUP] : " + current_grp.name + " has been created by : " + current_usr[0]._username);
+
     }
 
     private void writePrivate(String[] sender, String destination, String msg) throws IOException {
@@ -320,7 +465,7 @@ class ClientServiceThread extends Thread {
         String[] text = clientCommand.split(":");
         String groupe = text[1];
         for (Groupe curr : Socket_Serveur.groupes) {
-            if (curr._name.equals(groupe)) {
+            if (curr.name.equals(groupe)) {
                 current_grp = curr;
             }
         }
@@ -332,7 +477,45 @@ class ClientServiceThread extends Thread {
                         }));
         HashMap<Socket, User> user = new HashMap<Socket, User>();
         user.put(client, current[0]);
-        Socket_Serveur.groupes.get(Socket_Serveur.groupes.indexOf(current_grp)).groupeUsers.add(user);
+        int userId = current[0].Id;
+        int groupId = current_grp != null ? current_grp.Id : 0;
+
+        ArrayList<Integer> arguments = new ArrayList<>();
+        arguments.add(userId);
+        arguments.add(groupId);
+        try {
+            joinGroup(arguments);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void joinGroup(ArrayList<Integer> args) throws ClassNotFoundException {
+        SocketPerso socket_client = null;
+        ResultSet rs = null;
+        try {
+            Class.forName("org.mariadb.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123");
+
+
+
+            Statement stmt = conn.createStatement();
+
+
+            rs = stmt.executeQuery(
+                    "INSERT INTO group_users (`userId`, `groupId`) VALUES('" + args.get(0) + "','" + args.get(1) + "')");
+
+
+        } catch (SQLException ex1) {
+            int code = ex1.getErrorCode();
+            if (code != 1062) {
+                ex1.printStackTrace();
+                return;
+            }
+        }
+        System.out.println("USER ID N°"+args.get(0)+" HAS JOINED GROUP N°"+args.get(1) +"...");
     }
 
     private void sendGroup(String clientCommand) {
@@ -342,7 +525,7 @@ class ClientServiceThread extends Thread {
         final String[] sender = {null};
 
         for (Groupe current_grp : Socket_Serveur.groupes) {
-            if (current_grp._name.equals(groupe)) {
+            if (current_grp.name.equals(groupe)) {
                 Socket_Serveur.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
                                 .filter(entry1 -> entry1.getKey().equals(client))
@@ -353,7 +536,7 @@ class ClientServiceThread extends Thread {
                         .forEach(map -> map.entrySet()
                                 .forEach(username -> {
                                     try {
-                                        Socket_Serveur.writeSocket("[" + current_grp._name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
+                                        Socket_Serveur.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -372,7 +555,7 @@ class ClientServiceThread extends Thread {
         final String[] sender = {null};
 
         for (Groupe current_grp : Socket_Serveur.groupes) {
-            if (current_grp._name.equals(groupe)) {
+            if (current_grp.name.equals(groupe)) {
                 Socket_Serveur.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
                                 .filter(entry1 -> entry1.getKey().equals(client))
@@ -383,7 +566,7 @@ class ClientServiceThread extends Thread {
                         .forEach(map -> map.entrySet()
                                 .forEach(username -> {
                                     try {
-                                        Socket_Serveur.writeSocket("[" + current_grp._name + "] " + Arrays.toString(sender) + " : \n" + msg, username.getKey());
+                                        Socket_Serveur.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : \n" + msg, username.getKey());
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -483,6 +666,45 @@ class ClientServiceThread extends Thread {
         runState = false;
     }
 
+    public void CreateCloudSubscription(String clientCommand) throws Exception {
+        String[] text = clientCommand.split(":");
+        String[] args = text[1].split(",");
+        String groupe = args[0];
+        String spaceName = args[1];
+
+        String path = "C:\\temp\\"+ groupe +"\\"+spaceName+"\\";
+        //Creating a File object
+        File file = new File(path);
+        //Creating the directory
+        boolean bool = file.mkdir();
+        int groupId=0;
+        SocketPerso socket_client = null;
+        ResultSet rs = null;
+        String pseudo = null;
+        Statement stmt = null;
+        try {
+            groupId = Socket_Serveur.getGroupId(groupe);
+            Class.forName("org.mariadb.jdbc.Driver");
+            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+                    "wizle_test?user=wizle&password=projettest123")) {
+                //System.out.println("connected");
+                stmt = conn.createStatement();
+
+                rs = stmt.executeQuery(
+                        "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES ('" + groupId + "','" + path + "');");
+
+            } catch (Exception e) {
+                if (rs == null) {
+                    System.err.println("Erreur de création d'un groupe de partage ! ");
+                    System.err.println("Erreur :\n" + (stmt != null ? stmt.getWarnings().getSQLState() : null));
+                }
+                System.err.println("Erreur de connexion au serveur de fichier...");
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run() {
         ClientCommandEnum clientRequest =  ClientCommandEnum.Lazy;
         System.out.println("[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName());
@@ -513,7 +735,7 @@ class ClientServiceThread extends Thread {
                 else if (clientCommand.contains(ClientCommandEnum.GroupCreationRequest.Label)) createGroup(clientCommand);
                 else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.EndProcess.Label)) endProcess(log);
                 else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.Lazy.Label)) endProcess(log);
-                else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.CreateSharingSpace.Label)) endProcess(log);
+                else if (clientCommand.contains(ClientCommandEnum.CreateSharingSpace.Label)) CreateCloudSubscription(clientCommand);
                 else sendBroadcast(clientCommand);
 
             }
@@ -660,18 +882,20 @@ public class SocketPerso {
     static class Thread_Client_Send extends Thread {
         //String destination;
         private final SocketPerso socket;
+        private String email;
         private final Console console;
         private String username;
 
-        public Thread_Client_Send(SocketPerso s) throws IOException {
+        public Thread_Client_Send(SocketPerso s, String p_email) throws IOException {
             socket = s;
+            email = p_email;
             console = new Console(new BufferedReader(new InputStreamReader(System.in)), System.out);
         }
 
         public void run() {
             String msg;
             try {
-                socket.sendUserName(socket._username);
+                socket.sendUserName(socket._username+","+email);
                 console.writeLine("Connexion au serveur: " + socket._username);
                 //destination = console.readKey();
 
