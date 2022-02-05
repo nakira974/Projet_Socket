@@ -15,6 +15,7 @@ import java.sql.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 class LogUser {
 
@@ -24,8 +25,7 @@ class LogUser {
 
     }
 
-    private static String toHexString(byte[] hash)
-    {
+    private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
         BigInteger number = new BigInteger(1, hash);
 
@@ -33,8 +33,7 @@ class LogUser {
         StringBuilder hexString = new StringBuilder(number.toString(16));
 
         // Pad with leading zeros
-        while (hexString.length() < 32)
-        {
+        while (hexString.length() < 32) {
             hexString.insert(0, '0');
         }
 
@@ -67,13 +66,13 @@ class LogUser {
 
 
             rs = stmt.executeQuery(
-                    "INSERT INTO users (`pseudo`, `password`, `email`,`isConnected`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '"+ args.get(2) +"',1)");
+                    "INSERT INTO users (`pseudo`, `password`, `email`,`isConnected`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '" + args.get(2) + "',1)");
 
 
-            System.out.println("You've been registered on : "+ conn);
-        } catch (SQLException ex1 ) {
+            System.out.println("You've been registered on : " + conn);
+        } catch (SQLException ex1) {
             int code = ex1.getErrorCode();
-            if(code != 1062){
+            if (code != 1062) {
                 ex1.printStackTrace();
                 return;
             }
@@ -89,35 +88,7 @@ class LogUser {
                         (SELECT user_uuid FROM users WHERE pseudo = 'nakiradu77'));
 
      */
-    public void joinGroup(ArrayList<String> args) throws ClassNotFoundException {
-        SocketPerso socket_client = null;
-        ResultSet rs = null;
-        try {
-            Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
-                    "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("Requête de création d'utilisateur en cours d'execution...");
-
-
-            Statement stmt = conn.createStatement();
-
-
-            rs = stmt.executeQuery(
-                    "INSERT INTO users (`pseudo`, `password`, `email`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '"+ args.get(2) +"')");
-
-
-            System.out.println("You've been registered on : "+ conn);
-        } catch (SQLException ex1 ) {
-            int code = ex1.getErrorCode();
-            if(code != 1062){
-                ex1.printStackTrace();
-                return;
-            }
-            System.out.println("Nom d'utilisateur déjà pris.");
-        }
-
-    }
 
     public SocketPerso login(ArrayList<String> args) throws SQLException {
         SocketPerso socket_client = null;
@@ -139,7 +110,7 @@ class LogUser {
                         pseudo = rs.getString("pseudo");
                         //System.out.println(pseudo);
                         socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), pseudo);
-                        stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='"+ args.get(0)+"'");
+                        stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='" + args.get(0) + "'");
                     }
 
                     conn.close();
@@ -161,13 +132,15 @@ class LogUser {
         return socket_client;
     }
 
-    public SocketPerso newLogin(ArrayList<String> args) throws Exception {
+    public Hashtable<SocketPerso, String> newLogin(ArrayList<String> args) throws Exception {
+        Hashtable<SocketPerso, String> result = new Hashtable<>();
+        String email = "";
         byte[] sha256;
         String str_sha;
         String str_aes;
-        sha256=getSHA(args.get(0));
-        str_sha=toHexString(sha256);
-        str_aes=AES_Perso.encrypt(args.get(1),str_sha);
+        sha256 = getSHA(args.get(0));
+        str_sha = toHexString(sha256);
+        str_aes = AES_Perso.encrypt(args.get(1), str_sha);
         SocketPerso socket_client = null;
         ResultSet rs = null;
         String pseudo = null;
@@ -179,16 +152,17 @@ class LogUser {
                 Statement stmt = conn.createStatement();
 
                 rs = stmt.executeQuery(
-                        "SELECT `password` " +
-                                "FROM users WHERE pseudo ='" + str_sha +"'");
+                        "SELECT `password` ,`email` " +
+                                "FROM users WHERE pseudo ='" + str_sha + "'");
                 if (!rs.wasNull()) {
 
                     while (rs.next()) {
                         String passwd = rs.getString("password");
-                        if(AES_Perso.decrypt(passwd, str_sha).equals(args.get(1))){
+                        if (AES_Perso.decrypt(passwd, str_sha).equals(args.get(1))) {
                             //System.out.println(pseudo);
                             socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), args.get(0));
-                            stmt.executeQuery("UPDATE users SET isConnected=1 WHERE pseudo='"+ str_sha+"'");
+                            stmt.executeQuery("UPDATE users SET isConnected=1 WHERE pseudo='" + str_sha + "'");
+                            email = rs.getString("email");
                         }
 
                     }
@@ -209,25 +183,29 @@ class LogUser {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return socket_client;
+        result.put(socket_client, email);
+        return result;
     }
 }
 
 
 public class User {
 
-
-    User(){}
-    User(String username){
+    public int Id;
+    public String userMail;
+    public String _username;
+    public LocalTime _lastConnection;
+    public ArrayList<Groupe> Groups;
+    User() {
+    }
+    User(String username) {
         _username = username;
         LocalTime time = LocalTime.now();
         _lastConnection = time;
+        Groups = new ArrayList<>();
     }
 
-    public String _username;
-    public LocalTime _lastConnection;
-
-    public String translateMessage(String message){
+    public String translateMessage(String message) {
         try {
             assert false;
             HttpRequest request = HttpRequest.newBuilder()
@@ -253,13 +231,13 @@ public class User {
             return (String) translate.get("translatedText");
             //System.out.println(response.body());
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return "Impossible de traduire!";
     }
 
-    public double getWeather(){
+    public double getWeather() {
         try {
             assert false;
             HttpRequest request = HttpRequest.newBuilder()
@@ -278,7 +256,7 @@ public class User {
             return (double) jsonMain.get("temp");
             //System.out.println(response.body());
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return 0.0;
@@ -288,27 +266,31 @@ public class User {
 
 
 class Groupe {
-    public String _name ;
-    public static User _administrator;
-    public  ArrayList<HashMap<Socket, User> >groupeUsers;
+    public int Id;
+    public User administrator;
+    public int administratorId;
+    public String name;
+    public ArrayList<HashMap<Socket, User>> groupeUsers;
+
     public Groupe() {
-        _name="";
-        _administrator= new User();
+        name = "";
+        administrator = new User();
     }
 
     public Groupe(String name, User administrator, Socket admin_sock) {
-        groupeUsers=new ArrayList<>(10);
+        administratorId = administrator.Id;
+        groupeUsers = new ArrayList<>(10);
         HashMap<Socket, User> currentHash = new HashMap<>();
         currentHash.put(admin_sock, administrator);
-        _name=name;
-        _administrator=administrator;
+        this.name = name;
+        this.administrator = administrator;
         groupeUsers.add(currentHash);
     }
 
     /*
     INSERT INTO groupes  (nom, administrator)  VALUES (1804,5);
      */
-    public void createGroup(){
+    public void createGroup() {
 
     }
 }

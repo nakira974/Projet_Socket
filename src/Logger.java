@@ -12,15 +12,15 @@ import java.util.Locale;
 public class Logger {
 
 
-    private  FileWriter file;
-    public BufferedWriter output ;
+    public BufferedWriter output;
+    private FileWriter file;
 
     public Logger() {
 
         {
             try {
                 this.file = new FileWriter("src/logger(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ").txt");
-                output =new BufferedWriter(file);
+                output = new BufferedWriter(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }

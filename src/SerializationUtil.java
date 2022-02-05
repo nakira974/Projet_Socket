@@ -21,7 +21,7 @@ public class SerializationUtil {
      *
      * @param data the data
      * @return packet
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException            Signals that an I/O exception has occurred.
      * @throws ClassNotFoundException the class not found exception
      */
     public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
