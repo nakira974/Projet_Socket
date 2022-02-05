@@ -362,6 +362,36 @@ class ClientServiceThread extends Thread {
         }
     }
 
+    //TODO Chercher le repertoire du groupe, le fichier .json et envoyer au clients
+    // Ils reçoivent ce qu'il y'a sur le serveur et demande/supprime/ des fichiers
+    private void groupFileUpload(String clientCommand) {
+        String[] text = clientCommand.split(":");
+        String groupe = text[0].replace("/createSharingSpace", "");
+        String msg = text[1];
+
+        final String[] sender = {null};
+
+        for (Groupe current_grp : Socket_Serveur.groupes) {
+            if (current_grp._name.equals(groupe)) {
+                Socket_Serveur.users //stream out of arraylist
+                        .forEach(map -> map.entrySet().stream()
+                                .filter(entry1 -> entry1.getKey().equals(client))
+                                .forEach(username -> {
+                                    sender[0] = String.valueOf(username.getValue()._username);
+                                }));
+                current_grp.groupeUsers //stream out of arraylist
+                        .forEach(map -> map.entrySet()
+                                .forEach(username -> {
+                                    try {
+                                        Socket_Serveur.writeSocket("[" + current_grp._name + "] " + Arrays.toString(sender) + " : \n" + msg, username.getKey());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }));
+            }
+        }
+    }
+
     private void sendPrivate(String clientCommand) {
         String[] text = clientCommand.split(":");
         String destination = text[0].replace("/@", "");
@@ -472,27 +502,20 @@ class ClientServiceThread extends Thread {
                 }
                 assert clientCommand != null;
 
-                if (clientCommand.equalsIgnoreCase(ClientCommandEnum.Quit.Label)) {
+                if (clientCommand.equalsIgnoreCase(ClientCommandEnum.Quit.Label))
                     clientExit(clientCommand);
-                } else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.WeatherInfo.Label)) {
-                    getWeather(clientCommand);
-                } else if (clientCommand.contains(ClientCommandEnum.Translate.Label)) {
-                    getTranslate(clientCommand);
-                } else if (clientCommand.contains(ClientCommandEnum.PrivateMessage.Label)){
-                    sendPrivate(clientCommand);
-                } else if (clientCommand.contains(ClientCommandEnum.SendFile.Label)) {
-                    sendFile(clientCommand);
-                } else if (clientCommand.contains(ClientCommandEnum.GroupMessage.Label)) {
-                    sendGroup(clientCommand);
-                } else if (clientCommand.contains(ClientCommandEnum.JoinGroupRequest.Label)) {
-                    joinGroup(clientCommand);
-                } else if (clientCommand.contains(ClientCommandEnum.GroupCreationRequest.Label)) {
-                    createGroup(clientCommand);
-                } else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.EndProcess.Label)) {
-                    endProcess(log);
-                } else {
-                    sendBroadcast(clientCommand);
-                }
+                else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.WeatherInfo.Label)) getWeather(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.Translate.Label)) getTranslate(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.PrivateMessage.Label)) sendPrivate(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.SendFile.Label)) sendFile(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.GroupMessage.Label)) sendGroup(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.JoinGroupRequest.Label)) joinGroup(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.GroupCreationRequest.Label)) createGroup(clientCommand);
+                else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.EndProcess.Label)) endProcess(log);
+                else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.Lazy.Label)) endProcess(log);
+                else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.CreateSharingSpace.Label)) endProcess(log);
+                else sendBroadcast(clientCommand);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -532,40 +555,7 @@ public class SocketPerso {
 
     }
 
-    @Contract(pure = true)
-    public static @NotNull
-    String getRootPathFactory() {
-        return "C:\\temp\\CdProject";
-    }
 
-    public static File[] getRootFiles(String location) {
-        //Creating a File object for directory
-        File directoryPath = new File(location);
-        //List of all files and directories
-        return directoryPath.listFiles();
-    }
-
-    public static void checkFilesFromServer() {
-        File[] remoteFiles = null;
-        File[] missingFiles = new File[]{};
-        int count = 0;
-        //TODO récupérer la liste des fichiers sur le serveur
-
-        var localFiles = getRootFiles(getRootPathFactory());
-        for (var localFile : localFiles) {
-            for (var remoteFile : remoteFiles) {
-                count = !localFile.getPath().equals(remoteFile.getPath()) ? count++ : count;
-                Arrays.stream(missingFiles).toList().add(localFile);
-            }
-        }
-
-        if (missingFiles.length == 0) return;
-        for (var i = 0; i < count; i++) {
-            //TODO télécharger les fichiers manquants
-
-        }
-
-    }
 
     public String getUserName() {
 
@@ -692,7 +682,7 @@ public class SocketPerso {
                         if (msg.contains("/file:")) {
                             String[] test = msg.split(":");
                             //TODO terminer le check des fichiers
-                            checkFilesFromServer();
+                            //checkFilesFromServer();
                             socket.ecrireFichierSocket(test[1]);
                         }
                         socket.ecrireSocket(msg);

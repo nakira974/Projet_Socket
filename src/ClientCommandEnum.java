@@ -1,4 +1,5 @@
 public enum ClientCommandEnum {
+    CreateSharingSpace("/createSharingSpace"),
     Quit("quit"),
     WeatherInfo("/weather"),
     Translate("/translate:"),
