@@ -13,7 +13,10 @@ import java.nio.file.Files;
 import java.util.Objects;
 
 
-public class ClientTcp {
+/**
+ * Client des services du serveur tcp
+ */
+public final class ClientTcp {
 
     private final Socket socket;
     private final String _username;
@@ -28,10 +31,18 @@ public class ClientTcp {
     }
 
 
+    /**
+     * @return instance du client
+     */
     public Socket getSocket() {
         return this.socket;
     }
 
+    /**
+     * Envoie un message sur le serveur
+     * @param texte message à envoyer sur le serveur
+     * @throws IOException
+     */
     public void writeSocket(String texte) throws IOException {
 
         var out = new PrintWriter(Objects.requireNonNull(this.socket).getOutputStream());
@@ -41,6 +52,11 @@ public class ClientTcp {
 
     }
 
+    /**
+     * Envoie un fichier sur le serveur
+     * @param filename nom du fichier à envoyer sur le serveur
+     * @throws IOException
+     */
     public void writeFileSocket(String filename) throws IOException {
 
         var myFile = new File(filename);
@@ -60,6 +76,11 @@ public class ClientTcp {
 
     }
 
+    /**
+     * Envoi le pseudo de l'utilisateur au serveur
+     * @param pseudo nom de l'utilisateur
+     * @throws IOException
+     */
     public void sendUserName(String pseudo) throws IOException {
 
 
@@ -70,6 +91,11 @@ public class ClientTcp {
 
     }
 
+    /**
+     * Renvoie les messages en provenance du serveur
+     * @return message provenant du serveur
+     * @throws IOException
+     */
     public String readSocket() throws IOException {
 
         return new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
@@ -91,7 +117,10 @@ public class ClientTcp {
 
     }
 
-    public static class Thread_Client_Receive extends Thread {
+    /**
+     * Thread de réception du flux en provenance du serveur
+     */
+    public static final class Thread_Client_Receive extends Thread {
         private final ClientTcp client;
         private final Console commandes;
 
@@ -123,7 +152,10 @@ public class ClientTcp {
 
     }
 
-    public static class Thread_Client_Send extends Thread {
+    /**
+     * Thread d'envoi à destination du serveur
+     */
+    public static final class Thread_Client_Send extends Thread {
         //String destination;
         private final ClientTcp socket;
         private final Console console;

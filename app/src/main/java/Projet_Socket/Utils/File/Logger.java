@@ -9,11 +9,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.concurrent.Semaphore;
 
+
+/**
+ * Utilitaire de logs
+ */
 public class Logger {
 
 
     public BufferedWriter output;
 
+    /**
+     * Créer un logger qui créer s'il n'existe pas le fichier de journalisation
+     */
     public Logger() {
 
         {
@@ -32,6 +39,10 @@ public class Logger {
         }
     }
 
+    /**
+     * Renvoi le nom du fichier de log du jour
+     * @return nom du fichier
+     */
     public String getLogFileName() {
         var currentDirectoryPath = FileSystems.getDefault().
                 getPath("").
@@ -42,16 +53,30 @@ public class Logger {
     }
 
 
+    /**
+     * Renvoie la date du jour
+     * @return date du jour dd-MM-yyyy HH:MM:SS
+     */
     public String getDateNow() {
         var currentDate = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
         currentDate += " " + LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute() + ":" + LocalDateTime.now().getSecond();
         return currentDate;
     }
 
+    /**
+     * Renvoie la date du jour
+     * @return date du jour dd-MM-yyyy
+     */
     public String getDateNowShort() {
         return DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
     }
 
+    /**
+     * Ecris dans le fichier de log de l'application au format JSON
+     * @param p_fileData contenu à journaliser
+     * @param userId id de l'utilisateur concerné
+     * @param domain type de l'information
+     */
     public void writeLog(String p_fileData, int userId, String domain) {
         try {
             var reader = new BufferedReader(new FileReader(getLogFileName()));
@@ -83,6 +108,10 @@ public class Logger {
         }
     }
 
+    /**
+     * Ferme le log
+     * @throws IOException
+     */
     public void closeLog() throws IOException {
 
         this.output.close();

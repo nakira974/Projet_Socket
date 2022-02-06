@@ -11,8 +11,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-
-public abstract class Abstract_AES_Perso {
+public abstract sealed class Abstract_AES_Perso permits AES_Perso {
     protected static final byte[] SALTED = "Salted__".getBytes(US_ASCII);
 
     /**

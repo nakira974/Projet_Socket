@@ -22,13 +22,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class ServerClientWorker extends Thread {
+/**
+ * Thread d'écoute d'un client tcp
+ */
+public final class ServerClientWorker extends Thread {
 
     final private Socket client;
     final private Logger log;
     private boolean runState = true;
     private boolean ServerOn = true;
 
+    /**
+     * Lance un thread serveur de réception pour un client
+     * @param s socket client
+     */
     public ServerClientWorker(Socket s) {
 
         this.client = s;
@@ -38,6 +45,12 @@ public class ServerClientWorker extends Thread {
 
     }
 
+    /**
+     * Converti un byte array en string
+     * @param hash tableau de byte à convertir en string
+     * @return
+     */
+    @NotNull
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
         var number = new BigInteger(1, hash);
@@ -53,7 +66,13 @@ public class ServerClientWorker extends Thread {
         return hexString.toString();
     }
 
-    public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
+    /**
+     * Transforme une chaine de caractères en md5
+     * @param input contenu à transformer
+     * @return md5 de la chaine passée en paramètres
+     * @throws NoSuchAlgorithmException
+     */
+    public static byte[] getMd5(@NotNull String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
         var md = MessageDigest.getInstance("MD5");
 
@@ -63,6 +82,9 @@ public class ServerClientWorker extends Thread {
         return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Déconnecte tous les utilisateurs en base de données
+     */
     private void setUsersDown() {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -82,6 +104,10 @@ public class ServerClientWorker extends Thread {
 
     }
 
+    /**
+     * Déconnecte l'utilisateur en base de données
+     * @throws NoSuchAlgorithmException
+     */
     private void setUserDown() throws NoSuchAlgorithmException {
         final String[] currentUser = {null};
 
@@ -89,7 +115,7 @@ public class ServerClientWorker extends Thread {
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
                         .forEach(username -> currentUser[0] = username.getValue()._username));
-        var sha256 = getSHA(currentUser[0]);
+        var sha256 = getMd5(currentUser[0]);
         currentUser[0] = toHexString(sha256);
         var result = currentUser[0];
 
@@ -113,6 +139,10 @@ public class ServerClientWorker extends Thread {
 
     }
 
+    /**
+     * Affichage console sur le serveur des messages broadcast
+     * @param clientCommand commande du client
+     */
     private void printBroadcast(String clientCommand) {
         final int[] userId = {0};
         ServerTcp.users.forEach(socketUserHashMap -> {
@@ -125,6 +155,10 @@ public class ServerClientWorker extends Thread {
         }
     }
 
+    /**
+     * Transmet le message d'un client à tout le monde
+     * @param clientCommand message du client
+     */
     private void sendBroadcast(String clientCommand) {
 
         ServerTcp.users //stream out of arraylist
@@ -144,7 +178,12 @@ public class ServerClientWorker extends Thread {
                         }));
     }
 
-    private void endProcess(Logger log) throws IOException {
+    /**
+     * Stop le thread du client
+     * @param log context logger
+     * @throws IOException
+     */
+    private void endProcess(@NotNull Logger log) throws IOException {
         runState = false;
         System.out.print("Stopping server...");
         setUsersDown();
@@ -156,7 +195,11 @@ public class ServerClientWorker extends Thread {
     }
 
 
-    private void createGroup(String clientCommand) {
+    /**
+     * Créer un groupe sur le serveur et en base de données
+     * @param clientCommand commande du client
+     */
+    private void createGroup(@NotNull String clientCommand) {
         final User[] current_usr = {null};
         var text = clientCommand.split(":");
         var groupe = text[0];
@@ -194,16 +237,12 @@ public class ServerClientWorker extends Thread {
 
     }
 
-    private void writePrivate(String[] sender, String destination, String msg) throws IOException {
-        try {
-            privateSend(sender, destination, msg);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException();
-        }
-
-    }
-
+    /**
+     * Distribue le message privé d'un utilisateur à un autre
+     * @param sender envoyeur
+     * @param destination destinataire
+     * @param msg contenu du message
+     */
     private void privateSend(String[] sender, String destination, String msg) {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
@@ -221,6 +260,10 @@ public class ServerClientWorker extends Thread {
                         }));
     }
 
+    /**
+     * Permet de rejoindre un groupe en base et sur le serveur et recevoir les messages de ce dernier
+     * @param clientCommand commande du client
+     */
     private void joinGroup(@NotNull String clientCommand) {
         final User[] current = {null};
         var current_grp = new Group();
@@ -250,7 +293,13 @@ public class ServerClientWorker extends Thread {
     }
 
 
+    /**
+     * Permet de rejoindre un groupe en base de données
+     * @param args id de l'utilisateur et du groupe
+     * @throws ClassNotFoundException
+     */
     public void joinGroup(@NotNull ArrayList<Integer> args) throws ClassNotFoundException {
+        boolean finished = false;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -268,12 +317,18 @@ public class ServerClientWorker extends Thread {
             var code = ex1.getErrorCode();
             if (code != 1062) {
                 ex1.printStackTrace();
-                return;
+                finished = true;
             }
         }
-        System.out.println("USER ID N°" + args.get(0) + " HAS JOINED GROUP N°" + args.get(1) + "...");
+        if (!finished) {
+            System.out.println("USER ID N°" + args.get(0) + " HAS JOINED GROUP N°" + args.get(1) + "...");
+        }
     }
 
+    /**
+     * Distribue un message dans un groupe donné
+     * @param clientCommand commande du client
+     */
     private void sendGroup(@NotNull String clientCommand) {
         var text = clientCommand.split(":");
         var groupe = text[0].replace("/G", "");
@@ -298,33 +353,11 @@ public class ServerClientWorker extends Thread {
         }
     }
 
-    //TODO Chercher le repertoire du groupe, le fichier .json et envoyer au clients
-    // Ils reçoivent ce qu'il y'a sur le serveur et demande/supprime/ des fichiers
-    private void groupFileUpload(@NotNull String clientCommand) {
-        var text = clientCommand.split(":");
-        var groupe = text[0].replace("/createSharingSpace", "");
-        var msg = text[1];
 
-        final String[] sender = {null};
-
-        for (var current_grp : ServerTcp.groupes) {
-            if (current_grp.name.equals(groupe)) {
-                ServerTcp.users //stream out of arraylist
-                        .forEach(map -> map.entrySet().stream()
-                                .filter(entry1 -> entry1.getKey().equals(client))
-                                .forEach(username -> sender[0] = String.valueOf(username.getValue()._username)));
-                current_grp.groupeUsers //stream out of arraylist
-                        .forEach(map -> map.forEach((key, value) -> {
-                            try {
-                                ServerTcp.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : \n" + msg, key);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }));
-            }
-        }
-    }
-
+    /**
+     * Distribue le message privé à un utilisateur donné
+     * @param clientCommand contenu la commande client
+     */
     private void sendPrivate(@NotNull String clientCommand) {
         var text = clientCommand.split(":");
         var destination = text[0].replace("/@", "");
@@ -333,6 +366,10 @@ public class ServerClientWorker extends Thread {
         privateSend(sender, destination, msg);
     }
 
+    /**
+     * Renvoi la traduction en anglais de la saisie depuis yandex traduction
+     * @param clientCommand
+     */
     private void getTranslate(@NotNull String clientCommand) {
         var text = clientCommand.split(":");
         var msg = text[1];
@@ -352,6 +389,9 @@ public class ServerClientWorker extends Thread {
 
     }
 
+    /**
+     * Renvoi les informations météo depuis openweathermap
+     */
     private void getWeather() {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
@@ -365,6 +405,10 @@ public class ServerClientWorker extends Thread {
                         }));
     }
 
+    /**
+     * Fermeture de la connexion avec le client
+     * @throws NoSuchAlgorithmException
+     */
     private void clientExit() throws NoSuchAlgorithmException {
         runState = false;
         ServerTcp.sockets.remove(client);
@@ -394,12 +438,21 @@ public class ServerClientWorker extends Thread {
         System.out.println("Client(s) : " + ServerTcp.users.size());
     }
 
+    /**
+     * Extinction du serveur
+     * @throws IOException
+     */
     private void serverStop() throws IOException {
         System.out.print("Server has already stopped");
         ServerTcp.writeSocket("Server has already stopped", client);
         runState = false;
     }
 
+    /**
+     * Renvoie la liste des fichiers d'un espace cloud d'un groupe
+     * @param path chemin du dossier
+     * @return liste des fichiers d'un espace cloud de groupe
+     */
     @NotNull
     private ArrayList<String> checkGroupFiles(String path) {
         var result = new ArrayList<String>();
@@ -424,6 +477,9 @@ public class ServerClientWorker extends Thread {
         return result;
     }
 
+    /**
+     * Compare la liste des fichiers sur le serveur avec celle des clients
+     */
     public void fileSynchronisationRequest() {
         try {
 
@@ -454,6 +510,11 @@ public class ServerClientWorker extends Thread {
         }
     }
 
+    /**
+     * Créer une souscription à un espace cloud en base et créer le dossier correspondant
+     * @param clientCommand contenu de la commande client
+     * @throws Exception
+     */
     public void createCloudSubscription(@NotNull String clientCommand) throws Exception {
         var text = clientCommand.split(":");
         var args = text[1].split(",");
@@ -498,6 +559,10 @@ public class ServerClientWorker extends Thread {
         }
     }
 
+    /**
+     * Créer un nouveau repertoire pour un groupe
+     * @param path chemin du repertoire à créer
+     */
     private void createRootDirectory(String path) {
         try {
             var currentDirectoryPath = FileSystems.getDefault().

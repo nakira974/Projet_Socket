@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
+/**
+ * Utilitaire de sérialisation
+ */
 public class SerializationUtil {
 
     /**

@@ -26,13 +26,22 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class App {
+/**
+ * Application de lancement client/serveur tcp
+ */
+public final class App {
 
     public static final int FactoryPort = 5000;
     public static final String RootDirectory = "C:\\temp\\";
     static String _str;
 
-    private static byte[] getSHA(@NotNull String input) throws NoSuchAlgorithmException {
+    /**
+     * Convertie une chaine de caractères en md5
+     * @param input chaine à convertir
+     * @return tableau de bytes de la chaine convertie
+     * @throws NoSuchAlgorithmException
+     */
+    private static byte[] getMd5(@NotNull String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
         var md = MessageDigest.getInstance("MD5");
 
@@ -42,6 +51,10 @@ public class App {
         return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * @param hash hexadécimal à convertir en chaine de caratère
+     * @return chaine de caractère de l'hexadécimal converti
+     */
     @NotNull
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
@@ -58,6 +71,13 @@ public class App {
         return hexString.toString();
     }
 
+    /**
+     * Lance la saisie des informations de l'utilisateur
+     * @param args informations à saisir par l'utilisateur
+     * @param command instance d'une console pour l'affichage
+     * @return
+     * @throws Exception
+     */
     @NotNull
     private static ArrayList<String> register(@NotNull ArrayList<String> args, @NotNull Console command) throws Exception {
 
@@ -68,7 +88,7 @@ public class App {
         _str = command.readKey();
         result.add(_str);
         //ON ENCRYPTE LE NOM USER EN SHA256
-        var sha256 = getSHA(_str);
+        var sha256 = getMd5(_str);
         _str = toHexString(sha256);
         args.add(_str);
         //FIN ENCRYPTAGE

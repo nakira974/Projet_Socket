@@ -11,7 +11,11 @@ import java.net.http.HttpResponse;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-public class User {
+
+/**
+ * Utilisateur des services du serveur tcp
+ */
+public final class User {
 
     public int Id;
     public String userMail;
@@ -22,12 +26,21 @@ public class User {
     User() {
     }
 
+    /**
+     * Créer un utilisateur
+     * @param username nom de l'utilisateur
+     */
     public User(String username) {
         _username = username;
         _lastConnection = LocalTime.now();
         Groups = new ArrayList<>();
     }
 
+    /**
+     * Lance une requête HTTP GET vers google translate api sur rapidapi
+     * @param message message à traduire en anglais
+     * @return message traduit en anglais
+     */
     public String translateMessage(String message) {
         try {
             assert false;
@@ -60,6 +73,10 @@ public class User {
         return "Impossible de traduire!";
     }
 
+    /**
+     * Renvoie la température à Amiens
+     * @return température à Amiens
+     */
     public double getWeather() {
         try {
             assert false;

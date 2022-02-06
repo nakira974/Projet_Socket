@@ -3,6 +3,7 @@ package Projet_Socket.Server;
 import Projet_Socket.Login.Identity.Group;
 import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Utils.File.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
@@ -15,7 +16,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ServerTcp {
+/**
+ * Classe permettant de gérer le serveur TCP
+ */
+public final class ServerTcp {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
     public static ArrayList<Group> groupes = new ArrayList<>();
@@ -24,6 +28,10 @@ public class ServerTcp {
     private static int maxConnection;
     private static int nb_socket;
 
+    /**
+     * Lance un serveur tcp
+     * @param socket socket serveur
+     */
     public static void createServer(ServerSocket socket) {
         _srvSocket = socket;
         maxConnection = 20;
@@ -34,6 +42,11 @@ public class ServerTcp {
         return maxConnection;
     }
 
+    /**
+     * Accepte la connexion d'un client entrant
+     * @return socket du client accepté
+     * @throws IOException
+     */
     public static Socket acceptClient() throws IOException {
 
         nb_socket++;
@@ -43,6 +56,11 @@ public class ServerTcp {
 
     }
 
+    /**
+     * Permet de lancer un script powershell
+     * @param scriptPath chemin vers le script
+     * @param arguments arguments du script
+     */
     public static void runPowershellScript(String scriptPath, ArrayList<String> arguments) {
         try {
             final String[] script = {scriptPath};
@@ -76,19 +94,35 @@ public class ServerTcp {
     }
 
 
+    /**
+     * @return nombre de sockets connectés
+     */
     public static int getNbSocket() {
         return nb_socket;
     }
 
+    /**
+     * Décremente le nombre de socket sur le serveur
+     */
     public static void quit() {
         nb_socket--;
     }
 
 
+    /**
+     * @return instance du socket serveur
+     */
+    @Contract(pure = true)
     public static ServerSocket getServer() {
         return _srvSocket;
     }
 
+    /**
+     * Envoi le contenu du message à une liste de client
+     * @param content contenu à envoyer
+     * @param clients liste de clients à qui envoyer
+     * @throws IOException
+     */
     public static void writeSocket(String content, @NotNull ArrayList<Socket> clients) throws IOException {
 
         for (var socket : clients) {
@@ -101,6 +135,12 @@ public class ServerTcp {
 
     }
 
+    /**
+     * Envoi le contenu du message à un seul client
+     * @param content contenu à envoyer
+     * @param client client à qui envoyer
+     * @throws IOException
+     */
     public static void writeSocket(String content, @NotNull Socket client) throws IOException {
 
 
@@ -111,6 +151,12 @@ public class ServerTcp {
 
     }
 
+    /**
+     * Renvoie la liste de tous les fichiers pour un groupe
+     * @param groupId id du groupe
+     * @return liste des fichiers du groupe
+     * @throws SQLException
+     */
     @NotNull
     public static ArrayList<String> getFilesByGroup(int groupId) throws SQLException {
         var result = new ArrayList<String>();
@@ -141,6 +187,10 @@ public class ServerTcp {
         return result;
     }
 
+    /**
+     * Renvoi un hasmap de tous les groupes avec leur liste de fichiers associés
+     * @return mappage groupe/fichiers
+     */
     @NotNull
     public static HashMap<Group, ArrayList<String>> getFilesByGroup() {
         var result = new HashMap<Group, ArrayList<String>>();
@@ -159,6 +209,11 @@ public class ServerTcp {
         return result;
     }
 
+    /**
+     * Renvoi la liste des fichiers dans un repertoire donné
+     * @param directory repertoire à inspecter
+     * @return liste des fichiers sur le repertoire avec leur chemin absolu
+     */
     @NotNull
     private static ArrayList<String> getFilesByDirectory(String directory) {
 
@@ -179,7 +234,14 @@ public class ServerTcp {
         return result;
     }
 
+    /**
+     * Renvoie le contenu texte envoyé par un client
+     * @param client client du thread
+     * @return contenu envoyé par le client
+     * @throws IOException
+     */
     public static String readClientStream(Socket client) throws IOException {
+        String res = null;
 
         var result = "";
         try {
@@ -201,15 +263,23 @@ public class ServerTcp {
 
                 result = jsonObject.toString();
             } else {
-                return line;
+                res = line;
             }
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException();
         }
-        return result;
+        if (res == null) {
+            res = result;
+        }
+        return res;
     }
 
+    /**
+     * Renvoie la liste des groupes de l'utilisateur
+     * @param userId id de l'utilisateur
+     * @return liste des groupes de l'utilisateur
+     */
     @NotNull
     public static ArrayList<Group> getUserGroups(int userId) {
         var groupId = 0;
@@ -248,6 +318,10 @@ public class ServerTcp {
         return results;
     }
 
+    /**
+     * Renvoie la liste des groupes stockés en base
+     * @return liste des groupes présents en base de données
+     */
     @NotNull
     public static ArrayList<Group> getGroups() {
         var results = new ArrayList<Group>();
@@ -280,6 +354,11 @@ public class ServerTcp {
         return results;
     }
 
+    /**
+     * Renvoie l'id d'un groupe en fonction de son nom
+     * @param groupeName nom du groupe
+     * @return id du groupe
+     */
     public static int getGroupId(String groupeName) {
         var groupId = 0;
         try {
@@ -306,6 +385,11 @@ public class ServerTcp {
         return groupId;
     }
 
+    /**
+     * Renvoie l'id d'un utilisateur en fonction de son email
+     * @param userMail id de l'utilisateur
+     * @return id de l'utilisateur
+     */
     public static int getUserId(String userMail) {
         var userId = 0;
         try {
@@ -333,6 +417,12 @@ public class ServerTcp {
         return userId;
     }
 
+    /**
+     * Envoi un fichier à un client en écoute
+     * @param path chemin du fichier
+     * @param client client en écoute
+     * @throws IOException
+     */
     public void sendFileBroadcast(String path, @NotNull Socket client) throws IOException {
 
         var writer = new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8);
@@ -345,6 +435,12 @@ public class ServerTcp {
 
     }
 
+    /**
+     * Envoi un fichier à une liste de clients
+     * @param path chemin du fichier
+     * @param clients clients en écoutes
+     * @throws IOException
+     */
     public void sendFileBroadcast(String path, @NotNull ArrayList<Socket> clients) throws IOException {
 
         for (var socket : clients) {

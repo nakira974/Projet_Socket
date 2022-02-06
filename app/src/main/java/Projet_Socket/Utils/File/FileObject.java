@@ -1,12 +1,21 @@
 package Projet_Socket.Utils.File;
 
-public class FileObject {
+/**
+ * Classe servant à l'envoi et réception de fichiers en json
+ */
+public final class FileObject {
 
     private String name;
     private int size;
     private byte[] content;
 
 
+    /**
+     * Constructeur permettant de créer un fichier pour l'envoi
+     * @param name nom du fichier
+     * @param size taille du fichier
+     * @param content contenu du fichier
+     */
     public FileObject(String name, int size, byte[] content) {
         this.name = name;
         this.size = size;

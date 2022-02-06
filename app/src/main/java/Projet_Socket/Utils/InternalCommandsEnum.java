@@ -1,5 +1,8 @@
 package Projet_Socket.Utils;
 
+/**
+ * Enum comprenant l'ensemble des commandes interne de l'application
+ */
 public enum InternalCommandsEnum {
     FileSynchronisation("/fileSynchronisation"),
     CreateSharingSpace("/createSharingSpace"),

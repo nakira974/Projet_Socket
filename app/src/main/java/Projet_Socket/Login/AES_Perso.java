@@ -8,7 +8,7 @@ import java.util.Base64;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 
-public class AES_Perso extends Abstract_AES_Perso {
+public final class AES_Perso extends Abstract_AES_Perso {
     /**
      * Encrypt text with the passphrase
      *

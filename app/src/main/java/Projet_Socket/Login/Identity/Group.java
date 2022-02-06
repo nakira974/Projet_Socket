@@ -6,7 +6,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Group {
+/**
+ * Groupe de diffusion sur le serveur tcp
+ */
+public final class Group {
     public int Id;
     public User administrator;
     public int administratorId;
@@ -18,6 +21,12 @@ public class Group {
         administrator = new User();
     }
 
+    /**
+     * Créer un groupe
+     * @param name nom du groupe
+     * @param administrator utilisateur ayant créé le groupe
+     * @param admin_sock socket de l'administrateur
+     */
     public Group(String name, @NotNull User administrator, Socket admin_sock) {
         administratorId = administrator.Id;
         groupeUsers = new ArrayList<>(10);

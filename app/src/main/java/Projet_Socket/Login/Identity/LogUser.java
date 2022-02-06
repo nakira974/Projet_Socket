@@ -3,6 +3,7 @@ package Projet_Socket.Login.Identity;
 import Projet_Socket.Client.ClientTcp;
 import Projet_Socket.Login.AES_Perso;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.net.Socket;
@@ -13,12 +14,20 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class LogUser {
+/**
+ * Classe dédiée à l'authentification
+ */
+public final class LogUser {
 
     public LogUser() {
 
     }
 
+    /**
+     * Converti un byte array en string
+     * @param hash bytes à convertir en string
+     * @return bytes décryptés
+     */
     @NotNull
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
@@ -36,7 +45,13 @@ public class LogUser {
     }
 
 
-    public static byte[] getSHA(@NotNull String input) throws NoSuchAlgorithmException {
+    /**
+     * Convertie un chaine de caractères en md5
+     * @param input chaine à hacher
+     * @return chaine hachée
+     * @throws NoSuchAlgorithmException
+     */
+    public static byte[] getMd5(@NotNull String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
         var md = MessageDigest.getInstance("MD5");
 
@@ -46,6 +61,11 @@ public class LogUser {
         return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Créer un nouvel utilisateur en base
+     * @param args informations de l'utilisateur
+     * @throws ClassNotFoundException
+     */
     public void createUser(@NotNull ArrayList<String> args) throws ClassNotFoundException {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -82,10 +102,17 @@ public class LogUser {
      */
 
 
+    /**
+     * Vérifie l'identité de l'utilisateur en base et se connecte au serveur tcp
+     * @param args informations de l'utilisateur
+     * @return un client tcp connecté au serveur et l'email de l'utilisateur
+     * @throws Exception
+     */
+    @Nullable
     public Hashtable<ClientTcp, String> newLogin(@NotNull ArrayList<String> args) throws Exception {
         var result = new Hashtable<ClientTcp, String>();
         var email = "";
-        var sha256 = getSHA(args.get(0));
+        var sha256 = getMd5(args.get(0));
         var str_sha = toHexString(sha256);
         ClientTcp socket_client = null;
         ResultSet rs = null;
