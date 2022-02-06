@@ -347,11 +347,11 @@ public class ServerClientWorker extends Thread {
                         }));
     }
 
-    private void sendFile(String clientCommand) {
+    private void sendFile() {
 
     }
 
-    private void getWeather(String clientCommand) {
+    private void getWeather() {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
@@ -364,7 +364,7 @@ public class ServerClientWorker extends Thread {
                         }));
     }
 
-    private void clientExit(String clientCommand) throws NoSuchAlgorithmException {
+    private void clientExit() throws NoSuchAlgorithmException {
         runState = false;
         ServerTcp.sockets.remove(client);
         System.out.print("Stopping client thread for client :`\n ");
@@ -542,16 +542,16 @@ public class ServerClientWorker extends Thread {
                 if (clientCommand == null) continue;
 
                 //region Internal Commands
-                if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.Quit.Label)) clientExit(clientCommand);
+                if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.Quit.Label)) clientExit();
 
                 else if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.EndProcess.Label)) endProcess(log);
                 else if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.Lazy.Label)) endProcess(log);
                 else if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.WeatherInfo.Label))
-                    getWeather(clientCommand);
+                    getWeather();
 
                 else if (clientCommand.contains(InternalCommandsEnum.Translate.Label)) getTranslate(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.PrivateMessage.Label)) sendPrivate(clientCommand);
-                else if (clientCommand.contains(InternalCommandsEnum.SendFile.Label)) sendFile(clientCommand);
+                else if (clientCommand.contains(InternalCommandsEnum.SendFile.Label)) sendFile();
                 else if (clientCommand.contains(InternalCommandsEnum.GroupMessage.Label)) sendGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.JoinGroupRequest.Label)) joinGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.GroupCreationRequest.Label))

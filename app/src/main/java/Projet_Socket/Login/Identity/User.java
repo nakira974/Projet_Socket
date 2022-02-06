@@ -24,8 +24,7 @@ public class User {
 
     public User(String username) {
         _username = username;
-        LocalTime time = LocalTime.now();
-        _lastConnection = time;
+        _lastConnection = LocalTime.now();
         Groups = new ArrayList<>();
     }
 

@@ -214,7 +214,10 @@ public class ServerTcp {
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("[SQL] SETTING GROUPS FOR USER ID N° " + userId + "...");
+            var messageLog = "[SQL] "+ "SETTING GROUPS FOR USER ID N° " + userId + "...";
+            var logger = new Logger();
+            logger.writeLog(messageLog, -666,"[SQL]");
+            System.out.println(messageLog);
 
 
             var stmt = conn.createStatement();

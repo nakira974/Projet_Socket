@@ -20,9 +20,4 @@ public enum InternalCommandsEnum {
         this.Label = command;
     }
 
-    public boolean contains(String right) {
-        var result = false;
-        if (!this.Label.contains(right)) return result;
-        return true;
-    }
 }

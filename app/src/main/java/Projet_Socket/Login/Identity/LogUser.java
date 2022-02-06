@@ -14,8 +14,6 @@ import java.util.Hashtable;
 
 public class LogUser {
 
-    public static User currentUser;
-
     public LogUser() {
 
     }
@@ -57,8 +55,7 @@ public class LogUser {
 
             var stmt = conn.createStatement();
 
-
-            var rs = stmt.executeQuery(
+            stmt.executeQuery(
                     "INSERT INTO users (`pseudo`, `password`, `email`,`isConnected`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '" + args.get(2) + "',1)");
 
 
@@ -83,57 +80,13 @@ public class LogUser {
      */
 
 
-    public ClientTcp login(ArrayList<String> args) throws SQLException {
-        ClientTcp socket_client = null;
-        ResultSet rs = null;
-        var pseudo = "";
-        try {
-            Class.forName("org.mariadb.jdbc.Driver");
-            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
-                    "wizle_test?user=wizle&password=projettest123")) {
-                //System.out.println("connected");
-                Statement stmt = conn.createStatement();
-
-                rs = stmt.executeQuery(
-                        "SELECT `pseudo` " +
-                                "FROM users WHERE password ='" + args.get(1) + "' AND pseudo='" + args.get(0) + "'");
-
-                if (!rs.wasNull()) {
-                    while (rs.next()) {
-                        pseudo = rs.getString("pseudo");
-                        //System.out.println(pseudo);
-                        socket_client = new ClientTcp(new Socket("127.0.0.1", 5000), pseudo);
-                        stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='" + args.get(0) + "'");
-                    }
-
-                    conn.close();
-                }
-
-            } catch (Exception e) {
-                if (rs == null) {
-                    System.err.println("Erreur d'authenfication ! ");
-                    System.err.println("Nom d'utilisateur ou mot de passe incorrect(s) ! ");
-                    return null;
-                }
-                if (socket_client == null) {
-                    System.err.println("Erreur de connexion au serveur de chat...");
-                }
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return socket_client;
-    }
-
     public Hashtable<ClientTcp, String> newLogin(ArrayList<String> args) throws Exception {
         var result = new Hashtable<ClientTcp, String>();
         var email = "";
         var sha256 = getSHA(args.get(0));
         var str_sha = toHexString(sha256);
-        var str_aes = AES_Perso.encrypt(args.get(1), str_sha);
         ClientTcp socket_client = null;
         ResultSet rs = null;
-        String pseudo = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             try (var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +

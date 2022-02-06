@@ -26,10 +26,4 @@ public class Group {
         groupeUsers.add(currentHash);
     }
 
-    /*
-    INSERT INTO groupes  (nom, administrator)  VALUES (1804,5);
-     */
-    public void createGroup() {
-
-    }
 }

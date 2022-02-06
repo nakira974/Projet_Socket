@@ -8,16 +8,19 @@ import java.io.PrintStream;
 
 public class Console {
 
-    private BufferedReader _writeBuffer;
+    private final BufferedReader _writeBuffer;
 
-    private PrintStream _readBuffer;
+    private final PrintStream _readBuffer;
 
     public Console(BufferedReader readStream, PrintStream writeStream) throws IOException {
-        this._writeBuffer = readStream;
-        this._readBuffer = writeStream;
-    }
+        try{
+            this._writeBuffer = readStream;
+            this._readBuffer = writeStream;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new IOException();
+        }
 
-    public Console() {
     }
 
     public void writeLine(String texte) {
