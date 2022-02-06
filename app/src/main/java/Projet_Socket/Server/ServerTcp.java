@@ -186,10 +186,10 @@ public class ServerTcp {
             if (line.contains("{") && line.contains("}")) {
                 var jsonObject = new JSONObject(line);
                 var name = (String) jsonObject.get("name");
-                int size = (int) jsonObject.get("size");
+                var size = (int) jsonObject.get("size");
                 var content = jsonObject.getJSONArray("content");
-                byte[] data = new byte[content.length()];
-                for (int i = 0; i < content.length(); i++) {
+                var data = new byte[content.length()];
+                for (var i = 0; i < content.length(); i++) {
                     data[i] = ((Integer) content.get(i)).byteValue();
                 }
                 var out = new FileOutputStream(name + "_");

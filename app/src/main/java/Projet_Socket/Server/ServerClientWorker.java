@@ -65,13 +65,13 @@ public class ServerClientWorker extends Thread {
     private void setUsersDown() {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("[SQL] Exiting users...");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
             stmt.executeUpdate("UPDATE users SET isConnected= 0 where isConnected =1");
 
             System.out.println("[SQL] User has been disconnected from : " + conn);
@@ -250,22 +250,21 @@ public class ServerClientWorker extends Thread {
 
     public void joinGroup(ArrayList<Integer> args) throws ClassNotFoundException {
         ClientTcp socket_client = null;
-        ResultSet rs = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
-            rs = stmt.executeQuery(
+            var rs = stmt.executeQuery(
                     "INSERT INTO group_users (`userId`, `groupId`) VALUES('" + args.get(0) + "','" + args.get(1) + "')");
 
 
         } catch (SQLException ex1) {
-            int code = ex1.getErrorCode();
+            var code = ex1.getErrorCode();
             if (code != 1062) {
                 ex1.printStackTrace();
                 return;
@@ -275,12 +274,12 @@ public class ServerClientWorker extends Thread {
     }
 
     private void sendGroup(String clientCommand) {
-        String[] text = clientCommand.split(":");
-        String groupe = text[0].replace("/G", "");
-        String msg = text[1];
+        var text = clientCommand.split(":");
+        var groupe = text[0].replace("/G", "");
+        var msg = text[1];
         final String[] sender = {null};
 
-        for (Group current_grp : ServerTcp.groupes) {
+        for (var current_grp : ServerTcp.groupes) {
             if (current_grp.name.equals(groupe)) {
                 ServerTcp.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
@@ -304,13 +303,13 @@ public class ServerClientWorker extends Thread {
     //TODO Chercher le repertoire du groupe, le fichier .json et envoyer au clients
     // Ils reçoivent ce qu'il y'a sur le serveur et demande/supprime/ des fichiers
     private void groupFileUpload(String clientCommand) {
-        String[] text = clientCommand.split(":");
-        String groupe = text[0].replace("/createSharingSpace", "");
-        String msg = text[1];
+        var text = clientCommand.split(":");
+        var groupe = text[0].replace("/createSharingSpace", "");
+        var msg = text[1];
 
         final String[] sender = {null};
 
-        for (Group current_grp : ServerTcp.groupes) {
+        for (var current_grp : ServerTcp.groupes) {
             if (current_grp.name.equals(groupe)) {
                 ServerTcp.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
@@ -332,9 +331,9 @@ public class ServerClientWorker extends Thread {
     }
 
     private void sendPrivate(String clientCommand) {
-        String[] text = clientCommand.split(":");
-        String destination = text[0].replace("/@", "");
-        String msg = text[1];
+        var text = clientCommand.split(":");
+        var destination = text[0].replace("/@", "");
+        var msg = text[1];
         final String[] sender = {null};
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
@@ -355,8 +354,8 @@ public class ServerClientWorker extends Thread {
     }
 
     private void getTranslate(String clientCommand) {
-        String[] text = clientCommand.split(":");
-        String msg = text[1];
+        var text = clientCommand.split(":");
+        var msg = text[1];
         ServerTcp.users.stream() //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
@@ -390,7 +389,7 @@ public class ServerClientWorker extends Thread {
         runState = false;
         ServerTcp.sockets.remove(client);
         System.out.print("Stopping client thread for client :`\n ");
-        for (int i = 0; i < ServerTcp.users.size(); i++) {
+        for (var i = 0; i < ServerTcp.users.size(); i++) {
             //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
             if (ServerTcp.users.get(i).containsKey(client)) {
                 ServerTcp.quit();
@@ -400,7 +399,7 @@ public class ServerClientWorker extends Thread {
         }
 
         //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
-        for (int i = 0; i < ServerTcp.users.size(); i++) {
+        for (var i = 0; i < ServerTcp.users.size(); i++) {
             if (ServerTcp.users.get(i).containsKey(client)) {
                 setUserDown();
                 try {
@@ -438,7 +437,7 @@ public class ServerClientWorker extends Thread {
         //List of all the text files
         var filesList= directoryPath.listFiles(textFilefilter);
         System.out.println("List of the text files in the specified directory:");
-        for(File file : filesList) {
+        for(var file : filesList) {
             result.add(file.getAbsolutePath());
             System.out.println("File name: "+file.getName());
             System.out.println("File path: "+file.getAbsolutePath());
@@ -549,7 +548,7 @@ public class ServerClientWorker extends Thread {
 
 
     public void run() {
-        InternalCommandsEnum clientRequest = InternalCommandsEnum.Lazy;
+        var clientRequest = InternalCommandsEnum.Lazy;
         var message = "\"[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
