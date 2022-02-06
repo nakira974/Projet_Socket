@@ -1,4 +1,4 @@
-package Projet_Socket;
+package Projet_Socket.Login;
 
 import java.util.Base64;
 

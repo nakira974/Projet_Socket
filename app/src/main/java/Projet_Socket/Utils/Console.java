@@ -1,4 +1,4 @@
-package Projet_Socket;/*
+package Projet_Socket.Utils;/*
  --- creators : nakira974 && Weefle  ----
  */
 

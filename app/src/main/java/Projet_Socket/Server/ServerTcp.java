@@ -1,5 +1,8 @@
-package Projet_Socket;
+package Projet_Socket.Server;
 
+import Projet_Socket.Login.Identity.Group;
+import Projet_Socket.Login.Identity.User;
+import Projet_Socket.Utils.File.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -11,16 +14,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-class Socket_Serveur {
+public class ServerTcp {
 
     public static ArrayList<Socket> sockets = new ArrayList<>();
-    public static ArrayList<Groupe> groupes = new ArrayList<>();
+    public static ArrayList<Group> groupes = new ArrayList<>();
     public static ArrayList<HashMap<Socket, User>> users = new ArrayList<>();
     public static ServerSocket _srvSocket;
     private static int maxConnection;
     private static int nb_socket;
 
-    public static void createServer(java.net.ServerSocket socket) {
+    public static void createServer(ServerSocket socket) {
         _srvSocket = socket;
         maxConnection = 20;
         nb_socket = 0;
@@ -138,8 +141,8 @@ class Socket_Serveur {
         return result;
     }
 
-    public static HashMap<Groupe, ArrayList<String>> getFilesByGroup(){
-        var result = new HashMap<Groupe, ArrayList<String>>();
+    public static HashMap<Group, ArrayList<String>> getFilesByGroup(){
+        var result = new HashMap<Group, ArrayList<String>>();
         groupes.forEach(groupe -> {
         });
         return result;
@@ -175,9 +178,9 @@ class Socket_Serveur {
         return result;
     }
 
-    public static ArrayList<Groupe> getUserGroups(int userId) {
+    public static ArrayList<Group> getUserGroups(int userId) {
         int groupId = 0;
-        ArrayList<Groupe> results = new ArrayList<>();
+        ArrayList<Group> results = new ArrayList<>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -197,7 +200,7 @@ class Socket_Serveur {
 
             rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes WHERE groupe_uuid =" + groupId);
             while (rs.next()) {
-                Groupe currentGroup = new Groupe();
+                Group currentGroup = new Group();
                 currentGroup.Id = rs.getInt("groupe_uuid");
                 currentGroup.administratorId = rs.getInt("administrator");
                 currentGroup.name = rs.getString("nom");
@@ -209,9 +212,9 @@ class Socket_Serveur {
         return results;
     }
 
-    public static ArrayList<Groupe> getGroups() {
+    public static ArrayList<Group> getGroups() {
         int groupId = 0;
-        ArrayList<Groupe> results = new ArrayList<>();
+        ArrayList<Group> results = new ArrayList<>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -226,7 +229,7 @@ class Socket_Serveur {
             ResultSet rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes");
 
             while (rs.next()) {
-                Groupe currentGroup = new Groupe();
+                Group currentGroup = new Group();
                 currentGroup.Id = rs.getInt("groupe_uuid");
                 currentGroup.administratorId = rs.getInt("administrator");
                 currentGroup.name = rs.getString("nom");
@@ -234,7 +237,7 @@ class Socket_Serveur {
                 results.add(currentGroup);
             }
 
-            Socket_Serveur.groupes.addAll(results);
+            ServerTcp.groupes.addAll(results);
         } catch (SQLException | ClassNotFoundException ex1) {
             ex1.printStackTrace();
         }

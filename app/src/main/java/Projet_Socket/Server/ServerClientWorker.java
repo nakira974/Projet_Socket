@@ -1,5 +1,10 @@
-package Projet_Socket;
+package Projet_Socket.Server;
 
+import Projet_Socket.Client.ClientTcp;
+import Projet_Socket.Login.Identity.Group;
+import Projet_Socket.Login.Identity.User;
+import Projet_Socket.Utils.File.Logger;
+import Projet_Socket.Utils.InternalCommandsEnum;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -16,17 +21,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-class Server_ClientServiceThread extends Thread {
+public class ServerClientWorker extends Thread {
 
     final private Socket client;
     final private Logger log;
     private boolean runState = true;
     private boolean ServerOn = true;
 
-    Server_ClientServiceThread(Socket s) {
+    public ServerClientWorker(Socket s) {
 
         this.client = s;
-        Socket_Serveur.sockets.add(s);
+        ServerTcp.sockets.add(s);
         log = new Logger();
 
 
@@ -86,7 +91,7 @@ class Server_ClientServiceThread extends Thread {
         String result = "";
 
 
-        Socket_Serveur.users //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
                         .forEach(username -> {
@@ -119,7 +124,7 @@ class Server_ClientServiceThread extends Thread {
 
     private void printBroadcast(String clientCommand) {
         final int[] userId = {0};
-        Socket_Serveur.users.forEach(socketUserHashMap -> {
+        ServerTcp.users.forEach(socketUserHashMap -> {
             if (socketUserHashMap.containsKey(client))
                 userId[0] = socketUserHashMap.get(client).Id;
         });
@@ -131,15 +136,15 @@ class Server_ClientServiceThread extends Thread {
 
     private void sendBroadcast(String clientCommand) {
 
-        Socket_Serveur.users.stream() //stream out of arraylist
+        ServerTcp.users.stream() //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
                         .forEach(username -> {
                             try {
                                 if (clientCommand.contains("{") && clientCommand.contains("}")) {
-                                    Socket_Serveur.writeSocket(clientCommand, Socket_Serveur.sockets);
+                                    ServerTcp.writeSocket(clientCommand, ServerTcp.sockets);
                                 } else {
-                                    Socket_Serveur.writeSocket(username.getValue()._username + " : " + clientCommand, Socket_Serveur.sockets);
+                                    ServerTcp.writeSocket(username.getValue()._username + " : " + clientCommand, ServerTcp.sockets);
                                 }
 
                             } catch (IOException e) {
@@ -153,8 +158,8 @@ class Server_ClientServiceThread extends Thread {
         System.out.print("Stopping server...");
         setUsersDown();
         ServerOn = false;
-        Socket_Serveur.writeSocket("END", Socket_Serveur.sockets);
-        Socket_Serveur.sockets.removeAll(Socket_Serveur.sockets);
+        ServerTcp.writeSocket("END", ServerTcp.sockets);
+        ServerTcp.sockets.removeAll(ServerTcp.sockets);
         log.closeLog();
         System.exit(0);
     }
@@ -162,19 +167,19 @@ class Server_ClientServiceThread extends Thread {
 
     private void createGroup(String clientCommand) {
         final User[] current_usr = {null};
-        Groupe current_grp = null;
+        Group current_grp = null;
         String[] text = clientCommand.split(":");
         String groupe = text[0];
 
 
-        Socket_Serveur.users //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
                         .forEach(username -> {
                             current_usr[0] = username.getValue();
                         }));
-        current_grp = new Groupe(groupe, current_usr[0], client);
-        Socket_Serveur.groupes.add(current_grp);
+        current_grp = new Group(groupe, current_usr[0], client);
+        ServerTcp.groupes.add(current_grp);
         try {
 
             int administrator = current_usr[0].Id;
@@ -203,18 +208,18 @@ class Server_ClientServiceThread extends Thread {
     }
 
     private void writePrivate(String[] sender, String destination, String msg) throws IOException {
-        Socket_Serveur.users //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
                         .forEach(dest -> {
                             sender[0] = String.valueOf(dest.getValue()._username);
                         }));
-        Socket_Serveur.users //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getValue()._username.equals(destination))
                         .forEach(src -> {
                             try {
-                                Socket_Serveur.writeSocket(Arrays.toString(sender) + " : " + msg, src.getKey());
+                                ServerTcp.writeSocket(Arrays.toString(sender) + " : " + msg, src.getKey());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -223,15 +228,15 @@ class Server_ClientServiceThread extends Thread {
 
     private void joinGroup(String clientCommand) {
         final User[] current = {null};
-        Groupe current_grp = null;
+        Group current_grp = null;
         String[] text = clientCommand.split(":");
         String groupe = text[1];
-        for (Groupe curr : Socket_Serveur.groupes) {
+        for (Group curr : ServerTcp.groupes) {
             if (curr.name.equals(groupe)) {
                 current_grp = curr;
             }
         }
-        Socket_Serveur.users //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
                         .forEach(username -> {
@@ -285,9 +290,9 @@ class Server_ClientServiceThread extends Thread {
         String msg = text[1];
         final String[] sender = {null};
 
-        for (Groupe current_grp : Socket_Serveur.groupes) {
+        for (Group current_grp : ServerTcp.groupes) {
             if (current_grp.name.equals(groupe)) {
-                Socket_Serveur.users //stream out of arraylist
+                ServerTcp.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
                                 .filter(entry1 -> entry1.getKey().equals(client))
                                 .forEach(username -> {
@@ -297,7 +302,7 @@ class Server_ClientServiceThread extends Thread {
                         .forEach(map -> map.entrySet()
                                 .forEach(username -> {
                                     try {
-                                        Socket_Serveur.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
+                                        ServerTcp.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -315,9 +320,9 @@ class Server_ClientServiceThread extends Thread {
 
         final String[] sender = {null};
 
-        for (Groupe current_grp : Socket_Serveur.groupes) {
+        for (Group current_grp : ServerTcp.groupes) {
             if (current_grp.name.equals(groupe)) {
-                Socket_Serveur.users //stream out of arraylist
+                ServerTcp.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
                                 .filter(entry1 -> entry1.getKey().equals(client))
                                 .forEach(username -> {
@@ -327,7 +332,7 @@ class Server_ClientServiceThread extends Thread {
                         .forEach(map -> map.entrySet()
                                 .forEach(username -> {
                                     try {
-                                        Socket_Serveur.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : \n" + msg, username.getKey());
+                                        ServerTcp.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : \n" + msg, username.getKey());
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -341,18 +346,18 @@ class Server_ClientServiceThread extends Thread {
         String destination = text[0].replace("/@", "");
         String msg = text[1];
         final String[] sender = {null};
-        Socket_Serveur.users //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
                         .forEach(username -> {
                             sender[0] = String.valueOf(username.getValue()._username);
                         }));
-        Socket_Serveur.users //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getValue()._username.equals(destination))
                         .forEach(username -> {
                             try {
-                                Socket_Serveur.writeSocket(Arrays.toString(sender) + " : " + msg, username.getKey());
+                                ServerTcp.writeSocket(Arrays.toString(sender) + " : " + msg, username.getKey());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -362,12 +367,12 @@ class Server_ClientServiceThread extends Thread {
     private void getTranslate(String clientCommand) {
         String[] text = clientCommand.split(":");
         String msg = text[1];
-        Socket_Serveur.users.stream() //stream out of arraylist
+        ServerTcp.users.stream() //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
                         .forEach(username -> {
                             try {
-                                Socket_Serveur.writeSocket(username.getValue()._username + " : " + username.getValue().translateMessage(msg), Socket_Serveur.sockets);
+                                ServerTcp.writeSocket(username.getValue()._username + " : " + username.getValue().translateMessage(msg), ServerTcp.sockets);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -379,12 +384,12 @@ class Server_ClientServiceThread extends Thread {
     }
 
     private void getWeather(String clientCommand) {
-        Socket_Serveur.users.stream() //stream out of arraylist
+        ServerTcp.users.stream() //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
                         .forEach(username -> {
                             try {
-                                Socket_Serveur.writeSocket(username.getValue()._username + " : " + username.getValue().getWeather() + "°C", Socket_Serveur.sockets);
+                                ServerTcp.writeSocket(username.getValue()._username + " : " + username.getValue().getWeather() + "°C", ServerTcp.sockets);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -393,23 +398,23 @@ class Server_ClientServiceThread extends Thread {
 
     private void clientExit(String clientCommand) throws NoSuchAlgorithmException {
         runState = false;
-        Socket_Serveur.sockets.remove(client);
+        ServerTcp.sockets.remove(client);
         System.out.print("Stopping client thread for client :`\n ");
-        for (int i = 0; i < Socket_Serveur.users.size(); i++) {
+        for (int i = 0; i < ServerTcp.users.size(); i++) {
             //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
-            if (Socket_Serveur.users.get(i).containsKey(client)) {
-                Socket_Serveur.quit();
-                System.out.println("[CLIENT EXIT] Client : " + Socket_Serveur.users.get(i).toString()
+            if (ServerTcp.users.get(i).containsKey(client)) {
+                ServerTcp.quit();
+                System.out.println("[CLIENT EXIT] Client : " + ServerTcp.users.get(i).toString()
                         + " Disconnected");
             }
         }
 
         //SI LE SOCKET EST TROUVE DANS LES KEYS DES HASMAP DU ARRAYLIST
-        for (int i = 0; i < Socket_Serveur.users.size(); i++) {
-            if (Socket_Serveur.users.get(i).containsKey(client)) {
+        for (int i = 0; i < ServerTcp.users.size(); i++) {
+            if (ServerTcp.users.get(i).containsKey(client)) {
                 setUserDown();
                 try {
-                    Socket_Serveur.users.remove(i);
+                    ServerTcp.users.remove(i);
                 } catch (IndexOutOfBoundsException ex) {
                     ex.printStackTrace();
                 }
@@ -417,12 +422,12 @@ class Server_ClientServiceThread extends Thread {
         }
 
 
-        System.out.println("Client(s) : " + Socket_Serveur.users.size());
+        System.out.println("Client(s) : " + ServerTcp.users.size());
     }
 
     private void serverStop() throws IOException {
         System.out.print("Server has already stopped");
-        Socket_Serveur.writeSocket("Server has already stopped", client);
+        ServerTcp.writeSocket("Server has already stopped", client);
         runState = false;
     }
 
@@ -457,7 +462,7 @@ class Server_ClientServiceThread extends Thread {
         try{
 
             final String[] sender = {null};
-            Socket_Serveur.users //stream out of arraylist
+            ServerTcp.users //stream out of arraylist
                     .forEach(map -> map.entrySet().stream()
                             .filter(entry1 -> entry1.getKey().equals(client))
                             .forEach(username -> {
@@ -466,7 +471,7 @@ class Server_ClientServiceThread extends Thread {
 
             String userName = sender[0];
             HashMap<String, ArrayList<String>> filesByGroup = new HashMap<>();
-            ArrayList<Groupe> groups = Socket_Serveur.getGroups();
+            ArrayList<Group> groups = ServerTcp.getGroups();
 
             var content = new JSONObject();
             var date = log.getDateNow();
@@ -477,7 +482,7 @@ class Server_ClientServiceThread extends Thread {
             content.put("response status", 200);
             var json = content.toString();
 
-            Socket_Serveur.writeSocket(json, client);
+            ServerTcp.writeSocket(json, client);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -502,7 +507,7 @@ class Server_ClientServiceThread extends Thread {
         String pseudo = null;
         Statement stmt = null;
         try {
-            groupId = Socket_Serveur.getGroupId(groupe);
+            groupId = ServerTcp.getGroupId(groupe);
             Class.forName("org.mariadb.jdbc.Driver");
             try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123")) {
@@ -539,7 +544,7 @@ class Server_ClientServiceThread extends Thread {
             var scriptPath = currentDirectoryPath + "\\create_root_directory.ps1";
             var arguments = new ArrayList<String>();
             arguments.add(path);
-            Socket_Serveur.runPowershellScript(scriptPath,arguments);
+            ServerTcp.runPowershellScript(scriptPath,arguments);
             //String command = "powershell.exe  your command";
             //Getting the version
 
@@ -558,7 +563,7 @@ class Server_ClientServiceThread extends Thread {
         var message = "\"[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
-        message = "\"[LIST UPDATE] Client(s) : " + Socket_Serveur.users.size()+"\"";
+        message = "\"[LIST UPDATE] Client(s) : " + ServerTcp.users.size()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
         String clientUsername = null;
@@ -567,7 +572,7 @@ class Server_ClientServiceThread extends Thread {
 
             while (runState) {
 
-                String clientCommand = client.isConnected() ? Socket_Serveur.readClientStream(client) : null;
+                String clientCommand = client.isConnected() ? ServerTcp.readClientStream(client) : null;
                 if (clientCommand != null) {
                     printBroadcast(clientCommand);
                 }
@@ -607,18 +612,18 @@ class Server_ClientServiceThread extends Thread {
             final int[] clientId = {0};
             final HashMap<Socket, User>[] currentUser = new HashMap[]{null};
 
-            Socket_Serveur.users.forEach(user -> {
+            ServerTcp.users.forEach(user -> {
                 if (user.containsKey(client)) {
                     clientId[0] = user.get(client).Id;
                     currentUser[0] = user;
                 }
             });
-            Socket_Serveur.groupes.forEach(groupe -> {
+            ServerTcp.groupes.forEach(groupe -> {
                 if (groupe.groupeUsers.contains((currentUser[0])))
                     groupe.groupeUsers.remove(currentUser[0]);
             });
 
-            Socket_Serveur.users.remove(currentUser[0]);
+            ServerTcp.users.remove(currentUser[0]);
             message = "\"Thread Client N°" + clientId[0] + " finished, now disconnected\"";
             System.out.println(message);
             log.writeLog(message, -666, "[INFO]");

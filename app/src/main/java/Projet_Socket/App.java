@@ -3,6 +3,14 @@
  */
 package Projet_Socket;
 
+import Projet_Socket.Client.ClientTcp;
+import Projet_Socket.Login.AES_Perso;
+import Projet_Socket.Login.Identity.LogUser;
+import Projet_Socket.Login.Identity.User;
+import Projet_Socket.Server.Services.FileServer;
+import Projet_Socket.Utils.Console;
+import Projet_Socket.Utils.File.Logger;
+import Projet_Socket.Server.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -139,39 +147,39 @@ public class App {
 
             String clientUsername = null;
             String clientMail = null;
-            Socket_Serveur.createServer(new ServerSocket(FactoryPort));
+            ServerTcp.createServer(new ServerSocket(FactoryPort));
             //Si le msg contient %file% alors on lance un serveur de ficher en plus des autres services
             FileServer fileServerThread = msg.toUpperCase().contains("FILE") ?
                     new FileServer(RootDirectory, console)
                     : null;
 
-            Socket_Serveur.getGroups();
-            var log = "\"Server has started at : [" + Socket_Serveur._srvSocket.getInetAddress().getHostAddress() + "]::" + FactoryPort + "\"";
+            ServerTcp.getGroups();
+            var log = "\"Server has started at : [" + ServerTcp._srvSocket.getInetAddress().getHostAddress() + "]::" + FactoryPort + "\"";
             var logger = new Logger();
             logger.writeLog(log, -666, "[INFO]");
-            System.out.printf("[INFO] Server has started at : %s port :%d%n", Socket_Serveur._srvSocket.getInetAddress().getHostAddress(), FactoryPort);
-            while (!Socket_Serveur.getServer().isClosed()) {
+            System.out.printf("[INFO] Server has started at : %s port :%d%n", ServerTcp._srvSocket.getInetAddress().getHostAddress(), FactoryPort);
+            while (!ServerTcp.getServer().isClosed()) {
                 try {
                     Socket client;
-                    while (Socket_Serveur.getNbSocket() < Socket_Serveur.getMaxConnection()) {
-                        client = Socket_Serveur.acceptClient();
+                    while (ServerTcp.getNbSocket() < ServerTcp.getMaxConnection()) {
+                        client = ServerTcp.acceptClient();
                         if (client != null) {
                             try {
 
-                                String hello_request = Socket_Serveur.readClientStream(client);
+                                String hello_request = ServerTcp.readClientStream(client);
                                 final User[] current_usr = {null};
                                 String[] text = hello_request.split(",");
                                 clientUsername = text[0];
                                 clientMail = text[1];
                                 HashMap<Socket, User> currentUser = new HashMap<>();
                                 currentUser.put(client, new User(clientUsername));
-                                Socket_Serveur.users.add(currentUser);
-                                int userId = Socket_Serveur.getUserId(clientMail);
+                                ServerTcp.users.add(currentUser);
+                                int userId = ServerTcp.getUserId(clientMail);
                                 currentUser.get(client).Id = userId;
                                 currentUser.get(client).userMail = clientMail;
-                                currentUser.get(client).Groups = Socket_Serveur.getUserGroups(userId);
+                                currentUser.get(client).Groups = ServerTcp.getUserGroups(userId);
                                 Socket finalClient = client;
-                                Socket_Serveur.groupes.forEach(groupe -> {
+                                ServerTcp.groupes.forEach(groupe -> {
                                     currentUser.get(finalClient).Groups.forEach(usrGroup -> {
                                         if (usrGroup.Id == groupe.Id)
                                             groupe.groupeUsers.add(currentUser);
@@ -187,7 +195,7 @@ public class App {
                                 e.printStackTrace();
                             }
 
-                            Server_ClientServiceThread cliThread = new Server_ClientServiceThread(client);
+                            ServerClientWorker cliThread = new ServerClientWorker(client);
 
 
                             cliThread.start();

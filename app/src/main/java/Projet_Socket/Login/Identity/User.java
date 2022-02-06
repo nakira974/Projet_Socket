@@ -1,0 +1,89 @@
+package Projet_Socket.Login.Identity;
+
+import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.LocalTime;
+import java.util.ArrayList;
+
+public class User {
+
+    public int Id;
+    public String userMail;
+    public String _username;
+    public LocalTime _lastConnection;
+    public ArrayList<Group> Groups;
+
+    User() {
+    }
+
+    public User(String username) {
+        _username = username;
+        LocalTime time = LocalTime.now();
+        _lastConnection = time;
+        Groups = new ArrayList<>();
+    }
+
+    public String translateMessage(String message) {
+        try {
+            assert false;
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://google-translate1.p.rapidapi.com/language/translate/v2"))
+                    .header("content-type", "application/x-www-form-urlencoded")
+                    .header("accept-encoding", "application/gzip")
+                    .header("x-rapidapi-key", "f3c529b0c4msh16d0759eef9d379p14c09ejsnbdf2ec0a9b7e")
+                    .header("x-rapidapi-host", "google-translate1.p.rapidapi.com")
+                    .method("POST", HttpRequest.BodyPublishers.ofString("q=" + message + "&source=fr&target=en"))
+                    .build();
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response.body());
+
+            Object obj = JSONValue.parse(response.body());
+            JSONObject jsonObject = (JSONObject) obj;
+
+            JSONObject jsonMain = (JSONObject) jsonObject.get("data");
+
+            JSONArray jsonTrans = (JSONArray) jsonMain.get("translations");
+
+            JSONObject translate = (JSONObject) jsonTrans.get(0);
+
+            return (String) translate.get("translatedText");
+            //System.out.println(response.body());
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return "Impossible de traduire!";
+    }
+
+    public double getWeather() {
+        try {
+            assert false;
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://community-open-weather-map.p.rapidapi.com/weather?q=Amiens%20%2Cfr&lat=0&lon=0&id=2172797&lang=fr&units=metric"))
+                    .header("x-rapidapi-key", "8bcb441bf5mshb79ef4191cd9db1p150c6ejsn08a43923b961")
+                    .header("x-rapidapi-host", "community-open-weather-map.p.rapidapi.com")
+                    .method("GET", HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+
+            Object obj = JSONValue.parse(response.body());
+            JSONObject jsonObject = (JSONObject) obj;
+
+            JSONObject jsonMain = (JSONObject) jsonObject.get("main");
+
+            return (double) jsonMain.get("temp");
+            //System.out.println(response.body());
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return 0.0;
+    }
+
+}

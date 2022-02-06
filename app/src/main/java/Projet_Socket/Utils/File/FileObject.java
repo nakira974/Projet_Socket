@@ -1,4 +1,4 @@
-package Projet_Socket;
+package Projet_Socket.Utils.File;
 
 public class FileObject {
 

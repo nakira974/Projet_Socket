@@ -1,8 +1,9 @@
-package Projet_Socket;
+package Projet_Socket.Client;
 /*
  --- creators : nakira974 && Weefle  ----
  */
 
+import Projet_Socket.Utils.Console;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -16,7 +17,7 @@ public class ClientTcp {
     private final Socket socket;
     private String _username;
 
-    public ClientTcp(java.net.Socket socket) {
+    public ClientTcp(Socket socket) {
 
 
         this.socket = socket;
@@ -24,7 +25,7 @@ public class ClientTcp {
 
     }
 
-    public ClientTcp(java.net.Socket socket, String p_userName) {
+    public ClientTcp(Socket socket, String p_userName) {
 
 
         this._username = p_userName;
@@ -102,7 +103,7 @@ public class ClientTcp {
 
     }
 
-    static class Thread_Client_Receive extends Thread {
+    public static class Thread_Client_Receive extends Thread {
         private final ClientTcp client;
         private final Console commandes;
 
@@ -134,7 +135,7 @@ public class ClientTcp {
 
     }
 
-    static class Thread_Client_Send extends Thread {
+    public static class Thread_Client_Send extends Thread {
         //String destination;
         private final ClientTcp socket;
         private final Console console;

@@ -1,5 +1,7 @@
-package Projet_Socket;
+package Projet_Socket.Server.Services;
 
+import Projet_Socket.Server.ServerTcp;
+import Projet_Socket.Utils.Console;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +10,7 @@ import java.util.Arrays;
 
 public class FileServer extends Thread {
     public String ServerRootDirectory;
-    public Console Console;
+    public Projet_Socket.Utils.Console Console;
     private boolean _isServerRunning;
     public FileServer(String serverRootDirectory, Console console) {
         _isServerRunning = true;
@@ -21,7 +23,7 @@ public class FileServer extends Thread {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Socket_Serveur.writeSocket(e.getMessage(), Socket_Serveur.sockets);
+                    ServerTcp.writeSocket(e.getMessage(), ServerTcp.sockets);
                 }
                 sleep(5000);
             } while (_isServerRunning);
