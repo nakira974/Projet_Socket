@@ -1,5 +1,8 @@
 package Projet_Socket.Login;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -14,7 +17,7 @@ public class AES_Perso extends Abstract_AES_Perso {
      * @return A base64 encoded string containing the encrypted data
      * @throws Exception Throws exceptions
      */
-    public static String encrypt(String input, String passphrase) throws Exception {
+    public static String encrypt(@NotNull String input, @NotNull String passphrase) throws Exception {
         return Base64.getEncoder().encodeToString(_encrypt(input.getBytes(UTF_8), passphrase.getBytes(UTF_8)));
     }
 
@@ -38,7 +41,9 @@ public class AES_Perso extends Abstract_AES_Perso {
      * @return Decrypted data in bytes
      * @throws Exception Throws exceptions
      */
-    public static String decrypt(String crypted, String passphrase) throws Exception {
+    @NotNull
+    @Contract("_, _ -> new")
+    public static String decrypt(String crypted, @NotNull String passphrase) throws Exception {
         return new String(_decrypt(Base64.getDecoder().decode(crypted), passphrase.getBytes(UTF_8)), UTF_8);
     }
 

@@ -1,5 +1,8 @@
 package Projet_Socket.Login;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -20,6 +23,7 @@ public abstract class Abstract_AES_Perso {
      * @return Encrypted data
      * @throws Exception Throws exceptions
      */
+    @NotNull
     protected static byte[] _encrypt(byte[] input, byte[] passphrase) throws Exception {
         var salt = (new SecureRandom()).generateSeed(8);
         var keyIv = deriveKeyAndIv(passphrase, salt);
@@ -61,6 +65,8 @@ public abstract class Abstract_AES_Perso {
      * @return Array of key and iv
      * @throws Exception Throws exceptions
      */
+    @NotNull
+    @Contract("_, _ -> new")
     protected static Object[] deriveKeyAndIv(byte[] passphrase, byte[] salt) throws Exception {
         var md5 = MessageDigest.getInstance("MD5");
         var passSalt = concat(passphrase, salt);
@@ -82,7 +88,8 @@ public abstract class Abstract_AES_Perso {
      * @param b Second array
      * @return Concatenated bytes
      */
-    protected static byte[] concat(byte[] a, byte[] b) {
+    @NotNull
+    protected static byte[] concat(@NotNull byte[] a, @NotNull byte[] b) {
         var c = new byte[a.length + b.length];
         System.arraycopy(a, 0, c, 0, a.length);
         System.arraycopy(b, 0, c, a.length, b.length);

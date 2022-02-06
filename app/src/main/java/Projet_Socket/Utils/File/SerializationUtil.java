@@ -1,5 +1,7 @@
 package Projet_Socket.Utils.File;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 
 public class SerializationUtil {
@@ -11,6 +13,7 @@ public class SerializationUtil {
      * @return the serialized byte-array
      * @throws IOException Signals that an I/O exception has occurred.
      */
+    @NotNull
     public static byte[] serialize(Object obj) throws IOException {
         var out = new ByteArrayOutputStream();
         var os = new ObjectOutputStream(out);

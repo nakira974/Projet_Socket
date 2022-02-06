@@ -2,6 +2,7 @@ package Projet_Socket.Login.Identity;
 
 import Projet_Socket.Client.ClientTcp;
 import Projet_Socket.Login.AES_Perso;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.net.Socket;
@@ -18,6 +19,7 @@ public class LogUser {
 
     }
 
+    @NotNull
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
         var number = new BigInteger(1, hash);
@@ -34,7 +36,7 @@ public class LogUser {
     }
 
 
-    public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
+    public static byte[] getSHA(@NotNull String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
         var md = MessageDigest.getInstance("MD5");
 
@@ -44,7 +46,7 @@ public class LogUser {
         return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
-    public void createUser(ArrayList<String> args) throws ClassNotFoundException {
+    public void createUser(@NotNull ArrayList<String> args) throws ClassNotFoundException {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -80,7 +82,7 @@ public class LogUser {
      */
 
 
-    public Hashtable<ClientTcp, String> newLogin(ArrayList<String> args) throws Exception {
+    public Hashtable<ClientTcp, String> newLogin(@NotNull ArrayList<String> args) throws Exception {
         var result = new Hashtable<ClientTcp, String>();
         var email = "";
         var sha256 = getSHA(args.get(0));

@@ -4,6 +4,7 @@ import Projet_Socket.Login.Identity.Group;
 import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Utils.File.Logger;
 import Projet_Socket.Utils.InternalCommandsEnum;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -220,7 +221,7 @@ public class ServerClientWorker extends Thread {
                         }));
     }
 
-    private void joinGroup(String clientCommand) {
+    private void joinGroup(@NotNull String clientCommand) {
         final User[] current = {null};
         var current_grp = new Group();
         var text = clientCommand.split(":");
@@ -249,7 +250,7 @@ public class ServerClientWorker extends Thread {
     }
 
 
-    public void joinGroup(ArrayList<Integer> args) throws ClassNotFoundException {
+    public void joinGroup(@NotNull ArrayList<Integer> args) throws ClassNotFoundException {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -273,7 +274,7 @@ public class ServerClientWorker extends Thread {
         System.out.println("USER ID N°" + args.get(0) + " HAS JOINED GROUP N°" + args.get(1) + "...");
     }
 
-    private void sendGroup(String clientCommand) {
+    private void sendGroup(@NotNull String clientCommand) {
         var text = clientCommand.split(":");
         var groupe = text[0].replace("/G", "");
         var msg = text[1];
@@ -299,7 +300,7 @@ public class ServerClientWorker extends Thread {
 
     //TODO Chercher le repertoire du groupe, le fichier .json et envoyer au clients
     // Ils reçoivent ce qu'il y'a sur le serveur et demande/supprime/ des fichiers
-    private void groupFileUpload(String clientCommand) {
+    private void groupFileUpload(@NotNull String clientCommand) {
         var text = clientCommand.split(":");
         var groupe = text[0].replace("/createSharingSpace", "");
         var msg = text[1];
@@ -324,7 +325,7 @@ public class ServerClientWorker extends Thread {
         }
     }
 
-    private void sendPrivate(String clientCommand) {
+    private void sendPrivate(@NotNull String clientCommand) {
         var text = clientCommand.split(":");
         var destination = text[0].replace("/@", "");
         var msg = text[1];
@@ -332,7 +333,7 @@ public class ServerClientWorker extends Thread {
         privateSend(sender, destination, msg);
     }
 
-    private void getTranslate(String clientCommand) {
+    private void getTranslate(@NotNull String clientCommand) {
         var text = clientCommand.split(":");
         var msg = text[1];
         ServerTcp.users //stream out of arraylist
@@ -399,12 +400,13 @@ public class ServerClientWorker extends Thread {
         runState = false;
     }
 
+    @NotNull
     private ArrayList<String> checkGroupFiles(String path) {
         var result = new ArrayList<String>();
         //Creating a File object for directory
         var directoryPath = new File(path);
         var textFilefilter = new FileFilter() {
-            public boolean accept(File file) {
+            public boolean accept(@NotNull File file) {
                 return file.isFile();
             }
         };
@@ -452,7 +454,7 @@ public class ServerClientWorker extends Thread {
         }
     }
 
-    public void createCloudSubscription(String clientCommand) throws Exception {
+    public void createCloudSubscription(@NotNull String clientCommand) throws Exception {
         var text = clientCommand.split(":");
         var args = text[1].split(",");
         var groupe = args[0];

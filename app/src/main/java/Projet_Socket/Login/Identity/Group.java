@@ -1,5 +1,7 @@
 package Projet_Socket.Login.Identity;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ public class Group {
         administrator = new User();
     }
 
-    public Group(String name, User administrator, Socket admin_sock) {
+    public Group(String name, @NotNull User administrator, Socket admin_sock) {
         administratorId = administrator.Id;
         groupeUsers = new ArrayList<>(10);
         var currentHash = new HashMap<Socket, User>();

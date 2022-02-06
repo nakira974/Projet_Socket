@@ -12,6 +12,7 @@ import Projet_Socket.Server.ServerTcp;
 import Projet_Socket.Server.Services.FileServer;
 import Projet_Socket.Utils.Console;
 import Projet_Socket.Utils.File.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class App {
     public static final String RootDirectory = "C:\\temp\\";
     static String _str;
 
-    private static byte[] getSHA(String input) throws NoSuchAlgorithmException {
+    private static byte[] getSHA(@NotNull String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
         var md = MessageDigest.getInstance("MD5");
 
@@ -41,6 +42,7 @@ public class App {
         return md.digest(input.getBytes(StandardCharsets.UTF_8));
     }
 
+    @NotNull
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
         var number = new BigInteger(1, hash);
@@ -56,7 +58,8 @@ public class App {
         return hexString.toString();
     }
 
-    private static ArrayList<String> register(ArrayList<String> args, Console command) throws Exception {
+    @NotNull
+    private static ArrayList<String> register(@NotNull ArrayList<String> args, @NotNull Console command) throws Exception {
 
         var result = new ArrayList<String>();
         System.out.println("------REGISTER-----");

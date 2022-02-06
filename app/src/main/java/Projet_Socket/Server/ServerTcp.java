@@ -3,6 +3,7 @@ package Projet_Socket.Server;
 import Projet_Socket.Login.Identity.Group;
 import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Utils.File.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -88,7 +89,7 @@ public class ServerTcp {
         return _srvSocket;
     }
 
-    public static void writeSocket(String content, ArrayList<Socket> clients) throws IOException {
+    public static void writeSocket(String content, @NotNull ArrayList<Socket> clients) throws IOException {
 
         for (var socket : clients) {
 
@@ -100,7 +101,7 @@ public class ServerTcp {
 
     }
 
-    public static void writeSocket(String content, Socket client) throws IOException {
+    public static void writeSocket(String content, @NotNull Socket client) throws IOException {
 
 
         var out = new PrintWriter(client.getOutputStream());
@@ -110,6 +111,7 @@ public class ServerTcp {
 
     }
 
+    @NotNull
     public static ArrayList<String> getFilesByGroup(int groupId) throws SQLException {
         var result = new ArrayList<String>();
         try {
@@ -139,6 +141,7 @@ public class ServerTcp {
         return result;
     }
 
+    @NotNull
     public static HashMap<Group, ArrayList<String>> getFilesByGroup() {
         var result = new HashMap<Group, ArrayList<String>>();
         groupes.forEach(groupe -> {
@@ -156,6 +159,7 @@ public class ServerTcp {
         return result;
     }
 
+    @NotNull
     private static ArrayList<String> getFilesByDirectory(String directory) {
 
         var result = new ArrayList<String>();
@@ -206,6 +210,7 @@ public class ServerTcp {
         return result;
     }
 
+    @NotNull
     public static ArrayList<Group> getUserGroups(int userId) {
         var groupId = 0;
         var results = new ArrayList<Group>();
@@ -243,6 +248,7 @@ public class ServerTcp {
         return results;
     }
 
+    @NotNull
     public static ArrayList<Group> getGroups() {
         var results = new ArrayList<Group>();
         try {
@@ -327,7 +333,7 @@ public class ServerTcp {
         return userId;
     }
 
-    public void sendFileBroadcast(String path, Socket client) throws IOException {
+    public void sendFileBroadcast(String path, @NotNull Socket client) throws IOException {
 
         var writer = new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8);
 
@@ -339,7 +345,7 @@ public class ServerTcp {
 
     }
 
-    public void sendFileBroadcast(String path, ArrayList<Socket> clients) throws IOException {
+    public void sendFileBroadcast(String path, @NotNull ArrayList<Socket> clients) throws IOException {
 
         for (var socket : clients) {
             var writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
