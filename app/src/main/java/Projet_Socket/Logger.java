@@ -24,7 +24,7 @@ public class Logger {
                 this.file = new FileWriter(getLogFileName());
                 output = new BufferedWriter(file);
                 buffer.newLine();
-                buffer.append("{\"Logs\": [\n{},\n]\n}");
+                buffer.append("{\"Logs\": [\n{}\n]\n}");
                 buffer.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -38,7 +38,7 @@ public class Logger {
                 toAbsolutePath().
                 toString();
 
-        return currentDirectoryPath+"\\app\\src\\main\\java\\Projet_Socket\\logger(" + getDateNowShort() + ").txt";
+        return currentDirectoryPath+"\\app\\src\\main\\java\\Projet_Socket\\logger(" + getDateNowShort() + ").json";
     }
 
 
@@ -60,7 +60,7 @@ public class Logger {
                     "     \"domain\" : \""+domain+"\",\n" +
                     "\t  \"content\" : \""+p_fileData+"\",\n" +
                     "\t\t\"userId\" : \""+userId+"\"\n" +
-                    "},\n{},\n" +
+                    "},\n{}\n" +
                     "";
             Semaphore semaphore = new Semaphore(1);
             semaphore.acquire();
@@ -73,7 +73,7 @@ public class Logger {
 
                 line = reader.readLine();
             }
-            var newContent = oldContent.replace("{},", jsonContent);
+            var newContent = oldContent.replace("{}", jsonContent);
             var writer = new FileWriter(getLogFileName());
             writer.write(newContent);
             reader.close();
