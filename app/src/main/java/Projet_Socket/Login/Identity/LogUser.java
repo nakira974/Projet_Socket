@@ -49,13 +49,13 @@ public class LogUser {
     public void createUser(ArrayList<String> args) throws ClassNotFoundException {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("Requête de création d'utilisateur en cours d'execution...");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
             var rs = stmt.executeQuery(

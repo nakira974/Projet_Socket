@@ -165,7 +165,6 @@ public class App {
                             try {
 
                                 var hello_request = ServerTcp.readClientStream(client);
-                                final User[] current_usr = {null};
                                 var text = hello_request.split(",");
                                 clientUsername = text[0];
                                 clientMail = text[1];
@@ -176,14 +175,10 @@ public class App {
                                 currentUser.get(client).Id = userId;
                                 currentUser.get(client).userMail = clientMail;
                                 currentUser.get(client).Groups = ServerTcp.getUserGroups(userId);
-                                var finalClient = client;
-                                ServerTcp.groupes.forEach(groupe -> {
-                                    currentUser.get(finalClient).Groups.forEach(usrGroup -> {
-                                        if (usrGroup.Id == groupe.Id)
-                                            groupe.groupeUsers.add(currentUser);
-                                    });
-
-                                });
+                                ServerTcp.groupes.forEach(groupe -> currentUser.get(client).Groups.forEach(usrGroup -> {
+                                    if (usrGroup.Id == groupe.Id)
+                                        groupe.groupeUsers.add(currentUser);
+                                }));
                                 log = "{\n\t\t\"user\" : " + currentUser.get(client).Id + ",\n" +
                                         "\t\t\"email\" :\"" + currentUser.get(client).userMail + "\",\n" +
                                         "\t\t\"address\" : \"[" + client.getInetAddress().getHostAddress() + "]" + "\",\n" +

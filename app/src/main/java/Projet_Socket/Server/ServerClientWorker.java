@@ -1,6 +1,5 @@
 package Projet_Socket.Server;
 
-import Projet_Socket.Client.ClientTcp;
 import Projet_Socket.Login.Identity.Group;
 import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Utils.File.Logger;
@@ -20,6 +19,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class ServerClientWorker extends Thread {
 
@@ -87,10 +87,7 @@ public class ServerClientWorker extends Thread {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
-                        .forEach(username -> {
-                            currentUser[0] = username.getValue()._username;
-
-                        }));
+                        .forEach(username -> currentUser[0] = username.getValue()._username));
         var sha256 = getSHA(currentUser[0]);
         currentUser[0] = toHexString(sha256);
         var result = currentUser[0];
@@ -129,7 +126,7 @@ public class ServerClientWorker extends Thread {
 
     private void sendBroadcast(String clientCommand) {
 
-        ServerTcp.users.stream() //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
                         .forEach(username -> {
@@ -152,7 +149,7 @@ public class ServerClientWorker extends Thread {
         setUsersDown();
         ServerOn = false;
         ServerTcp.writeSocket("END", ServerTcp.sockets);
-        ServerTcp.sockets.removeAll(ServerTcp.sockets);
+        ServerTcp.sockets = null;
         log.closeLog();
         System.exit(0);
     }
@@ -167,9 +164,8 @@ public class ServerClientWorker extends Thread {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
-                        .forEach(username -> {
-                            current_usr[0] = username.getValue();
-                        }));
+                        .forEach(username -> current_usr[0] = username.getValue()));
+
         var current_grp = new Group(groupe, current_usr[0], client);
         ServerTcp.groupes.add(current_grp);
         try {
@@ -198,12 +194,20 @@ public class ServerClientWorker extends Thread {
     }
 
     private void writePrivate(String[] sender, String destination, String msg) throws IOException {
+        try{
+            privateSend(sender, destination, msg);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new IOException();
+        }
+
+    }
+
+    private void privateSend(String[] sender, String destination, String msg) {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
-                        .forEach(dest -> {
-                            sender[0] = String.valueOf(dest.getValue()._username);
-                        }));
+                        .forEach(dest -> sender[0] = String.valueOf(dest.getValue()._username)));
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getValue()._username.equals(destination))
@@ -229,13 +233,10 @@ public class ServerClientWorker extends Thread {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
-                        .forEach(username -> {
-                            current[0] = username.getValue();
-                        }));
-        var user = new HashMap<Socket, User>();
-        user.put(client, current[0]);
+                        .forEach(username -> current[0] = username.getValue()));
+
         var userId = current[0].Id;
-        var groupId = current_grp != null ? current_grp.Id : 0;
+        var groupId = current_grp.Id;
 
         var arguments = new ArrayList<Integer>();
         arguments.add(userId);
@@ -249,7 +250,6 @@ public class ServerClientWorker extends Thread {
 
 
     public void joinGroup(ArrayList<Integer> args) throws ClassNotFoundException {
-        ClientTcp socket_client = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -259,7 +259,7 @@ public class ServerClientWorker extends Thread {
             var stmt = conn.createStatement();
 
 
-            var rs = stmt.executeQuery(
+            stmt.executeQuery(
                     "INSERT INTO group_users (`userId`, `groupId`) VALUES('" + args.get(0) + "','" + args.get(1) + "')");
 
 
@@ -284,18 +284,15 @@ public class ServerClientWorker extends Thread {
                 ServerTcp.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
                                 .filter(entry1 -> entry1.getKey().equals(client))
-                                .forEach(username -> {
-                                    sender[0] = String.valueOf(username.getValue()._username);
-                                }));
+                                .forEach(username -> sender[0] = String.valueOf(username.getValue()._username)));
                 current_grp.groupeUsers //stream out of arraylist
-                        .forEach(map -> map.entrySet()
-                                .forEach(username -> {
-                                    try {
-                                        ServerTcp.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : " + msg, username.getKey());
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }));
+                        .forEach(map -> map.forEach((key, value) -> {
+                            try {
+                                ServerTcp.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : " + msg, key);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }));
             }
         }
     }
@@ -314,18 +311,15 @@ public class ServerClientWorker extends Thread {
                 ServerTcp.users //stream out of arraylist
                         .forEach(map -> map.entrySet().stream()
                                 .filter(entry1 -> entry1.getKey().equals(client))
-                                .forEach(username -> {
-                                    sender[0] = String.valueOf(username.getValue()._username);
-                                }));
+                                .forEach(username -> sender[0] = String.valueOf(username.getValue()._username)));
                 current_grp.groupeUsers //stream out of arraylist
-                        .forEach(map -> map.entrySet()
-                                .forEach(username -> {
-                                    try {
-                                        ServerTcp.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : \n" + msg, username.getKey());
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }));
+                        .forEach(map -> map.forEach((key, value) -> {
+                            try {
+                                ServerTcp.writeSocket("[" + current_grp.name + "] " + Arrays.toString(sender) + " : \n" + msg, key);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }));
             }
         }
     }
@@ -335,28 +329,13 @@ public class ServerClientWorker extends Thread {
         var destination = text[0].replace("/@", "");
         var msg = text[1];
         final String[] sender = {null};
-        ServerTcp.users //stream out of arraylist
-                .forEach(map -> map.entrySet().stream()
-                        .filter(entry1 -> entry1.getKey().equals(client))
-                        .forEach(username -> {
-                            sender[0] = String.valueOf(username.getValue()._username);
-                        }));
-        ServerTcp.users //stream out of arraylist
-                .forEach(map -> map.entrySet().stream()
-                        .filter(entry -> entry.getValue()._username.equals(destination))
-                        .forEach(username -> {
-                            try {
-                                ServerTcp.writeSocket(Arrays.toString(sender) + " : " + msg, username.getKey());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }));
+        privateSend(sender, destination, msg);
     }
 
     private void getTranslate(String clientCommand) {
         var text = clientCommand.split(":");
         var msg = text[1];
-        ServerTcp.users.stream() //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
                         .forEach(username -> {
@@ -373,7 +352,7 @@ public class ServerClientWorker extends Thread {
     }
 
     private void getWeather(String clientCommand) {
-        ServerTcp.users.stream() //stream out of arraylist
+        ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(client))
                         .forEach(username -> {
@@ -426,18 +405,14 @@ public class ServerClientWorker extends Thread {
         var directoryPath = new File(path);
         var textFilefilter = new FileFilter(){
             public boolean accept(File file) {
-                var isFile = file.isFile();
-                if (isFile) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return file.isFile();
             }
         };
         //List of all the text files
         var filesList= directoryPath.listFiles(textFilefilter);
         System.out.println("List of the text files in the specified directory:");
-        for(var file : filesList) {
+
+        for(var file : Objects.requireNonNull(filesList)) {
             result.add(file.getAbsolutePath());
             System.out.println("File name: "+file.getName());
             System.out.println("File path: "+file.getAbsolutePath());
@@ -447,16 +422,14 @@ public class ServerClientWorker extends Thread {
         return result;
     }
 
-    public void fileSynchronisationRequest(String clientCommand){
+    public void fileSynchronisationRequest(){
         try{
 
             final String[] sender = {null};
             ServerTcp.users //stream out of arraylist
                     .forEach(map -> map.entrySet().stream()
                             .filter(entry1 -> entry1.getKey().equals(client))
-                            .forEach(username -> {
-                                sender[0] = String.valueOf(username.getValue()._username);
-                            }));
+                            .forEach(username -> sender[0] = String.valueOf(username.getValue()._username)));
 
             var userName = sender[0];
             var filesByGroup = new HashMap<String, ArrayList<String>>();
@@ -490,10 +463,9 @@ public class ServerClientWorker extends Thread {
         var file = new File(path);
         //Creating the directory
         var bool = file.mkdir();
+        if(!bool) return;
         var groupId = 0;
-        ClientTcp socket_client = null;
         ResultSet rs = null;
-        String pseudo = null;
         Statement stmt = null;
         try {
             groupId = ServerTcp.getGroupId(groupe);
@@ -548,14 +520,12 @@ public class ServerClientWorker extends Thread {
 
 
     public void run() {
-        var clientRequest = InternalCommandsEnum.Lazy;
         var message = "\"[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
         message = "\"[LIST UPDATE] Client(s) : " + ServerTcp.users.size()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
-        var clientUsername = "";
 
         try {
 
@@ -585,7 +555,7 @@ public class ServerClientWorker extends Thread {
                 else if (clientCommand.contains(InternalCommandsEnum.JoinGroupRequest.Label)) joinGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.GroupCreationRequest.Label)) createGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.CreateSharingSpace.Label)) createCloudSubscription(clientCommand);
-                else if(clientCommand.contains(InternalCommandsEnum.FileSynchronisation.Label)) fileSynchronisationRequest(clientCommand);
+                else if(clientCommand.contains(InternalCommandsEnum.FileSynchronisation.Label)) fileSynchronisationRequest();
                 else sendBroadcast(clientCommand);
                 //endregion Internal Commands
             }
@@ -599,7 +569,7 @@ public class ServerClientWorker extends Thread {
                 e.printStackTrace();
             }
             final int[] clientId = {0};
-            final HashMap<Socket, User>[] currentUser = new HashMap[]{null};
+            var currentUser = new HashMap[]{null};
 
             ServerTcp.users.forEach(user -> {
                 if (user.containsKey(client)) {

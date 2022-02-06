@@ -10,20 +10,13 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Objects;
 
 
 public class ClientTcp {
 
     private final Socket socket;
-    private String _username;
-
-    public ClientTcp(Socket socket) {
-
-
-        this.socket = socket;
-
-
-    }
+    private final String _username;
 
     public ClientTcp(Socket socket, String p_userName) {
 
@@ -35,18 +28,13 @@ public class ClientTcp {
     }
 
 
-    public String getUserName() {
-
-        return this._username;
-    }
-
     public Socket getSocket() {
         return this.socket;
     }
 
     public void writeSocket(String texte) throws IOException {
 
-        var out = new PrintWriter(this.socket.getOutputStream());
+        var out = new PrintWriter(Objects.requireNonNull(this.socket).getOutputStream());
         out.println(texte);
         out.flush();
 
@@ -139,8 +127,7 @@ public class ClientTcp {
         //String destination;
         private final ClientTcp socket;
         private final Console console;
-        private String email;
-        private String username;
+        private final String email;
 
         public Thread_Client_Send(ClientTcp s, String p_email) throws IOException {
             socket = s;

@@ -178,11 +178,11 @@ public class ServerTcp {
     }
     public static String readClientStream(Socket client) throws IOException {
 
-        String result = "";
+        var result = "";
         try {
             var reader = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
 
-            String line = client.isConnected() ? reader.readLine() : "";
+            var line = client.isConnected() ? reader.readLine() : "";
             if (line.contains("{") && line.contains("}")) {
                 var jsonObject = new JSONObject(line);
                 var name = (String) jsonObject.get("name");
@@ -208,11 +208,11 @@ public class ServerTcp {
     }
 
     public static ArrayList<Group> getUserGroups(int userId) {
-        int groupId = 0;
+        var groupId = 0;
         var results = new ArrayList<Group>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("[SQL] SETTING GROUPS FOR USER ID N° " + userId + "...");
@@ -229,7 +229,7 @@ public class ServerTcp {
 
             rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes WHERE groupe_uuid =" + groupId);
             while (rs.next()) {
-                Group currentGroup = new Group();
+                var currentGroup = new Group();
                 currentGroup.Id = rs.getInt("groupe_uuid");
                 currentGroup.administratorId = rs.getInt("administrator");
                 currentGroup.name = rs.getString("nom");
@@ -242,11 +242,11 @@ public class ServerTcp {
     }
 
     public static ArrayList<Group> getGroups() {
-        int groupId = 0;
+        var groupId = 0;
         var results = new  ArrayList<Group>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("[SQL] FETCHING GROUPS FROM DATABASE...");
@@ -300,7 +300,7 @@ public class ServerTcp {
     }
 
     public static int getUserId(String userMail) {
-        int userId = 0;
+        var userId = 0;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -340,7 +340,7 @@ public class ServerTcp {
 
     public void sendFileBroadcast(String path, ArrayList<Socket> clients) throws IOException {
 
-        for (Socket socket : clients) {
+        for (var socket : clients) {
             var writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
 
 
