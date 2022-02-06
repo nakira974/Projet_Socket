@@ -12,8 +12,8 @@ public class SerializationUtil {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
+        var out = new ByteArrayOutputStream();
+        var os = new ObjectOutputStream(out);
         os.writeObject(obj);
         return out.toByteArray();
     }
@@ -27,8 +27,8 @@ public class SerializationUtil {
      * @throws ClassNotFoundException the class not found exception
      */
     public static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
+        var in = new ByteArrayInputStream(data);
+        var is = new ObjectInputStream(in);
         return is.readObject();
     }
 

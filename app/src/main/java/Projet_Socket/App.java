@@ -31,7 +31,7 @@ public class App {
 
     private static byte[] getSHA(String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        var md = MessageDigest.getInstance("MD5");
 
         // digest() method called
         // to calculate message digest of an input
@@ -41,10 +41,10 @@ public class App {
 
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
-        BigInteger number = new BigInteger(1, hash);
+        var number = new BigInteger(1, hash);
 
         // Convert message digest into hex value
-        StringBuilder hexString = new StringBuilder(number.toString(16));
+        var hexString = new StringBuilder(number.toString(16));
 
         // Pad with leading zeros
         while (hexString.length() < 32) {
@@ -55,16 +55,15 @@ public class App {
     }
 
     private static ArrayList<String> register(ArrayList<String> args, Console command) throws Exception {
-        byte[] sha256;
 
-        ArrayList<String> result = new ArrayList<>();
+        var result = new ArrayList<String>();
         System.out.println("------REGISTER-----");
-        LogUser logger = new LogUser();
+        var logger = new LogUser();
         System.out.println("Nom d'utilisateur : ");
         _str = command.readKey();
         result.add(_str);
         //ON ENCRYPTE LE NOM USER EN SHA256
-        sha256 = getSHA(_str);
+        var sha256 = getSHA(_str);
         _str = toHexString(sha256);
         args.add(_str);
         //FIN ENCRYPTAGE
@@ -88,12 +87,12 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
-        String userMail = "";
+        var userMail = "";
         ClientTcp socket_client = null;
-        Console console = new Console(new BufferedReader(new InputStreamReader(System.in)), System.out);
-        String msg;
+        var console = new Console(new BufferedReader(new InputStreamReader(System.in)), System.out);
+        var msg = "";
 
-        ArrayList<String> userInfo = new ArrayList<>();
+        var userInfo = new ArrayList<String>();
 
 
         msg = console.readKey();
@@ -116,7 +115,7 @@ public class App {
                 userInfo = register(userInfo, console);
             }
             try {
-                LogUser log = new LogUser();
+                var log = new LogUser();
                 //do{
                 var hashtable = log.newLogin(userInfo);
                 socket_client = hashtable.keys().nextElement();
@@ -129,12 +128,12 @@ public class App {
             //FIN LOGIN
 
             if (socket_client != null) {
-                ClientTcp.Thread_Client_Receive receiver = new ClientTcp.Thread_Client_Receive(socket_client);
+                var receiver = new ClientTcp.Thread_Client_Receive(socket_client);
 
                 receiver.start();
 
 
-                ClientTcp.Thread_Client_Send sender = new ClientTcp.Thread_Client_Send(socket_client, userMail);
+                var sender = new ClientTcp.Thread_Client_Send(socket_client, userMail);
 
                 sender.start();
             } else {
@@ -145,11 +144,11 @@ public class App {
         } else if (msg.equals("serveur")) {
 
 
-            String clientUsername = null;
-            String clientMail = null;
+            var clientUsername = "";
+            var clientMail = "";
             ServerTcp.createServer(new ServerSocket(FactoryPort));
             //Si le msg contient %file% alors on lance un serveur de ficher en plus des autres services
-            FileServer fileServerThread = msg.toUpperCase().contains("FILE") ?
+            var fileServerThread = msg.toUpperCase().contains("FILE") ?
                     new FileServer(RootDirectory, console)
                     : null;
 
@@ -160,25 +159,24 @@ public class App {
             System.out.printf("[INFO] Server has started at : %s port :%d%n", ServerTcp._srvSocket.getInetAddress().getHostAddress(), FactoryPort);
             while (!ServerTcp.getServer().isClosed()) {
                 try {
-                    Socket client;
                     while (ServerTcp.getNbSocket() < ServerTcp.getMaxConnection()) {
-                        client = ServerTcp.acceptClient();
+                        var client = ServerTcp.acceptClient();
                         if (client != null) {
                             try {
 
-                                String hello_request = ServerTcp.readClientStream(client);
+                                var hello_request = ServerTcp.readClientStream(client);
                                 final User[] current_usr = {null};
-                                String[] text = hello_request.split(",");
+                                var text = hello_request.split(",");
                                 clientUsername = text[0];
                                 clientMail = text[1];
-                                HashMap<Socket, User> currentUser = new HashMap<>();
+                                var currentUser = new  HashMap<Socket, User>();
                                 currentUser.put(client, new User(clientUsername));
                                 ServerTcp.users.add(currentUser);
-                                int userId = ServerTcp.getUserId(clientMail);
+                                var userId = ServerTcp.getUserId(clientMail);
                                 currentUser.get(client).Id = userId;
                                 currentUser.get(client).userMail = clientMail;
                                 currentUser.get(client).Groups = ServerTcp.getUserGroups(userId);
-                                Socket finalClient = client;
+                                var finalClient = client;
                                 ServerTcp.groupes.forEach(groupe -> {
                                     currentUser.get(finalClient).Groups.forEach(usrGroup -> {
                                         if (usrGroup.Id == groupe.Id)
@@ -195,7 +193,7 @@ public class App {
                                 e.printStackTrace();
                             }
 
-                            ServerClientWorker cliThread = new ServerClientWorker(client);
+                            var cliThread = new ServerClientWorker(client);
 
 
                             cliThread.start();

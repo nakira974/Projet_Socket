@@ -21,7 +21,7 @@ public enum InternalCommandsEnum {
     }
 
     public boolean contains(String right) {
-        boolean result = false;
+        var result = false;
         if (!this.Label.contains(right)) return result;
         return true;
     }

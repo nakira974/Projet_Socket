@@ -46,7 +46,7 @@ public class ClientTcp {
 
     public void writeSocket(String texte) throws IOException {
 
-        PrintWriter out = new PrintWriter(this.socket.getOutputStream());
+        var out = new PrintWriter(this.socket.getOutputStream());
         out.println(texte);
         out.flush();
 
@@ -55,15 +55,15 @@ public class ClientTcp {
 
     public void writeFileSocket(String filename) throws IOException {
 
-        File myFile = new File(filename);
-        byte[] bFile = new byte[(int) myFile.length()];
-        FileInputStream fileInputStream = new FileInputStream(myFile);
+        var myFile = new File(filename);
+        var bFile = new byte[(int) myFile.length()];
+        var fileInputStream = new FileInputStream(myFile);
         fileInputStream.read(bFile);
         fileInputStream.close();
-        OutputStreamWriter writer = new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.UTF_8);
+        var writer = new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.UTF_8);
 
 
-        JSONObject jsonObject = new JSONObject();
+        var jsonObject = new JSONObject();
         jsonObject.put("name", filename);
         jsonObject.put("size", Files.size(myFile.toPath()) / 1024);
         jsonObject.put("content", bFile);
@@ -75,7 +75,7 @@ public class ClientTcp {
     public void sendUserName(String pseudo) throws IOException {
 
 
-        PrintWriter out = new PrintWriter(this.socket.getOutputStream());
+        var out = new PrintWriter(this.socket.getOutputStream());
         out.println(pseudo);
         out.flush();
 
@@ -91,11 +91,11 @@ public class ClientTcp {
     public String readSocketFileStream() throws IOException {
 
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
+        var reader = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
 
-        String line = reader.readLine();
+        var line = reader.readLine();
         if (line.contains("{") && line.contains("}")) {
-            JSONObject jsonObject = new JSONObject(line);
+            var jsonObject = new JSONObject(line);
             return jsonObject.toString();
         } else {
             return line;
@@ -117,7 +117,7 @@ public class ClientTcp {
             try {
                 do {
                     //String val = client.readSocketFileStream();
-                    String val = client.readSocket();
+                    var val = client.readSocket();
                     if (val.contains("END")) {
 
                         System.exit(0);

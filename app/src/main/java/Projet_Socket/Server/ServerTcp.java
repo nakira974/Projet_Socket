@@ -48,21 +48,21 @@ public class ServerTcp {
             arguments.forEach(arg ->{
                 script[0] +=" "+arg;
             });
-            String command = "powershell.exe  " + script[0];
+            var command = "powershell.exe  " + script[0];
             // Executing the command
-            Process powerShellProcess = Runtime.getRuntime().exec(command);
+            var powerShellProcess = Runtime.getRuntime().exec(command);
             // Getting the results
             powerShellProcess.getOutputStream().close();
-            String line;
+            var line ="";
             System.out.println("Standard Output:");
-            BufferedReader stdout = new BufferedReader(new InputStreamReader(
+            var stdout = new BufferedReader(new InputStreamReader(
                     powerShellProcess.getInputStream()));
             while ((line = stdout.readLine()) != null) {
                 System.out.println(line);
             }
             stdout.close();
             System.out.println("Standard Error:");
-            BufferedReader stderr = new BufferedReader(new InputStreamReader(
+            var stderr = new BufferedReader(new InputStreamReader(
                     powerShellProcess.getErrorStream()));
             while ((line = stderr.readLine()) != null) {
                 System.out.println(line);
@@ -92,9 +92,9 @@ public class ServerTcp {
 
     public static void writeSocket(String content, ArrayList<Socket> clients) throws IOException {
 
-        for (Socket socket : clients) {
+        for (var socket : clients) {
 
-            PrintWriter out = new PrintWriter(socket.getOutputStream());
+            var out = new PrintWriter(socket.getOutputStream());
             out.println(content);
             out.flush();
         }
@@ -105,7 +105,7 @@ public class ServerTcp {
     public static void writeSocket(String content, Socket client) throws IOException {
 
 
-        PrintWriter out = new PrintWriter(client.getOutputStream());
+        var out = new PrintWriter(client.getOutputStream());
         out.println(content);
         out.flush();
 
@@ -113,10 +113,10 @@ public class ServerTcp {
     }
 
     public static ArrayList<String> getFilesByGroup(int groupId) throws SQLException {
-        ArrayList<String> result = new ArrayList<>();
+        var result = new  ArrayList<String>();
         try{
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             var logger = new Logger();
@@ -125,10 +125,10 @@ public class ServerTcp {
             logger.writeLog(logMessage, -666, "[SQL]" );
             System.out.println("[SQL] "+logMessage);
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
-            ResultSet rs = stmt.executeQuery("SELECT rootPath FROM tcpFileSharing WHERE groupId="+groupId);
+            var rs = stmt.executeQuery("SELECT rootPath FROM tcpFileSharing WHERE groupId="+groupId);
 
             while (rs.next()) {
                 var entry = rs.getString("rootPath");
@@ -144,26 +144,55 @@ public class ServerTcp {
     public static HashMap<Group, ArrayList<String>> getFilesByGroup(){
         var result = new HashMap<Group, ArrayList<String>>();
         groupes.forEach(groupe -> {
+            try {
+                var groupSpaces = getFilesByGroup(groupe.Id);
+                result.put(groupe, groupSpaces);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
         });
+        result.forEach((__, rootDirectories) -> {
+
+        });
+        return result;
+    }
+
+    private static ArrayList<String> getFilesByDirectory(String directory){
+
+        var result = new ArrayList<String>();
+        //Creating a File object for directory
+        var directoryPath = new File("D:\\ExampleDirectory");
+        //List of all files and directories
+        var messageLog = "\"List of files and directories in :"+directory+"\"";
+        var filesList = directoryPath.listFiles();
+        System.out.println("[CLOUD] "+messageLog);
+        for(var file : filesList != null ? filesList : new File[0]) {
+            result.add(file.getAbsolutePath());
+            System.out.println("File name: "+file.getName());
+            System.out.println("File path: "+file.getAbsolutePath());
+            System.out.println("Size :"+file.getTotalSpace());
+            System.out.println(" ");
+        }
         return result;
     }
     public static String readClientStream(Socket client) throws IOException {
 
         String result = "";
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
+            var reader = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
 
             String line = client.isConnected() ? reader.readLine() : "";
             if (line.contains("{") && line.contains("}")) {
-                JSONObject jsonObject = new JSONObject(line);
-                String name = (String) jsonObject.get("name");
+                var jsonObject = new JSONObject(line);
+                var name = (String) jsonObject.get("name");
                 int size = (int) jsonObject.get("size");
-                JSONArray content = jsonObject.getJSONArray("content");
+                var content = jsonObject.getJSONArray("content");
                 byte[] data = new byte[content.length()];
                 for (int i = 0; i < content.length(); i++) {
                     data[i] = ((Integer) content.get(i)).byteValue();
                 }
-                FileOutputStream out = new FileOutputStream(name + "_");
+                var out = new FileOutputStream(name + "_");
                 out.write(data);
                 out.close();
 
@@ -180,7 +209,7 @@ public class ServerTcp {
 
     public static ArrayList<Group> getUserGroups(int userId) {
         int groupId = 0;
-        ArrayList<Group> results = new ArrayList<>();
+        var results = new ArrayList<Group>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -189,10 +218,10 @@ public class ServerTcp {
             System.out.println("[SQL] SETTING GROUPS FOR USER ID N° " + userId + "...");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
-            ResultSet rs = stmt.executeQuery("SELECT groupId FROM group_users WHERE userId='" + userId + "'");
+            var rs = stmt.executeQuery("SELECT groupId FROM group_users WHERE userId='" + userId + "'");
 
             while (rs.next()) {
                 groupId = rs.getInt("groupId");
@@ -214,7 +243,7 @@ public class ServerTcp {
 
     public static ArrayList<Group> getGroups() {
         int groupId = 0;
-        ArrayList<Group> results = new ArrayList<>();
+        var results = new  ArrayList<Group>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -223,13 +252,13 @@ public class ServerTcp {
             System.out.println("[SQL] FETCHING GROUPS FROM DATABASE...");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
-            ResultSet rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes");
+            var rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes");
 
             while (rs.next()) {
-                Group currentGroup = new Group();
+                var currentGroup = new Group();
                 currentGroup.Id = rs.getInt("groupe_uuid");
                 currentGroup.administratorId = rs.getInt("administrator");
                 currentGroup.name = rs.getString("nom");
@@ -245,19 +274,19 @@ public class ServerTcp {
     }
 
     public static int getGroupId(String groupeName) {
-        int groupId = 0;
+        var groupId = 0;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("[SQL] GET GROUP ID REQUEST REQUEST for " + groupeName + "...");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
-            ResultSet rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom='" + groupeName + "'");
+            var rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom='" + groupeName + "'");
 
             while (rs.next()) {
                 groupId = rs.getInt("groupe_uuid");
@@ -274,16 +303,16 @@ public class ServerTcp {
         int userId = 0;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("[SQL] GET USER ID for " + userMail + "...");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
-            ResultSet rs = stmt.executeQuery("SELECT user_uuid FROM users WHERE email='" + userMail + "'");
+            var rs = stmt.executeQuery("SELECT user_uuid FROM users WHERE email='" + userMail + "'");
 
             while (rs.next()) {
                 userId = rs.getInt("user_uuid");
@@ -299,10 +328,10 @@ public class ServerTcp {
 
     public void sendFileBroadcast(String path, Socket client) throws IOException {
 
-        OutputStreamWriter writer = new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8);
+        var writer = new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8);
 
 
-        JSONObject jsonObject = new JSONObject();
+        var jsonObject = new JSONObject();
         jsonObject.put("test", path);
         writer.write(jsonObject.toString());
         writer.flush();
@@ -312,10 +341,10 @@ public class ServerTcp {
     public void sendFileBroadcast(String path, ArrayList<Socket> clients) throws IOException {
 
         for (Socket socket : clients) {
-            OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
+            var writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
 
 
-            JSONObject jsonObject = new JSONObject();
+            var jsonObject = new JSONObject();
             jsonObject.put("test", path);
             writer.write(jsonObject.toString());
             writer.flush();

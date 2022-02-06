@@ -32,7 +32,7 @@ public class User {
     public String translateMessage(String message) {
         try {
             assert false;
-            HttpRequest request = HttpRequest.newBuilder()
+            var request = HttpRequest.newBuilder()
                     .uri(URI.create("https://google-translate1.p.rapidapi.com/language/translate/v2"))
                     .header("content-type", "application/x-www-form-urlencoded")
                     .header("accept-encoding", "application/gzip")
@@ -40,17 +40,17 @@ public class User {
                     .header("x-rapidapi-host", "google-translate1.p.rapidapi.com")
                     .method("POST", HttpRequest.BodyPublishers.ofString("q=" + message + "&source=fr&target=en"))
                     .build();
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            var response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             System.out.println(response.body());
 
-            Object obj = JSONValue.parse(response.body());
-            JSONObject jsonObject = (JSONObject) obj;
+            var obj = JSONValue.parse(response.body());
+            var jsonObject = (JSONObject) obj;
 
-            JSONObject jsonMain = (JSONObject) jsonObject.get("data");
+            var jsonMain = (JSONObject) jsonObject.get("data");
 
-            JSONArray jsonTrans = (JSONArray) jsonMain.get("translations");
+            var jsonTrans = (JSONArray) jsonMain.get("translations");
 
-            JSONObject translate = (JSONObject) jsonTrans.get(0);
+            var translate = (JSONObject) jsonTrans.get(0);
 
             return (String) translate.get("translatedText");
             //System.out.println(response.body());
@@ -64,18 +64,18 @@ public class User {
     public double getWeather() {
         try {
             assert false;
-            HttpRequest request = HttpRequest.newBuilder()
+            var request = HttpRequest.newBuilder()
                     .uri(URI.create("https://community-open-weather-map.p.rapidapi.com/weather?q=Amiens%20%2Cfr&lat=0&lon=0&id=2172797&lang=fr&units=metric"))
                     .header("x-rapidapi-key", "8bcb441bf5mshb79ef4191cd9db1p150c6ejsn08a43923b961")
                     .header("x-rapidapi-host", "community-open-weather-map.p.rapidapi.com")
                     .method("GET", HttpRequest.BodyPublishers.noBody())
                     .build();
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            var response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-            Object obj = JSONValue.parse(response.body());
-            JSONObject jsonObject = (JSONObject) obj;
+            var obj = JSONValue.parse(response.body());
+            var jsonObject = (JSONObject) obj;
 
-            JSONObject jsonMain = (JSONObject) jsonObject.get("main");
+            var jsonMain = (JSONObject) jsonObject.get("main");
 
             return (double) jsonMain.get("temp");
             //System.out.println(response.body());

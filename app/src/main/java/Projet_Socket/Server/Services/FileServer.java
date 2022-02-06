@@ -40,15 +40,15 @@ public class FileServer extends Thread {
 
     private static File[] getRootFiles(String location) {
         //Creating a File object for directory
-        File directoryPath = new File(location);
+        var directoryPath = new File(location);
         //List of all files and directories
         return directoryPath.listFiles();
     }
 
     private static void checkFilesFromServer() {
         File[] remoteFiles = null;
-        File[] missingFiles = new File[]{};
-        int count = 0;
+        var missingFiles = new File[]{};
+        var count = 0;
         //TODO récupérer la liste des fichiers sur le serveur
 
         var localFiles = getRootFiles(getRootPathFactory());

@@ -21,7 +21,7 @@ public class Group {
     public Group(String name, User administrator, Socket admin_sock) {
         administratorId = administrator.Id;
         groupeUsers = new ArrayList<>(10);
-        HashMap<Socket, User> currentHash = new HashMap<>();
+        var currentHash = new HashMap<Socket, User>();
         currentHash.put(admin_sock, administrator);
         this.name = name;
         this.administrator = administrator;

@@ -22,10 +22,10 @@ public class LogUser {
 
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
-        BigInteger number = new BigInteger(1, hash);
+        var number = new BigInteger(1, hash);
 
         // Convert message digest into hex value
-        StringBuilder hexString = new StringBuilder(number.toString(16));
+        var hexString = new StringBuilder(number.toString(16));
 
         // Pad with leading zeros
         while (hexString.length() < 32) {
@@ -38,7 +38,7 @@ public class LogUser {
 
     public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        var md = MessageDigest.getInstance("MD5");
 
         // digest() method called
         // to calculate message digest of an input
@@ -47,8 +47,6 @@ public class LogUser {
     }
 
     public void createUser(ArrayList<String> args) throws ClassNotFoundException {
-        ClientTcp socket_client = null;
-        ResultSet rs = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -60,7 +58,7 @@ public class LogUser {
             Statement stmt = conn.createStatement();
 
 
-            rs = stmt.executeQuery(
+            var rs = stmt.executeQuery(
                     "INSERT INTO users (`pseudo`, `password`, `email`,`isConnected`) VALUES('" + args.get(0) + "','" + args.get(1) + "' , '" + args.get(2) + "',1)");
 
 
@@ -88,7 +86,7 @@ public class LogUser {
     public ClientTcp login(ArrayList<String> args) throws SQLException {
         ClientTcp socket_client = null;
         ResultSet rs = null;
-        String pseudo = null;
+        var pseudo = "";
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -96,7 +94,7 @@ public class LogUser {
                 //System.out.println("connected");
                 Statement stmt = conn.createStatement();
 
-                rs = stmt.executeQuery(
+                 rs = stmt.executeQuery(
                         "SELECT `pseudo` " +
                                 "FROM users WHERE password ='" + args.get(1) + "' AND pseudo='" + args.get(0) + "'");
 
@@ -128,23 +126,20 @@ public class LogUser {
     }
 
     public Hashtable<ClientTcp, String> newLogin(ArrayList<String> args) throws Exception {
-        Hashtable<ClientTcp, String> result = new Hashtable<>();
-        String email = "";
-        byte[] sha256;
-        String str_sha;
-        String str_aes;
-        sha256 = getSHA(args.get(0));
-        str_sha = toHexString(sha256);
-        str_aes = AES_Perso.encrypt(args.get(1), str_sha);
+        var result = new Hashtable<ClientTcp, String>();
+        var email = "";
+        var sha256 = getSHA(args.get(0));
+        var str_sha = toHexString(sha256);
+        var str_aes = AES_Perso.encrypt(args.get(1), str_sha);
         ClientTcp socket_client = null;
         ResultSet rs = null;
         String pseudo = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            try (var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123")) {
                 //System.out.println("connected");
-                Statement stmt = conn.createStatement();
+                var stmt = conn.createStatement();
 
                 rs = stmt.executeQuery(
                         "SELECT `password` ,`email` " +
@@ -152,7 +147,7 @@ public class LogUser {
                 if (!rs.wasNull()) {
 
                     while (rs.next()) {
-                        String passwd = rs.getString("password");
+                        var passwd = rs.getString("password");
                         if (AES_Perso.decrypt(passwd, str_sha).equals(args.get(1))) {
                             //System.out.println(pseudo);
                             socket_client = new ClientTcp(new Socket("127.0.0.1", 5000), args.get(0));

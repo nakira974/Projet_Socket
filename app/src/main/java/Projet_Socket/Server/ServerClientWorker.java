@@ -39,10 +39,10 @@ public class ServerClientWorker extends Thread {
 
     private static String toHexString(byte[] hash) {
         // Convert byte array into signum representation
-        BigInteger number = new BigInteger(1, hash);
+        var number = new BigInteger(1, hash);
 
         // Convert message digest into hex value
-        StringBuilder hexString = new StringBuilder(number.toString(16));
+        var hexString = new StringBuilder(number.toString(16));
 
         // Pad with leading zeros
         while (hexString.length() < 32) {
@@ -54,7 +54,7 @@ public class ServerClientWorker extends Thread {
 
     public static byte[] getSHA(String input) throws NoSuchAlgorithmException {
         // Static getInstance method is called with hashing SHA
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        var md = MessageDigest.getInstance("MD5");
 
         // digest() method called
         // to calculate message digest of an input
@@ -63,7 +63,6 @@ public class ServerClientWorker extends Thread {
     }
 
     private void setUsersDown() {
-        int rs;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
@@ -73,8 +72,6 @@ public class ServerClientWorker extends Thread {
 
 
             Statement stmt = conn.createStatement();
-
-
             stmt.executeUpdate("UPDATE users SET isConnected= 0 where isConnected =1");
 
             System.out.println("[SQL] User has been disconnected from : " + conn);
@@ -85,11 +82,7 @@ public class ServerClientWorker extends Thread {
     }
 
     private void setUserDown() throws NoSuchAlgorithmException {
-
-        byte[] sha256;
         final String[] currentUser = {null};
-        String result = "";
-
 
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
@@ -98,19 +91,19 @@ public class ServerClientWorker extends Thread {
                             currentUser[0] = username.getValue()._username;
 
                         }));
-        sha256 = getSHA(currentUser[0]);
+        var sha256 = getSHA(currentUser[0]);
         currentUser[0] = toHexString(sha256);
-        result = currentUser[0];
-        ResultSet rs;
+        var result = currentUser[0];
+
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
+            var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             System.out.println("[SQL] Exiting users...");
 
 
-            Statement stmt = conn.createStatement();
+            var stmt = conn.createStatement();
 
 
             stmt.executeUpdate("UPDATE users SET isConnected=0 WHERE pseudo='" + result + "'");
@@ -167,9 +160,8 @@ public class ServerClientWorker extends Thread {
 
     private void createGroup(String clientCommand) {
         final User[] current_usr = {null};
-        Group current_grp = null;
-        String[] text = clientCommand.split(":");
-        String groupe = text[0];
+        var text = clientCommand.split(":");
+        var groupe = text[0];
 
 
         ServerTcp.users //stream out of arraylist
@@ -178,19 +170,17 @@ public class ServerClientWorker extends Thread {
                         .forEach(username -> {
                             current_usr[0] = username.getValue();
                         }));
-        current_grp = new Group(groupe, current_usr[0], client);
+        var current_grp = new Group(groupe, current_usr[0], client);
         ServerTcp.groupes.add(current_grp);
         try {
 
-            int administrator = current_usr[0].Id;
-            Statement stmt = null;
-            ResultSet rs = null;
+            var administrator = current_usr[0].Id;
             Class.forName("org.mariadb.jdbc.Driver");
             try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123")) {
-                stmt = conn.createStatement();
+                var stmt = conn.createStatement();
 
-                rs = stmt.executeQuery(
+                var rs = stmt.executeQuery(
                         "INSERT INTO groupes(nom, administrator) VALUES ('" + groupe + "','" + administrator + "');");
                 rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom=" + groupe);
                 while (rs.next()) {
@@ -228,10 +218,10 @@ public class ServerClientWorker extends Thread {
 
     private void joinGroup(String clientCommand) {
         final User[] current = {null};
-        Group current_grp = null;
-        String[] text = clientCommand.split(":");
-        String groupe = text[1];
-        for (Group curr : ServerTcp.groupes) {
+        var current_grp = new Group();
+        var text = clientCommand.split(":");
+        var groupe = text[1];
+        for (var curr : ServerTcp.groupes) {
             if (curr.name.equals(groupe)) {
                 current_grp = curr;
             }
@@ -242,12 +232,12 @@ public class ServerClientWorker extends Thread {
                         .forEach(username -> {
                             current[0] = username.getValue();
                         }));
-        HashMap<Socket, User> user = new HashMap<Socket, User>();
+        var user = new HashMap<Socket, User>();
         user.put(client, current[0]);
-        int userId = current[0].Id;
-        int groupId = current_grp != null ? current_grp.Id : 0;
+        var userId = current[0].Id;
+        var groupId = current_grp != null ? current_grp.Id : 0;
 
-        ArrayList<Integer> arguments = new ArrayList<>();
+        var arguments = new ArrayList<Integer>();
         arguments.add(userId);
         arguments.add(groupId);
         try {
@@ -432,12 +422,12 @@ public class ServerClientWorker extends Thread {
     }
 
     private ArrayList<String> checkGroupFiles(String path){
-        ArrayList<String> result = new ArrayList<>();
+        var result = new ArrayList<String>();
         //Creating a File object for directory
-        File directoryPath = new File(path);
-        FileFilter textFilefilter = new FileFilter(){
+        var directoryPath = new File(path);
+        var textFilefilter = new FileFilter(){
             public boolean accept(File file) {
-                boolean isFile = file.isFile();
+                var isFile = file.isFile();
                 if (isFile) {
                     return true;
                 } else {
@@ -446,7 +436,7 @@ public class ServerClientWorker extends Thread {
             }
         };
         //List of all the text files
-        File filesList[] = directoryPath.listFiles(textFilefilter);
+        var filesList= directoryPath.listFiles(textFilefilter);
         System.out.println("List of the text files in the specified directory:");
         for(File file : filesList) {
             result.add(file.getAbsolutePath());
@@ -469,9 +459,9 @@ public class ServerClientWorker extends Thread {
                                 sender[0] = String.valueOf(username.getValue()._username);
                             }));
 
-            String userName = sender[0];
-            HashMap<String, ArrayList<String>> filesByGroup = new HashMap<>();
-            ArrayList<Group> groups = ServerTcp.getGroups();
+            var userName = sender[0];
+            var filesByGroup = new HashMap<String, ArrayList<String>>();
+            var groups = ServerTcp.getGroups();
 
             var content = new JSONObject();
             var date = log.getDateNow();
@@ -491,17 +481,17 @@ public class ServerClientWorker extends Thread {
     }
 
     public void createCloudSubscription(String clientCommand) throws Exception {
-        String[] text = clientCommand.split(":");
-        String[] args = text[1].split(",");
-        String groupe = args[0];
-        String spaceName = args[1];
+        var text = clientCommand.split(":");
+        var args = text[1].split(",");
+        var groupe = args[0];
+        var spaceName = args[1];
 
-        String path = "C:/temp/" + groupe + "/" + spaceName + "/";
+        var path = "C:/temp/" + groupe + "/" + spaceName + "/";
         //Creating a File object
-        File file = new File(path);
+        var file = new File(path);
         //Creating the directory
-        boolean bool = file.mkdir();
-        int groupId = 0;
+        var bool = file.mkdir();
+        var groupId = 0;
         ClientTcp socket_client = null;
         ResultSet rs = null;
         String pseudo = null;
@@ -537,7 +527,7 @@ public class ServerClientWorker extends Thread {
 
     private void createRootDirectory(String path) {
         try {
-            String currentDirectoryPath = FileSystems.getDefault().
+            var currentDirectoryPath = FileSystems.getDefault().
                     getPath("").
                     toAbsolutePath().
                     toString();
@@ -566,13 +556,13 @@ public class ServerClientWorker extends Thread {
         message = "\"[LIST UPDATE] Client(s) : " + ServerTcp.users.size()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
-        String clientUsername = null;
+        var clientUsername = "";
 
         try {
 
             while (runState) {
 
-                String clientCommand = client.isConnected() ? ServerTcp.readClientStream(client) : null;
+                var clientCommand = client.isConnected() ? ServerTcp.readClientStream(client) : null;
                 if (clientCommand != null) {
                     printBroadcast(clientCommand);
                 }

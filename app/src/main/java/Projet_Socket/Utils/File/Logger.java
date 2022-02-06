@@ -21,7 +21,7 @@ public class Logger {
                 var currentFile = new File(getLogFileName());
                 if (currentFile.exists()) return;
                 var buffer = new BufferedWriter(new FileWriter(getLogFileName(), true));
-                FileWriter file = new FileWriter(getLogFileName());
+                var file = new FileWriter(getLogFileName());
                 output = new BufferedWriter(file);
                 buffer.newLine();
                 buffer.append("{\"Logs\": [\n{}\n]\n}");
@@ -33,7 +33,7 @@ public class Logger {
     }
 
     public String getLogFileName() {
-        String currentDirectoryPath = FileSystems.getDefault().
+        var currentDirectoryPath = FileSystems.getDefault().
                 getPath("").
                 toAbsolutePath().
                 toString();
@@ -55,18 +55,18 @@ public class Logger {
     public void writeLog(String p_fileData, int userId, String domain) {
         try {
             var reader = new BufferedReader(new FileReader(getLogFileName()));
-            String jsonContent = "\n" +
+            var jsonContent = "\n" +
                     "{\n" +
                     "   \"time\" : \"" + getDateNow() + "\",\n" +
                     "   \"domain\" : \"" + domain + "\",\n" +
                     "   \"content\" : " + p_fileData + ",\n" +
                     "   \"userId\" : " + userId + "\n" +
                     "},\n\n\t{}";
-            Semaphore semaphore = new Semaphore(1);
+            var semaphore = new Semaphore(1);
             semaphore.acquire();
             // Writes the string to the file
             var line = reader.readLine();
-            String oldContent = "";
+            var oldContent = "";
             while (line != null) {
                 oldContent = oldContent + line + System.lineSeparator();
 
