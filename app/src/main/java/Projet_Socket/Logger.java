@@ -56,12 +56,11 @@ public class Logger {
             var reader = new BufferedReader(new FileReader(getLogFileName()));
             String jsonContent = "\n" +
                     "{\n" +
-                    "     \"time\" : \""+ getDateNow()+"\",\n" +
-                    "     \"domain\" : \""+domain+"\",\n" +
-                    "\t  \"content\" : \""+p_fileData+"\",\n" +
-                    "\t\t\"userId\" : \""+userId+"\"\n" +
-                    "},\n{}\n" +
-                    "";
+                    "   \"time\" : \""+ getDateNow()+"\",\n" +
+                    "   \"domain\" : \""+domain+"\",\n" +
+                    "   \"content\" : \""+p_fileData+"\",\n" +
+                    "   \"userId\" : \""+userId+"\"\n" +
+                    "},\n\n\t{}";
             Semaphore semaphore = new Semaphore(1);
             semaphore.acquire();
             // Writes the string to the file
@@ -78,7 +77,7 @@ public class Logger {
             writer.write(newContent);
             reader.close();
             writer.close();
-            semaphore.release();
+            semaphore.release(1);
         } catch (Exception e) {
             e.getStackTrace();
         }
