@@ -370,8 +370,8 @@ class ClientServiceThread extends Thread {
                 userId[0] = socketUserHashMap.get(client).Id;
         });
         if (clientCommand != null) {
-            System.out.println("[BROADCAST] { Client : " + userId[0] + " } Says :" + clientCommand);
-            log.writeLog(clientCommand, userId[0], "BROADCAST");
+            System.out.println("\"[BROADCAST] { Client : " + userId[0] + " } Says :" + clientCommand+"\"");
+            log.writeLog("\""+clientCommand+"\"", userId[0], "BROADCAST");
         }
     }
 
@@ -747,16 +747,16 @@ class ClientServiceThread extends Thread {
             e.printStackTrace();
             throw new RuntimeException();
         }
-        log.writeLog("Root directory : " + path + "\" created", -666, "[CLOUD]");
+        log.writeLog("\"Root directory : " + path + " created\"", -666, "[CLOUD]");
         System.out.println("[CLOUD] Root directory :\"" + path + "\" created");
     }
 
     public void run() {
         ClientCommandEnum clientRequest = ClientCommandEnum.Lazy;
-        var message = "[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName();
+        var message = "\"[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
-        message = "[LIST UPDATE] Client(s) : " + Socket_Serveur.users.size();
+        message = "\"[LIST UPDATE] Client(s) : " + Socket_Serveur.users.size()+"\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
         String clientUsername = null;
@@ -815,7 +815,7 @@ class ClientServiceThread extends Thread {
             });
 
             Socket_Serveur.users.remove(currentUser[0]);
-            message = "Thread Client N°" + clientId[0] + " finished, now disconnected";
+            message = "\"Thread Client N°" + clientId[0] + " finished, now disconnected\"";
             System.out.println(message);
             log.writeLog(message, -666, "[INFO]");
         }
