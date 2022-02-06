@@ -60,7 +60,7 @@ public class Logger {
                     "   \"time\" : \"" + getDateNow() + "\",\n" +
                     "   \"domain\" : \"" + domain + "\",\n" +
                     "   \"content\" : " + p_fileData + ",\n" +
-                    "   \"userId\" : \"" + userId + "\"\n" +
+                    "   \"userId\" : " + userId + "\n" +
                     "},\n\n\t{}";
             Semaphore semaphore = new Semaphore(1);
             semaphore.acquire();

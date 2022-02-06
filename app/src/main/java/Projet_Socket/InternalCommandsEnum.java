@@ -1,6 +1,7 @@
 package Projet_Socket;
 
-public enum ClientCommandEnum {
+public enum InternalCommandsEnum {
+    FileSynchronisation("/fileSynchronisation"),
     CreateSharingSpace("/createSharingSpace"),
     Quit("quit"),
     WeatherInfo("/weather"),
@@ -15,7 +16,7 @@ public enum ClientCommandEnum {
     ;
     public final String Label;
 
-    ClientCommandEnum(String command) {
+    InternalCommandsEnum(String command) {
         this.Label = command;
     }
 

@@ -81,7 +81,7 @@ public class App {
     public static void main(String[] args) throws Exception {
 
         String userMail = "";
-        SocketPerso socket_client = null;
+        ClientTcp socket_client = null;
         Console console = new Console(new BufferedReader(new InputStreamReader(System.in)), System.out);
         String msg;
 
@@ -91,7 +91,7 @@ public class App {
         msg = console.readKey();
         if (msg.equals("client")) {
             //FAIS SI LE LOGIN EST OK
-            //SocketPerso socket_client = new SocketPerso(new Socket("127.0.0.1",5000));
+            //ClientTcp socket_client = new ClientTcp(new Socket("127.0.0.1",5000));
 
             System.out.println("-(1) S'authentifier || S'enregistrer (2)-");
             msg = console.readKey();
@@ -121,12 +121,12 @@ public class App {
             //FIN LOGIN
 
             if (socket_client != null) {
-                SocketPerso.Thread_Client_Receive receiver = new SocketPerso.Thread_Client_Receive(socket_client);
+                ClientTcp.Thread_Client_Receive receiver = new ClientTcp.Thread_Client_Receive(socket_client);
 
                 receiver.start();
 
 
-                SocketPerso.Thread_Client_Send sender = new SocketPerso.Thread_Client_Send(socket_client, userMail);
+                ClientTcp.Thread_Client_Send sender = new ClientTcp.Thread_Client_Send(socket_client, userMail);
 
                 sender.start();
             } else {
@@ -187,7 +187,7 @@ public class App {
                                 e.printStackTrace();
                             }
 
-                            ClientServiceThread cliThread = new ClientServiceThread(client);
+                            Server_ClientServiceThread cliThread = new Server_ClientServiceThread(client);
 
 
                             cliThread.start();

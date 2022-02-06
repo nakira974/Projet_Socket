@@ -54,7 +54,7 @@ class LogUser {
     }
 
     public void createUser(ArrayList<String> args) throws ClassNotFoundException {
-        SocketPerso socket_client = null;
+        ClientTcp socket_client = null;
         ResultSet rs = null;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -92,8 +92,8 @@ class LogUser {
      */
 
 
-    public SocketPerso login(ArrayList<String> args) throws SQLException {
-        SocketPerso socket_client = null;
+    public ClientTcp login(ArrayList<String> args) throws SQLException {
+        ClientTcp socket_client = null;
         ResultSet rs = null;
         String pseudo = null;
         try {
@@ -111,7 +111,7 @@ class LogUser {
                     while (rs.next()) {
                         pseudo = rs.getString("pseudo");
                         //System.out.println(pseudo);
-                        socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), pseudo);
+                        socket_client = new ClientTcp(new Socket("127.0.0.1", 5000), pseudo);
                         stmt.executeUpdate("UPDATE users SET isConnected=1 WHERE pseudo='" + args.get(0) + "'");
                     }
 
@@ -134,8 +134,8 @@ class LogUser {
         return socket_client;
     }
 
-    public Hashtable<SocketPerso, String> newLogin(ArrayList<String> args) throws Exception {
-        Hashtable<SocketPerso, String> result = new Hashtable<>();
+    public Hashtable<ClientTcp, String> newLogin(ArrayList<String> args) throws Exception {
+        Hashtable<ClientTcp, String> result = new Hashtable<>();
         String email = "";
         byte[] sha256;
         String str_sha;
@@ -143,7 +143,7 @@ class LogUser {
         sha256 = getSHA(args.get(0));
         str_sha = toHexString(sha256);
         str_aes = AES_Perso.encrypt(args.get(1), str_sha);
-        SocketPerso socket_client = null;
+        ClientTcp socket_client = null;
         ResultSet rs = null;
         String pseudo = null;
         try {
@@ -162,7 +162,7 @@ class LogUser {
                         String passwd = rs.getString("password");
                         if (AES_Perso.decrypt(passwd, str_sha).equals(args.get(1))) {
                             //System.out.println(pseudo);
-                            socket_client = new SocketPerso(new Socket("127.0.0.1", 5000), args.get(0));
+                            socket_client = new ClientTcp(new Socket("127.0.0.1", 5000), args.get(0));
                             stmt.executeQuery("UPDATE users SET isConnected=1 WHERE pseudo='" + str_sha + "'");
                             email = rs.getString("email");
                         }
