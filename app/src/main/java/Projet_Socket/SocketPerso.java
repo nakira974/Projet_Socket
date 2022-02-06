@@ -1,4 +1,5 @@
-package Projet_Socket;/*
+package Projet_Socket;
+/*
  --- creators : nakira974 && Weefle  ----
  */
 
@@ -10,13 +11,14 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 class Socket_Serveur {
 
@@ -84,10 +86,10 @@ class Socket_Serveur {
     public static String readClientStream(Socket client) throws IOException {
 
         String result = "";
-        try{
+        try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
 
-            String line = client.isConnected() ?reader.readLine() : "";
+            String line = client.isConnected() ? reader.readLine() : "";
             if (line.contains("{") && line.contains("}")) {
                 JSONObject jsonObject = new JSONObject(line);
                 String name = (String) jsonObject.get("name");
@@ -105,14 +107,14 @@ class Socket_Serveur {
             } else {
                 return line;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new IOException();
         }
         return result;
     }
 
-    public static ArrayList<Groupe> getUserGroups(int userId){
+    public static ArrayList<Groupe> getUserGroups(int userId) {
         int groupId = 0;
         ArrayList<Groupe> results = new ArrayList<>();
         try {
@@ -120,23 +122,23 @@ class Socket_Serveur {
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("[SQL] SETTING GROUPS FOR USER ID N° "+ userId+ "...");
+            System.out.println("[SQL] SETTING GROUPS FOR USER ID N° " + userId + "...");
 
 
             Statement stmt = conn.createStatement();
 
 
-            ResultSet rs  = stmt.executeQuery("SELECT groupId FROM group_users WHERE userId='" + userId + "'");
+            ResultSet rs = stmt.executeQuery("SELECT groupId FROM group_users WHERE userId='" + userId + "'");
 
             while (rs.next()) {
                 groupId = rs.getInt("groupId");
             }
 
-            rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes WHERE groupe_uuid ="+groupId);
+            rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes WHERE groupe_uuid =" + groupId);
             while (rs.next()) {
                 Groupe currentGroup = new Groupe();
-                currentGroup.Id =  rs.getInt("groupe_uuid");
-                currentGroup.administratorId =  rs.getInt("administrator");
+                currentGroup.Id = rs.getInt("groupe_uuid");
+                currentGroup.administratorId = rs.getInt("administrator");
                 currentGroup.name = rs.getString("nom");
                 results.add(currentGroup);
             }
@@ -146,7 +148,7 @@ class Socket_Serveur {
         return results;
     }
 
-    public static ArrayList<Groupe> getGroups(){
+    public static ArrayList<Groupe> getGroups() {
         int groupId = 0;
         ArrayList<Groupe> results = new ArrayList<>();
         try {
@@ -160,12 +162,12 @@ class Socket_Serveur {
             Statement stmt = conn.createStatement();
 
 
-            ResultSet rs  = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes");
+            ResultSet rs = stmt.executeQuery("SELECT groupe_uuid, administrator,nom FROM groupes");
 
             while (rs.next()) {
                 Groupe currentGroup = new Groupe();
-                currentGroup.Id =  rs.getInt("groupe_uuid");
-                currentGroup.administratorId =  rs.getInt("administrator");
+                currentGroup.Id = rs.getInt("groupe_uuid");
+                currentGroup.administratorId = rs.getInt("administrator");
                 currentGroup.name = rs.getString("nom");
                 currentGroup.groupeUsers = new ArrayList<>();
                 results.add(currentGroup);
@@ -185,13 +187,13 @@ class Socket_Serveur {
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("[SQL] GET GROUP ID REQUEST REQUEST for "+ groupeName+ "...");
+            System.out.println("[SQL] GET GROUP ID REQUEST REQUEST for " + groupeName + "...");
 
 
             Statement stmt = conn.createStatement();
 
 
-            ResultSet rs  = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom='" + groupeName + "'");
+            ResultSet rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom='" + groupeName + "'");
 
             while (rs.next()) {
                 groupId = rs.getInt("groupe_uuid");
@@ -211,19 +213,19 @@ class Socket_Serveur {
             Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
-            System.out.println("[SQL] GET USER ID for "+ userMail+ "...");
+            System.out.println("[SQL] GET USER ID for " + userMail + "...");
 
 
             Statement stmt = conn.createStatement();
 
 
-            ResultSet rs  = stmt.executeQuery("SELECT user_uuid FROM users WHERE email='" + userMail + "'");
+            ResultSet rs = stmt.executeQuery("SELECT user_uuid FROM users WHERE email='" + userMail + "'");
 
             while (rs.next()) {
                 userId = rs.getInt("user_uuid");
             }
 
-            System.out.println("[SQL] USER "+userMail+" is : " + userId);
+            System.out.println("[SQL] USER " + userMail + " is : " + userId);
         } catch (SQLException | ClassNotFoundException ex1) {
             ex1.printStackTrace();
         }
@@ -364,11 +366,11 @@ class ClientServiceThread extends Thread {
     private void printBroadcast(String clientCommand) {
         final int[] userId = {0};
         Socket_Serveur.users.forEach(socketUserHashMap -> {
-            if(socketUserHashMap.containsKey(client))
+            if (socketUserHashMap.containsKey(client))
                 userId[0] = socketUserHashMap.get(client).Id;
         });
         if (clientCommand != null) {
-            System.out.println("[BROADCAST] { Client : "+userId[0]+" } Says :" + clientCommand);
+            System.out.println("[BROADCAST] { Client : " + userId[0] + " } Says :" + clientCommand);
             log.writeLog(clientCommand, userId[0], "BROADCAST");
         }
     }
@@ -404,7 +406,6 @@ class ClientServiceThread extends Thread {
     }
 
 
-
     private void createGroup(String clientCommand) {
         final User[] current_usr = {null};
         Groupe current_grp = null;
@@ -420,7 +421,7 @@ class ClientServiceThread extends Thread {
                         }));
         current_grp = new Groupe(groupe, current_usr[0], client);
         Socket_Serveur.groupes.add(current_grp);
-        try{
+        try {
 
             int administrator = current_usr[0].Id;
             Statement stmt = null;
@@ -431,15 +432,15 @@ class ClientServiceThread extends Thread {
                 stmt = conn.createStatement();
 
                 rs = stmt.executeQuery(
-                        "INSERT INTO groupes(nom, administrator) VALUES ('" + groupe + "','" + administrator  + "');");
-                rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom="+groupe);
-                while (rs.next()){
+                        "INSERT INTO groupes(nom, administrator) VALUES ('" + groupe + "','" + administrator + "');");
+                rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom=" + groupe);
+                while (rs.next()) {
                     current_grp.Id = rs.getInt("groupe_uuid");
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -507,7 +508,6 @@ class ClientServiceThread extends Thread {
                     "wizle_test?user=wizle&password=projettest123");
 
 
-
             Statement stmt = conn.createStatement();
 
 
@@ -522,7 +522,7 @@ class ClientServiceThread extends Thread {
                 return;
             }
         }
-        System.out.println("USER ID N°"+args.get(0)+" HAS JOINED GROUP N°"+args.get(1) +"...");
+        System.out.println("USER ID N°" + args.get(0) + " HAS JOINED GROUP N°" + args.get(1) + "...");
     }
 
     private void sendGroup(String clientCommand) {
@@ -672,18 +672,18 @@ class ClientServiceThread extends Thread {
         runState = false;
     }
 
-    public void CreateCloudSubscription(String clientCommand) throws Exception {
+    public void createCloudSubscription(String clientCommand) throws Exception {
         String[] text = clientCommand.split(":");
         String[] args = text[1].split(",");
         String groupe = args[0];
         String spaceName = args[1];
 
-        String path = "C:/temp/"+ groupe +"/"+spaceName+"/";
+        String path = "C:/temp/" + groupe + "/" + spaceName + "/";
         //Creating a File object
         File file = new File(path);
         //Creating the directory
         boolean bool = file.mkdir();
-        int groupId=0;
+        int groupId = 0;
         SocketPerso socket_client = null;
         ResultSet rs = null;
         String pseudo = null;
@@ -697,9 +697,9 @@ class ClientServiceThread extends Thread {
                 stmt = conn.createStatement();
 
                 rs = stmt.executeQuery(
-                        "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES ("+groupId +",'" + path +" ')");
-                log.writeLog("Group N°"+groupId+" created new Cloud Service at : "+path,-666,"[SQL]");
-
+                        "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES (" + groupId + ",'" + path + " ')");
+                log.writeLog("\"Group N°" + groupId + " created new Cloud Service at : " + path + "\"", -666, "[SQL]");
+                createRootDirectory(path);
             } catch (Exception e) {
                 if (rs == null) {
                     System.err.println("Erreur de création d'un groupe de partage ! ");
@@ -712,8 +712,47 @@ class ClientServiceThread extends Thread {
         }
     }
 
+    private void createRootDirectory(String path) {
+        try {
+            String currentDirectoryPath = FileSystems.getDefault().
+                    getPath("").
+                    toAbsolutePath().
+                    toString();
+            var script = currentDirectoryPath + "\\create_root_directory.ps1 " + path;
+            //String command = "powershell.exe  your command";
+            //Getting the version
+            String command = "powershell.exe  " + script;
+
+            // Executing the command
+            Process powerShellProcess = Runtime.getRuntime().exec(command);
+            // Getting the results
+            powerShellProcess.getOutputStream().close();
+            String line;
+            System.out.println("Standard Output:");
+            BufferedReader stdout = new BufferedReader(new InputStreamReader(
+                    powerShellProcess.getInputStream()));
+            while ((line = stdout.readLine()) != null) {
+                System.out.println(line);
+            }
+            stdout.close();
+            System.out.println("Standard Error:");
+            BufferedReader stderr = new BufferedReader(new InputStreamReader(
+                    powerShellProcess.getErrorStream()));
+            while ((line = stderr.readLine()) != null) {
+                System.out.println(line);
+            }
+            stderr.close();
+            System.out.println("Done");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+        log.writeLog("Root directory : " + path + "\" created", -666, "[CLOUD]");
+        System.out.println("[CLOUD] Root directory :\"" + path + "\" created");
+    }
+
     public void run() {
-        ClientCommandEnum clientRequest =  ClientCommandEnum.Lazy;
+        ClientCommandEnum clientRequest = ClientCommandEnum.Lazy;
         var message = "[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName();
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
@@ -726,7 +765,7 @@ class ClientServiceThread extends Thread {
 
             while (runState) {
 
-                String clientCommand = client.isConnected() ?  Socket_Serveur.readClientStream(client) : null;
+                String clientCommand = client.isConnected() ? Socket_Serveur.readClientStream(client) : null;
                 if (clientCommand != null) {
                     printBroadcast(clientCommand);
                 }
@@ -734,7 +773,7 @@ class ClientServiceThread extends Thread {
                     serverStop();
                 }
 
-                if(clientCommand == null) continue;
+                if (clientCommand == null) continue;
                 if (clientCommand.equalsIgnoreCase(ClientCommandEnum.Quit.Label))
                     clientExit(clientCommand);
                 else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.WeatherInfo.Label)) getWeather(clientCommand);
@@ -743,10 +782,12 @@ class ClientServiceThread extends Thread {
                 else if (clientCommand.contains(ClientCommandEnum.SendFile.Label)) sendFile(clientCommand);
                 else if (clientCommand.contains(ClientCommandEnum.GroupMessage.Label)) sendGroup(clientCommand);
                 else if (clientCommand.contains(ClientCommandEnum.JoinGroupRequest.Label)) joinGroup(clientCommand);
-                else if (clientCommand.contains(ClientCommandEnum.GroupCreationRequest.Label)) createGroup(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.GroupCreationRequest.Label))
+                    createGroup(clientCommand);
                 else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.EndProcess.Label)) endProcess(log);
                 else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.Lazy.Label)) endProcess(log);
-                else if (clientCommand.contains(ClientCommandEnum.CreateSharingSpace.Label)) CreateCloudSubscription(clientCommand);
+                else if (clientCommand.contains(ClientCommandEnum.CreateSharingSpace.Label))
+                    createCloudSubscription(clientCommand);
                 else sendBroadcast(clientCommand);
 
             }
@@ -762,19 +803,19 @@ class ClientServiceThread extends Thread {
             final int[] clientId = {0};
             final HashMap<Socket, User>[] currentUser = new HashMap[]{null};
 
-            Socket_Serveur.users.forEach(user ->{
-                if(user.containsKey(client)){
+            Socket_Serveur.users.forEach(user -> {
+                if (user.containsKey(client)) {
                     clientId[0] = user.get(client).Id;
                     currentUser[0] = user;
                 }
             });
             Socket_Serveur.groupes.forEach(groupe -> {
-                if(groupe.groupeUsers.contains((currentUser[0])))
+                if (groupe.groupeUsers.contains((currentUser[0])))
                     groupe.groupeUsers.remove(currentUser[0]);
             });
 
             Socket_Serveur.users.remove(currentUser[0]);
-            message = "Thread Client N°"+clientId[0]+" finished, now disconnected";
+            message = "Thread Client N°" + clientId[0] + " finished, now disconnected";
             System.out.println(message);
             log.writeLog(message, -666, "[INFO]");
         }
@@ -805,7 +846,6 @@ public class SocketPerso {
 
 
     }
-
 
 
     public String getUserName() {
@@ -911,8 +951,8 @@ public class SocketPerso {
     static class Thread_Client_Send extends Thread {
         //String destination;
         private final SocketPerso socket;
-        private String email;
         private final Console console;
+        private String email;
         private String username;
 
         public Thread_Client_Send(SocketPerso s, String p_email) throws IOException {
@@ -924,7 +964,7 @@ public class SocketPerso {
         public void run() {
             String msg;
             try {
-                socket.sendUserName(socket._username+","+email);
+                socket.sendUserName(socket._username + "," + email);
                 console.writeLine("Connexion au serveur: " + socket._username);
                 //destination = console.readKey();
 

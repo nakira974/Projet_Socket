@@ -8,10 +8,13 @@
 -- Server version: 10.5.8-MariaDB
 -- PHP Version: 7.2.29
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
+SET
+SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET
+AUTOCOMMIT = 0;
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET
+time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -22,8 +25,10 @@ SET time_zone = "+00:00";
 --
 -- Database: `serveur_db`
 --
-CREATE DATABASE IF NOT EXISTS `serveur_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `serveur_db`;
+CREATE
+DATABASE IF NOT EXISTS `serveur_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE
+`serveur_db`;
 
 -- --------------------------------------------------------
 
@@ -32,13 +37,32 @@ USE `serveur_db`;
 --
 
 DROP TABLE IF EXISTS `groupes`;
-CREATE TABLE IF NOT EXISTS `groupes` (
-    `groupe_uuid` int(11) NOT NULL AUTO_INCREMENT,
-    `nom` varchar(512) NOT NULL,
-    `administrator` int(11) NOT NULL DEFAULT 11,
-    PRIMARY KEY (`groupe_uuid`),
-    UNIQUE KEY `groupes_administrator_uindex` (`administrator`),
-    UNIQUE KEY `groupes_nom_uindex` (`nom`)
+CREATE TABLE IF NOT EXISTS `groupes`
+(
+    `groupe_uuid` int
+(
+    11
+) NOT NULL AUTO_INCREMENT,
+    `nom` varchar
+(
+    512
+) NOT NULL,
+    `administrator` int
+(
+    11
+) NOT NULL DEFAULT 11,
+    PRIMARY KEY
+(
+    `groupe_uuid`
+),
+    UNIQUE KEY `groupes_administrator_uindex`
+(
+    `administrator`
+),
+    UNIQUE KEY `groupes_nom_uindex`
+(
+    `nom`
+)
     ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -48,24 +72,52 @@ CREATE TABLE IF NOT EXISTS `groupes` (
 --
 
 DROP TABLE IF EXISTS `GroupesMembres`;
-CREATE TABLE IF NOT EXISTS `GroupesMembres` (
-    `membre_uuid` int(11) NOT NULL AUTO_INCREMENT,
-    `groupe` int(11) NOT NULL,
-    `membre` int(11) NOT NULL,
-    PRIMARY KEY (`membre_uuid`),
-    KEY `GroupesMembres_groupes_groupe_uuid_fk` (`groupe`),
-    KEY `GroupesMembres_users_user_uuid_fk` (`membre`)
+CREATE TABLE IF NOT EXISTS `GroupesMembres`
+(
+    `membre_uuid` int
+(
+    11
+) NOT NULL AUTO_INCREMENT,
+    `groupe` int
+(
+    11
+) NOT NULL,
+    `membre` int
+(
+    11
+) NOT NULL,
+    PRIMARY KEY
+(
+    `membre_uuid`
+),
+    KEY `GroupesMembres_groupes_groupe_uuid_fk`
+(
+    `groupe`
+),
+    KEY `GroupesMembres_users_user_uuid_fk`
+(
+    `membre`
+)
     ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Triggers `GroupesMembres`
 --
 DROP TRIGGER IF EXISTS `MembreDuplicate`;
-DELIMITER $$
-CREATE TRIGGER `MembreDuplicate` BEFORE INSERT ON `GroupesMembres` FOR EACH ROW BEGIN
-    IF (SELECT COUNT(membre) FROM GroupesMembres WHERE groupe = NEW.groupe AND membre = NEW.membre)  > 0 THEN
+DELIMITER
+$$
+CREATE TRIGGER `MembreDuplicate`
+    BEFORE INSERT
+    ON `GroupesMembres`
+    FOR EACH ROW
+BEGIN
+    IF (
+    SELECT COUNT(membre)
+    FROM GroupesMembres
+    WHERE groupe = NEW.groupe
+      AND membre = NEW.membre)  > 0 THEN
         signal sqlstate '45000'
-        set message_text='Erreurr! Utilisateur déjà dans le groupe !';
+    set message_text ='Erreurr! Utilisateur déjà dans le groupe !';
 END IF;
 END
 $$
@@ -78,25 +130,52 @@ DELIMITER ;
 --
 
 DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-    `user_uuid` int(11) NOT NULL AUTO_INCREMENT,
-    `pseudo` varchar(512) DEFAULT NULL,
-    `password` varchar(255) NOT NULL,
-    `email` varchar(255) NOT NULL,
+CREATE TABLE IF NOT EXISTS `users`
+(
+    `user_uuid` int
+(
+    11
+) NOT NULL AUTO_INCREMENT,
+    `pseudo` varchar
+(
+    512
+) DEFAULT NULL,
+    `password` varchar
+(
+    255
+) NOT NULL,
+    `email` varchar
+(
+    255
+) NOT NULL,
     `dt_last_connection` date DEFAULT NULL,
-    `isConnected` tinyint(1) NOT NULL,
-    PRIMARY KEY (`user_uuid`),
-    UNIQUE KEY `user_uuid_uindex` (`user_uuid`),
-    UNIQUE KEY `user_pseudo` (`pseudo`)
+    `isConnected` tinyint
+(
+    1
+) NOT NULL,
+    PRIMARY KEY
+(
+    `user_uuid`
+),
+    UNIQUE KEY `user_uuid_uindex`
+(
+    `user_uuid`
+),
+    UNIQUE KEY `user_pseudo`
+(
+    `pseudo`
+)
     ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_uuid`, `pseudo`, `password`, `email`, `dt_last_connection`, `isConnected`) VALUES
-(36, 'f2b0c1c1b30125e247f520eebfaae6e4', 'U2FsdGVkX1807J51BelY6KEsGw3REZBjvKEQcbETEdQ=', 'nakiraranger@gmail.com', NULL, 1),
-(37, 'c8857c26bc5db685812b7a91b3c5471d', 'U2FsdGVkX1+oHcQJxt01cms0TJ0U4CSze3rCM50f3e0=', 'mrweefle@gmail.com', NULL, 1);
+INSERT INTO `users` (`user_uuid`, `pseudo`, `password`, `email`, `dt_last_connection`, `isConnected`)
+VALUES (36, 'f2b0c1c1b30125e247f520eebfaae6e4', 'U2FsdGVkX1807J51BelY6KEsGw3REZBjvKEQcbETEdQ=',
+        'nakiraranger@gmail.com', NULL, 1),
+       (37, 'c8857c26bc5db685812b7a91b3c5471d', 'U2FsdGVkX1+oHcQJxt01cms0TJ0U4CSze3rCM50f3e0=', 'mrweefle@gmail.com',
+        NULL, 1);
 
 --
 -- Constraints for dumped tables

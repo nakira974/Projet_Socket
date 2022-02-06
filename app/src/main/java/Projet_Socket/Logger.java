@@ -32,42 +32,42 @@ public class Logger {
         }
     }
 
-    public String getLogFileName(){
+    public String getLogFileName() {
         String currentDirectoryPath = FileSystems.getDefault().
                 getPath("").
                 toAbsolutePath().
                 toString();
 
-        return currentDirectoryPath+"\\logger(" + getDateNowShort() + ").json";
+        return currentDirectoryPath + "\\logger(" + getDateNowShort() + ").json";
     }
 
 
-    public String getDateNow(){
-        var currentDate =  DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
-        currentDate+=" "+LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute()+":"+LocalDateTime.now().getSecond();
+    public String getDateNow() {
+        var currentDate = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
+        currentDate += " " + LocalDateTime.now().getHour() + ":" + LocalDateTime.now().getMinute() + ":" + LocalDateTime.now().getSecond();
         return currentDate;
     }
 
-    public String getDateNowShort(){
+    public String getDateNowShort() {
         return DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
     }
+
     public void writeLog(String p_fileData, int userId, String domain) {
         try {
             var reader = new BufferedReader(new FileReader(getLogFileName()));
             String jsonContent = "\n" +
                     "{\n" +
-                    "   \"time\" : \""+ getDateNow()+"\",\n" +
-                    "   \"domain\" : \""+domain+"\",\n" +
-                    "   \"content\" : "+p_fileData+",\n" +
-                    "   \"userId\" : \""+userId+"\"\n" +
+                    "   \"time\" : \"" + getDateNow() + "\",\n" +
+                    "   \"domain\" : \"" + domain + "\",\n" +
+                    "   \"content\" : " + p_fileData + ",\n" +
+                    "   \"userId\" : \"" + userId + "\"\n" +
                     "},\n\n\t{}";
             Semaphore semaphore = new Semaphore(1);
             semaphore.acquire();
             // Writes the string to the file
             var line = reader.readLine();
             String oldContent = "";
-            while (line != null)
-            {
+            while (line != null) {
                 oldContent = oldContent + line + System.lineSeparator();
 
                 line = reader.readLine();

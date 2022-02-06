@@ -14,12 +14,14 @@ public enum ClientCommandEnum {
     Lazy(""),
     ;
     public final String Label;
+
     ClientCommandEnum(String command) {
         this.Label = command;
     }
-    public boolean contains(String right){
+
+    public boolean contains(String right) {
         boolean result = false;
-        if(!this.Label.contains(right)) return result;
+        if (!this.Label.contains(right)) return result;
         return true;
     }
 }

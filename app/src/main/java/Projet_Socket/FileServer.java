@@ -4,13 +4,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.sql.*;
 import java.util.Arrays;
 
 public class FileServer extends Thread {
-    private class FileSubscriber{
-
-    }
     public String ServerRootDirectory;
     public Console Console;
     private boolean _isServerRunning;
@@ -23,9 +19,9 @@ public class FileServer extends Thread {
             do {
                 try {
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
-                    Socket_Serveur.writeSocket(e.getMessage(),Socket_Serveur.sockets);
+                    Socket_Serveur.writeSocket(e.getMessage(), Socket_Serveur.sockets);
                 }
                 sleep(5000);
             } while (_isServerRunning);
@@ -73,9 +69,9 @@ public class FileServer extends Thread {
         _isServerRunning = false;
     }
 
+    private class FileSubscriber {
 
-
-
+    }
 
 
 }

@@ -1,7 +1,7 @@
 package Projet_Socket;
 
-import org.json.simple.JSONArray;
 import org.json.JSONObject;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 
 import java.math.BigInteger;
@@ -198,8 +198,10 @@ public class User {
     public String _username;
     public LocalTime _lastConnection;
     public ArrayList<Groupe> Groups;
+
     User() {
     }
+
     User(String username) {
         _username = username;
         LocalTime time = LocalTime.now();
