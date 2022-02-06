@@ -2,44 +2,82 @@ package Projet_Socket;/*
  --- creators : nakira974 && Weefle  ----
  */
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.concurrent.Semaphore;
 
 public class Logger {
 
 
     public BufferedWriter output;
-    private FileWriter file;
 
     public Logger() {
 
         {
             try {
-                String currentDirectoryPath = FileSystems.getDefault().
-                        getPath("").
-                        toAbsolutePath().
-                        toString();
-                System.out.println(currentDirectoryPath);
-                var currentDate =  DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
-                this.file = new FileWriter(currentDirectoryPath+"\\app\\src\\main\\java\\Projet_Socket\\logger(" +currentDate + ").txt");
+                var currentFile = new File(getLogFileName());
+                if (currentFile.exists()) return;
+                var buffer = new BufferedWriter(new FileWriter(getLogFileName(), true));
+                FileWriter file = new FileWriter(getLogFileName());
                 output = new BufferedWriter(file);
+                buffer.newLine();
+                buffer.append("{\"Logs\": [\n{}\n]\n}");
+                buffer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    public String getLogFileName(){
+        String currentDirectoryPath = FileSystems.getDefault().
+                getPath("").
+                toAbsolutePath().
+                toString();
 
-    public void writeLog(String p_fileData) {
+        return currentDirectoryPath+"\\app\\src\\main\\java\\Projet_Socket\\logger(" + getDateNowShort() + ").json";
+    }
+
+
+    public String getDateNow(){
+        var currentDate =  DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
+        currentDate+=" "+LocalDateTime.now().getHour()+":"+LocalDateTime.now().getMinute()+":"+LocalDateTime.now().getSecond();
+        return currentDate;
+    }
+
+    public String getDateNowShort(){
+        return DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now());
+    }
+    public void writeLog(String p_fileData, int userId, String domain) {
         try {
+            var reader = new BufferedReader(new FileReader(getLogFileName()));
+            String jsonContent = "\n" +
+                    "{\n" +
+                    "   \"time\" : \""+ getDateNow()+"\",\n" +
+                    "   \"domain\" : \""+domain+"\",\n" +
+                    "   \"content\" : \""+p_fileData+"\",\n" +
+                    "   \"userId\" : \""+userId+"\"\n" +
+                    "},\n\n\t{}";
+            Semaphore semaphore = new Semaphore(1);
+            semaphore.acquire();
             // Writes the string to the file
-            this.output.append(p_fileData);
-            this.output.newLine();
+            var line = reader.readLine();
+            String oldContent = "";
+            while (line != null)
+            {
+                oldContent = oldContent + line + System.lineSeparator();
+
+                line = reader.readLine();
+            }
+            var newContent = oldContent.replace("{}", jsonContent);
+            var writer = new FileWriter(getLogFileName());
+            writer.write(newContent);
+            reader.close();
+            writer.close();
+            semaphore.release(1);
         } catch (Exception e) {
             e.getStackTrace();
         }

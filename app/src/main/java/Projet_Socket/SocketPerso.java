@@ -357,9 +357,14 @@ class ClientServiceThread extends Thread {
     }
 
     private void printBroadcast(String clientCommand) {
+        final int[] userId = {0};
+        Socket_Serveur.users.forEach(socketUserHashMap -> {
+            if(socketUserHashMap.containsKey(client))
+                userId[0] = socketUserHashMap.get(client).Id;
+        });
         if (clientCommand != null) {
-            System.out.println("[BROADCAST] Client Says :" + clientCommand);
-            log.writeLog(client.getInetAddress().getHostName() + "(" + DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.FRANCE).format(LocalDateTime.now()) + ") : " + clientCommand);
+            System.out.println("[BROADCAST] { Client : "+userId[0]+" } Says :" + clientCommand);
+            log.writeLog(clientCommand, userId[0], "BROADCAST");
         }
     }
 

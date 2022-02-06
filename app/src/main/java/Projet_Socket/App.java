@@ -146,6 +146,9 @@ public class App {
                     : null;
 
             Socket_Serveur.getGroups();
+            var log = "Server has started at : "+Socket_Serveur._srvSocket.getInetAddress().getHostAddress()+ " port :"+FactoryPort;
+            var logger = new Logger();
+            logger.writeLog(log,-666,"[INFO]");
             System.out.printf("[INFO] Server has started at : %s port :%d%n", Socket_Serveur._srvSocket.getInetAddress().getHostAddress(), FactoryPort);
             while (!Socket_Serveur.getServer().isClosed()) {
                 try {
@@ -175,7 +178,10 @@ public class App {
                                     } );
 
                                 });
-
+                                log = "user : "+currentUser.get(client).Id+
+                                        ", email :"+currentUser.get(client).userMail+
+                                        " at address"+client.getInetAddress().getHostAddress()+" is connected";
+                                logger.writeLog(log,-666,"[INFO]");
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
