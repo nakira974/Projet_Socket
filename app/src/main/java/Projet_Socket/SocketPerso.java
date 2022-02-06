@@ -678,7 +678,7 @@ class ClientServiceThread extends Thread {
         String groupe = args[0];
         String spaceName = args[1];
 
-        String path = "C:\\temp\\"+ groupe +"\\"+spaceName+"\\";
+        String path = "C:/temp/"+ groupe +"/"+spaceName+"/";
         //Creating a File object
         File file = new File(path);
         //Creating the directory
