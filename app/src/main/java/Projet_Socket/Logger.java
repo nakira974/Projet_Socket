@@ -13,15 +13,15 @@ public class Logger {
 
 
     public BufferedWriter output;
-    private FileWriter file;
 
     public Logger() {
 
         {
             try {
-
+                var currentFile = new File(getLogFileName());
+                if (currentFile.exists()) return;
                 var buffer = new BufferedWriter(new FileWriter(getLogFileName(), true));
-                this.file = new FileWriter(getLogFileName());
+                FileWriter file = new FileWriter(getLogFileName());
                 output = new BufferedWriter(file);
                 buffer.newLine();
                 buffer.append("{\"Logs\": [\n{}\n]\n}");
