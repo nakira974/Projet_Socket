@@ -38,7 +38,7 @@ public class Logger {
                 toAbsolutePath().
                 toString();
 
-        return currentDirectoryPath+"\\app\\src\\main\\java\\Projet_Socket\\logger(" + getDateNowShort() + ").json";
+        return currentDirectoryPath+"\\logger(" + getDateNowShort() + ").json";
     }
 
 

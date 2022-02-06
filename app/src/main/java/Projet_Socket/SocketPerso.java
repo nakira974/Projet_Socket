@@ -83,28 +83,33 @@ class Socket_Serveur {
 
     public static String readClientStream(Socket client) throws IOException {
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
+        String result = "";
+        try{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
 
-        String line = reader.readLine();
-        if (line.contains("{") && line.contains("}")) {
-            JSONObject jsonObject = new JSONObject(line);
-            String name = (String) jsonObject.get("name");
-            int size = (int) jsonObject.get("size");
-            JSONArray content = jsonObject.getJSONArray("content");
-            byte[] data = new byte[content.length()];
-            for (int i = 0; i < content.length(); i++) {
-                data[i] = ((Integer) content.get(i)).byteValue();
+            String line = client.isConnected() ?reader.readLine() : "";
+            if (line.contains("{") && line.contains("}")) {
+                JSONObject jsonObject = new JSONObject(line);
+                String name = (String) jsonObject.get("name");
+                int size = (int) jsonObject.get("size");
+                JSONArray content = jsonObject.getJSONArray("content");
+                byte[] data = new byte[content.length()];
+                for (int i = 0; i < content.length(); i++) {
+                    data[i] = ((Integer) content.get(i)).byteValue();
+                }
+                FileOutputStream out = new FileOutputStream(name + "_");
+                out.write(data);
+                out.close();
+
+                result = jsonObject.toString();
+            } else {
+                return line;
             }
-            FileOutputStream out = new FileOutputStream(name + "_");
-            out.write(data);
-            out.close();
-
-            return jsonObject.toString();
-        } else {
-            return line;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new IOException();
         }
-
-
+        return result;
     }
 
     public static ArrayList<Groupe> getUserGroups(int userId){
@@ -617,7 +622,6 @@ class ClientServiceThread extends Thread {
 
     private void sendFile(String clientCommand) {
 
-
     }
 
     private void getWeather(String clientCommand) {
@@ -693,7 +697,8 @@ class ClientServiceThread extends Thread {
                 stmt = conn.createStatement();
 
                 rs = stmt.executeQuery(
-                        "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES ('" + groupId + "','" + path + "');");
+                        "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES ("+groupId +",'" + path +" ')");
+                log.writeLog("Group N°"+groupId+" created new Cloud Service at : "+path,-666,"[SQL]");
 
             } catch (Exception e) {
                 if (rs == null) {
@@ -709,23 +714,27 @@ class ClientServiceThread extends Thread {
 
     public void run() {
         ClientCommandEnum clientRequest =  ClientCommandEnum.Lazy;
-        System.out.println("[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName());
-        System.out.println("[LIST UPDATE] Client(s) : " + Socket_Serveur.users.size());
+        var message = "[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName();
+        System.out.println(message);
+        log.writeLog(message, -666, "[INFO]");
+        message = "[LIST UPDATE] Client(s) : " + Socket_Serveur.users.size();
+        System.out.println(message);
+        log.writeLog(message, -666, "[INFO]");
         String clientUsername = null;
 
         try {
 
             while (runState) {
 
-                String clientCommand = Socket_Serveur.readClientStream(client);
+                String clientCommand = client.isConnected() ?  Socket_Serveur.readClientStream(client) : null;
                 if (clientCommand != null) {
                     printBroadcast(clientCommand);
                 }
                 if (!ServerOn) {
                     serverStop();
                 }
-                assert clientCommand != null;
 
+                if(clientCommand == null) continue;
                 if (clientCommand.equalsIgnoreCase(ClientCommandEnum.Quit.Label))
                     clientExit(clientCommand);
                 else if (clientCommand.equalsIgnoreCase(ClientCommandEnum.WeatherInfo.Label)) getWeather(clientCommand);
@@ -743,13 +752,31 @@ class ClientServiceThread extends Thread {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException();
         } finally {
             try {
                 client.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("...Stopped");
+            final int[] clientId = {0};
+            final HashMap<Socket, User>[] currentUser = new HashMap[]{null};
+
+            Socket_Serveur.users.forEach(user ->{
+                if(user.containsKey(client)){
+                    clientId[0] = user.get(client).Id;
+                    currentUser[0] = user;
+                }
+            });
+            Socket_Serveur.groupes.forEach(groupe -> {
+                if(groupe.groupeUsers.contains((currentUser[0])))
+                    groupe.groupeUsers.remove(currentUser[0]);
+            });
+
+            Socket_Serveur.users.remove(currentUser[0]);
+            message = "Thread Client N°"+clientId[0]+" finished, now disconnected";
+            System.out.println(message);
+            log.writeLog(message, -666, "[INFO]");
         }
     }
 
