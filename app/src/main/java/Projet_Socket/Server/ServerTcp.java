@@ -3,7 +3,6 @@ package Projet_Socket.Server;
 import Projet_Socket.Login.Identity.Group;
 import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Utils.File.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -45,9 +44,7 @@ public class ServerTcp {
     public static void runPowershellScript(String scriptPath, ArrayList<String> arguments){
         try{
             final String[] script = {scriptPath};
-            arguments.forEach(arg ->{
-                script[0] +=" "+arg;
-            });
+            arguments.forEach(arg -> script[0] +=" "+arg);
             var command = "powershell.exe  " + script[0];
             // Executing the command
             var powerShellProcess = Runtime.getRuntime().exec(command);
@@ -242,7 +239,6 @@ public class ServerTcp {
     }
 
     public static ArrayList<Group> getGroups() {
-        var groupId = 0;
         var results = new  ArrayList<Group>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
