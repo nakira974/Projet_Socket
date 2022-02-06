@@ -7,10 +7,12 @@ import Projet_Socket.Client.ClientTcp;
 import Projet_Socket.Login.AES_Perso;
 import Projet_Socket.Login.Identity.LogUser;
 import Projet_Socket.Login.Identity.User;
+import Projet_Socket.Server.ServerClientWorker;
+import Projet_Socket.Server.ServerTcp;
 import Projet_Socket.Server.Services.FileServer;
 import Projet_Socket.Utils.Console;
 import Projet_Socket.Utils.File.Logger;
-import Projet_Socket.Server.*;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -168,7 +170,7 @@ public class App {
                                 var text = hello_request.split(",");
                                 clientUsername = text[0];
                                 clientMail = text[1];
-                                var currentUser = new  HashMap<Socket, User>();
+                                var currentUser = new HashMap<Socket, User>();
                                 currentUser.put(client, new User(clientUsername));
                                 ServerTcp.users.add(currentUser);
                                 var userId = ServerTcp.getUserId(clientMail);

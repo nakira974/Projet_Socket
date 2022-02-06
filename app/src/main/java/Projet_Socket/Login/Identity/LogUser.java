@@ -94,7 +94,7 @@ public class LogUser {
                 //System.out.println("connected");
                 Statement stmt = conn.createStatement();
 
-                 rs = stmt.executeQuery(
+                rs = stmt.executeQuery(
                         "SELECT `pseudo` " +
                                 "FROM users WHERE password ='" + args.get(1) + "' AND pseudo='" + args.get(0) + "'");
 

@@ -119,8 +119,8 @@ public class ServerClientWorker extends Thread {
                 userId[0] = socketUserHashMap.get(client).Id;
         });
         if (clientCommand != null) {
-            System.out.println("\"[BROADCAST] { Client : " + userId[0] + " } Says :" + clientCommand+"\"");
-            log.writeLog("\""+clientCommand+"\"", userId[0], "BROADCAST");
+            System.out.println("\"[BROADCAST] { Client : " + userId[0] + " } Says :" + clientCommand + "\"");
+            log.writeLog("\"" + clientCommand + "\"", userId[0], "BROADCAST");
         }
     }
 
@@ -194,9 +194,9 @@ public class ServerClientWorker extends Thread {
     }
 
     private void writePrivate(String[] sender, String destination, String msg) throws IOException {
-        try{
+        try {
             privateSend(sender, destination, msg);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new IOException();
         }
@@ -399,31 +399,31 @@ public class ServerClientWorker extends Thread {
         runState = false;
     }
 
-    private ArrayList<String> checkGroupFiles(String path){
+    private ArrayList<String> checkGroupFiles(String path) {
         var result = new ArrayList<String>();
         //Creating a File object for directory
         var directoryPath = new File(path);
-        var textFilefilter = new FileFilter(){
+        var textFilefilter = new FileFilter() {
             public boolean accept(File file) {
                 return file.isFile();
             }
         };
         //List of all the text files
-        var filesList= directoryPath.listFiles(textFilefilter);
+        var filesList = directoryPath.listFiles(textFilefilter);
         System.out.println("List of the text files in the specified directory:");
 
-        for(var file : Objects.requireNonNull(filesList)) {
+        for (var file : Objects.requireNonNull(filesList)) {
             result.add(file.getAbsolutePath());
-            System.out.println("File name: "+file.getName());
-            System.out.println("File path: "+file.getAbsolutePath());
-            System.out.println("Size :"+file.getTotalSpace());
+            System.out.println("File name: " + file.getName());
+            System.out.println("File path: " + file.getAbsolutePath());
+            System.out.println("Size :" + file.getTotalSpace());
             System.out.println(" ");
         }
         return result;
     }
 
-    public void fileSynchronisationRequest(){
-        try{
+    public void fileSynchronisationRequest() {
+        try {
 
             final String[] sender = {null};
             ServerTcp.users //stream out of arraylist
@@ -437,16 +437,16 @@ public class ServerClientWorker extends Thread {
 
             var content = new JSONObject();
             var date = log.getDateNow();
-            content.put("date", "\""+date+"\"");
+            content.put("date", "\"" + date + "\"");
             content.put("server_files", filesByGroup);
-            content.put("user","\""+ userName+"\"");
+            content.put("user", "\"" + userName + "\"");
             content.put("groups", groups);
             content.put("response status", 200);
             var json = content.toString();
 
             ServerTcp.writeSocket(json, client);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
@@ -463,7 +463,7 @@ public class ServerClientWorker extends Thread {
         var file = new File(path);
         //Creating the directory
         var bool = file.mkdir();
-        if(!bool) return;
+        if (!bool) return;
         var groupId = 0;
         ResultSet rs = null;
         Statement stmt = null;
@@ -479,7 +479,7 @@ public class ServerClientWorker extends Thread {
                         "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES (" + groupId + ",'" + path + " ')");
                 var message = "\"Group N°" + groupId + " created new Cloud Service at : " + path + "\"";
                 log.writeLog(message, -666, "[CLOUD]");
-                sendGroup("/G"+groupe+":\n"+"[CLOUD] "+message);
+                sendGroup("/G" + groupe + ":\n" + "[CLOUD] " + message);
                 createRootDirectory(path);
             } catch (Exception e) {
                 if (rs == null) {
@@ -487,7 +487,7 @@ public class ServerClientWorker extends Thread {
                     System.err.println("Erreur :\n" + (stmt != null ? stmt.getWarnings().getSQLState() : null));
                     var message = "\"Group N°" + groupId + " cannot be created at : " + path + "\"";
                     log.writeLog(message, -666, "[CLOUD]");
-                    sendGroup("/G"+groupe+":\n"+"[CLOUD] "+message);
+                    sendGroup("/G" + groupe + ":\n" + "[CLOUD] " + message);
                 }
                 System.err.println("Erreur de connexion au serveur de fichier...");
             }
@@ -505,7 +505,7 @@ public class ServerClientWorker extends Thread {
             var scriptPath = currentDirectoryPath + "\\create_root_directory.ps1";
             var arguments = new ArrayList<String>();
             arguments.add(path);
-            ServerTcp.runPowershellScript(scriptPath,arguments);
+            ServerTcp.runPowershellScript(scriptPath, arguments);
             //String command = "powershell.exe  your command";
             //Getting the version
 
@@ -520,10 +520,10 @@ public class ServerClientWorker extends Thread {
 
 
     public void run() {
-        var message = "\"[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName()+"\"";
+        var message = "\"[NEW THREAD] Accepted Client Address - " + client.getInetAddress().getHostName() + "\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
-        message = "\"[LIST UPDATE] Client(s) : " + ServerTcp.users.size()+"\"";
+        message = "\"[LIST UPDATE] Client(s) : " + ServerTcp.users.size() + "\"";
         System.out.println(message);
         log.writeLog(message, -666, "[INFO]");
 
@@ -546,16 +546,20 @@ public class ServerClientWorker extends Thread {
 
                 else if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.EndProcess.Label)) endProcess(log);
                 else if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.Lazy.Label)) endProcess(log);
-                else if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.WeatherInfo.Label)) getWeather(clientCommand);
+                else if (clientCommand.equalsIgnoreCase(InternalCommandsEnum.WeatherInfo.Label))
+                    getWeather(clientCommand);
 
                 else if (clientCommand.contains(InternalCommandsEnum.Translate.Label)) getTranslate(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.PrivateMessage.Label)) sendPrivate(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.SendFile.Label)) sendFile(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.GroupMessage.Label)) sendGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.JoinGroupRequest.Label)) joinGroup(clientCommand);
-                else if (clientCommand.contains(InternalCommandsEnum.GroupCreationRequest.Label)) createGroup(clientCommand);
-                else if (clientCommand.contains(InternalCommandsEnum.CreateSharingSpace.Label)) createCloudSubscription(clientCommand);
-                else if(clientCommand.contains(InternalCommandsEnum.FileSynchronisation.Label)) fileSynchronisationRequest();
+                else if (clientCommand.contains(InternalCommandsEnum.GroupCreationRequest.Label))
+                    createGroup(clientCommand);
+                else if (clientCommand.contains(InternalCommandsEnum.CreateSharingSpace.Label))
+                    createCloudSubscription(clientCommand);
+                else if (clientCommand.contains(InternalCommandsEnum.FileSynchronisation.Label))
+                    fileSynchronisationRequest();
                 else sendBroadcast(clientCommand);
                 //endregion Internal Commands
             }

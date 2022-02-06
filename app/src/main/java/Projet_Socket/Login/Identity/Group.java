@@ -1,7 +1,5 @@
 package Projet_Socket.Login.Identity;
 
-import Projet_Socket.Login.Identity.User;
-
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;

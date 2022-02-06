@@ -9,7 +9,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.sql.*;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -41,16 +42,16 @@ public class ServerTcp {
 
     }
 
-    public static void runPowershellScript(String scriptPath, ArrayList<String> arguments){
-        try{
+    public static void runPowershellScript(String scriptPath, ArrayList<String> arguments) {
+        try {
             final String[] script = {scriptPath};
-            arguments.forEach(arg -> script[0] +=" "+arg);
+            arguments.forEach(arg -> script[0] += " " + arg);
             var command = "powershell.exe  " + script[0];
             // Executing the command
             var powerShellProcess = Runtime.getRuntime().exec(command);
             // Getting the results
             powerShellProcess.getOutputStream().close();
-            var line ="";
+            var line = "";
             System.out.println("Standard Output:");
             var stdout = new BufferedReader(new InputStreamReader(
                     powerShellProcess.getInputStream()));
@@ -66,7 +67,7 @@ public class ServerTcp {
             }
             stderr.close();
             System.out.println("Done");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
@@ -110,35 +111,35 @@ public class ServerTcp {
     }
 
     public static ArrayList<String> getFilesByGroup(int groupId) throws SQLException {
-        var result = new  ArrayList<String>();
-        try{
+        var result = new ArrayList<String>();
+        try {
             Class.forName("org.mariadb.jdbc.Driver");
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
             var logger = new Logger();
-            var logMessage = "GET FILES FOR GROUP ID N°"+groupId;
+            var logMessage = "GET FILES FOR GROUP ID N°" + groupId;
             System.out.println();
-            logger.writeLog(logMessage, -666, "[SQL]" );
-            System.out.println("[SQL] "+logMessage);
+            logger.writeLog(logMessage, -666, "[SQL]");
+            System.out.println("[SQL] " + logMessage);
 
             var stmt = conn.createStatement();
 
 
-            var rs = stmt.executeQuery("SELECT rootPath FROM tcpFileSharing WHERE groupId="+groupId);
+            var rs = stmt.executeQuery("SELECT rootPath FROM tcpFileSharing WHERE groupId=" + groupId);
 
             while (rs.next()) {
                 var entry = rs.getString("rootPath");
                 result.add(entry);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new SQLException();
         }
 
         return result;
     }
 
-    public static HashMap<Group, ArrayList<String>> getFilesByGroup(){
+    public static HashMap<Group, ArrayList<String>> getFilesByGroup() {
         var result = new HashMap<Group, ArrayList<String>>();
         groupes.forEach(groupe -> {
             try {
@@ -155,24 +156,25 @@ public class ServerTcp {
         return result;
     }
 
-    private static ArrayList<String> getFilesByDirectory(String directory){
+    private static ArrayList<String> getFilesByDirectory(String directory) {
 
         var result = new ArrayList<String>();
         //Creating a File object for directory
         var directoryPath = new File("D:\\ExampleDirectory");
         //List of all files and directories
-        var messageLog = "\"List of files and directories in :"+directory+"\"";
+        var messageLog = "\"List of files and directories in :" + directory + "\"";
         var filesList = directoryPath.listFiles();
-        System.out.println("[CLOUD] "+messageLog);
-        for(var file : filesList != null ? filesList : new File[0]) {
+        System.out.println("[CLOUD] " + messageLog);
+        for (var file : filesList != null ? filesList : new File[0]) {
             result.add(file.getAbsolutePath());
-            System.out.println("File name: "+file.getName());
-            System.out.println("File path: "+file.getAbsolutePath());
-            System.out.println("Size :"+file.getTotalSpace());
+            System.out.println("File name: " + file.getName());
+            System.out.println("File path: " + file.getAbsolutePath());
+            System.out.println("Size :" + file.getTotalSpace());
             System.out.println(" ");
         }
         return result;
     }
+
     public static String readClientStream(Socket client) throws IOException {
 
         var result = "";
@@ -239,7 +241,7 @@ public class ServerTcp {
     }
 
     public static ArrayList<Group> getGroups() {
-        var results = new  ArrayList<Group>();
+        var results = new ArrayList<Group>();
         try {
             Class.forName("org.mariadb.jdbc.Driver");
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +

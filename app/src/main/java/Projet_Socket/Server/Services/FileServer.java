@@ -12,6 +12,7 @@ public class FileServer extends Thread {
     public String ServerRootDirectory;
     public Projet_Socket.Utils.Console Console;
     private boolean _isServerRunning;
+
     public FileServer(String serverRootDirectory, Console console) {
         _isServerRunning = true;
         try {
