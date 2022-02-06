@@ -40,7 +40,7 @@ public class Logger {
     }
 
     /**
-     * Renvoi le nom du fichier de log du jour
+     * Renvoie le nom du fichier de log du jour
      * @return nom du fichier
      */
     public String getLogFileName() {
