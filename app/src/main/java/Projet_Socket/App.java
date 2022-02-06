@@ -146,7 +146,7 @@ public class App {
                     : null;
 
             Socket_Serveur.getGroups();
-            var log = "Server has started at : "+Socket_Serveur._srvSocket.getInetAddress().getHostAddress()+ " port :"+FactoryPort;
+            var log = "\"Server has started at : ["+Socket_Serveur._srvSocket.getInetAddress().getHostAddress()+ "]::"+FactoryPort+"\"";
             var logger = new Logger();
             logger.writeLog(log,-666,"[INFO]");
             System.out.printf("[INFO] Server has started at : %s port :%d%n", Socket_Serveur._srvSocket.getInetAddress().getHostAddress(), FactoryPort);
@@ -178,9 +178,10 @@ public class App {
                                     } );
 
                                 });
-                                log = "user : "+currentUser.get(client).Id+
-                                        ", email :"+currentUser.get(client).userMail+
-                                        " at address"+client.getInetAddress().getHostAddress()+" is connected";
+                                log = "{\n\t\t\"user\" : "+currentUser.get(client).Id+",\n"+
+                                        "\t\t\"email\" :\""+currentUser.get(client).userMail+"\",\n"+
+                                        "\t\t\"address\" : \"["+client.getInetAddress().getHostAddress()+"]"+"\",\n" +
+                                        "\t\t\"status\" : \"CONNECTED\"}";
                                 logger.writeLog(log,-666,"[INFO]");
                             } catch (IOException e) {
                                 e.printStackTrace();
