@@ -50,10 +50,35 @@ jobs:
         # Prefix the list here with "+" to use these queries and those in the config file.
         # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
-    # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-    # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+     - name: Gradle Build Action
+  # You may pin to the exact commit or the version.
+  # uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+  uses: gradle/gradle-build-action@v2.1.3
+  with:
+    # Gradle version to use
+    gradle-version: # optional
+    # When 'true', all caching is disabled. No entries will be written to or read from the cache.
+    cache-disabled: # optional
+    # When 'true', existing entries will be read from the cache but no entries will be written.
+    cache-read-only: # optional
+    # Paths within Gradle User Home to cache.
+    gradle-home-cache-includes: # optional, default is caches
+notifications
+
+    # Paths within Gradle User Home to exclude from cache.
+    gradle-home-cache-excludes: # optional
+    # Gradle command line arguments (supports multi-line input)
+    arguments: # optional
+    # Path to the root directory of the build
+    build-root-directory: # optional
+    # Path to the Gradle executable
+    gradle-executable: # optional
+    # When 'true', entries will not be restored from the cache but will be saved at the end of the Job. This allows a 'clean' cache entry to be written.
+    cache-write-only: # optional
+    # When 'true', the action will not attempt to restore the Gradle User Home entries from other Jobs.
+    gradle-home-cache-strict-match: # optional
+    # Used to uniquely identify the current job invocation. Defaults to the matrix values for this job; this should not be overridden by users (INTERNAL).
+    workflow-job-context: # optional, default is ${{ toJSON(matrix) }}
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
@@ -68,3 +93,5 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
+      
+   
