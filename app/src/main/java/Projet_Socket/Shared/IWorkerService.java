@@ -5,7 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-public interface IWorkerService<T>{
+/**
+ * @param <T>
+ */
+public interface IWorkerService<T> extends Runnable{
     /**
      * Extinction du serveur
      *

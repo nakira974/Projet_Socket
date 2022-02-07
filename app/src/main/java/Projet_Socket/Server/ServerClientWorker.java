@@ -8,6 +8,7 @@ import Projet_Socket.Utils.InternalCommandsEnum;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -459,6 +460,4 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
             log.writeLog(message, -666, "[INFO]");
         }
     }
-
-
 }

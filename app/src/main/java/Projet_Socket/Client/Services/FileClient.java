@@ -9,7 +9,7 @@ import java.net.Socket;
 /**
  * Thread de client du serveur de fichier
  */
-public final class FileClient extends WorkerService {
+public final class FileClient extends WorkerService<FileClient> {
 
     private final Logger _logger;
 

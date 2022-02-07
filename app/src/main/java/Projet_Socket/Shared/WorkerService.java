@@ -4,6 +4,7 @@ import Projet_Socket.Server.ServerTcp;
 import Projet_Socket.Utils.File.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -23,7 +24,8 @@ public abstract class WorkerService<T> extends Thread implements IWorkerService<
     protected boolean runState;
     protected String workerType;
 
-    protected WorkerService(Socket p_client,String p_workerType){
+
+    protected WorkerService(Socket p_client, String p_workerType){
         workerType = p_workerType;
         client = p_client;
         logger = new Logger();
