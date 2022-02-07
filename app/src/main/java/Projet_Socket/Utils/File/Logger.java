@@ -2,6 +2,8 @@ package Projet_Socket.Utils.File;/*
  --- creators : nakira974 && Weefle  ----
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.time.LocalDateTime;
@@ -77,7 +79,7 @@ public class Logger {
      * @param userId id de l'utilisateur concerné
      * @param domain type de l'information
      */
-    public void writeLog(String p_fileData, int userId, String domain) {
+    public void writeLog(@NotNull String p_fileData,int userId, @NotNull String domain) {
         try {
             var reader = new BufferedReader(new FileReader(getLogFileName()));
             var jsonContent = "\n" +

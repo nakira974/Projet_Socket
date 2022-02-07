@@ -13,6 +13,7 @@ import Projet_Socket.Server.Services.FileServer;
 import Projet_Socket.Utils.Console;
 import Projet_Socket.Utils.File.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,7 +57,7 @@ public final class App {
      * @return chaine de caractère de l'hexadécimal converti
      */
     @NotNull
-    private static String toHexString(byte[] hash) {
+    private static String toHexString(@NotNull byte[] hash) {
         // Convert byte array into signum representation
         var number = new BigInteger(1, hash);
 
@@ -110,7 +111,7 @@ public final class App {
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(@Nullable String[] args) throws Exception {
 
         var userMail = "";
         ClientTcp socket_client = null;

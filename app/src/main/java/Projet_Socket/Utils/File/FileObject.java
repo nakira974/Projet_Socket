@@ -1,5 +1,7 @@
 package Projet_Socket.Utils.File;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Classe servant à l'envoi et réception de fichiers en json
  */
@@ -16,12 +18,13 @@ public final class FileObject {
      * @param size taille du fichier
      * @param content contenu du fichier
      */
-    public FileObject(String name, int size, byte[] content) {
+    public FileObject(@NotNull String name, int size,@NotNull byte[] content) {
         this.name = name;
         this.size = size;
         this.content = content;
     }
 
+    @NotNull
     public String getName() {
         return name;
     }

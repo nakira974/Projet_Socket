@@ -29,22 +29,22 @@ public final class AES_Perso extends Abstract_AES_Perso {
      * @return A base64 encoded bytes containing the encrypted data
      * @throws Exception Throws exceptions
      */
-    public static byte[] encrypt(byte[] input, byte[] passphrase) throws Exception {
+    public static byte[] encrypt(@NotNull byte[] input,@NotNull byte[] passphrase) throws Exception {
         return Base64.getEncoder().encode(_encrypt(input, passphrase));
     }
 
     /**
      * Decrypt encrypted base64 encoded text in bytes
      *
-     * @param crypted    Text in bytes to decrypt
+     * @param encrypted    Text in bytes to decrypt
      * @param passphrase The passphrase in bytes
      * @return Decrypted data in bytes
      * @throws Exception Throws exceptions
      */
     @NotNull
     @Contract("_, _ -> new")
-    public static String decrypt(String crypted, @NotNull String passphrase) throws Exception {
-        return new String(_decrypt(Base64.getDecoder().decode(crypted), passphrase.getBytes(UTF_8)), UTF_8);
+    public static String decrypt(@NotNull String encrypted, @NotNull String passphrase) throws Exception {
+        return new String(_decrypt(Base64.getDecoder().decode(encrypted), passphrase.getBytes(UTF_8)), UTF_8);
     }
 
     /**
@@ -55,7 +55,7 @@ public final class AES_Perso extends Abstract_AES_Perso {
      * @return Decrypted data in bytes
      * @throws Exception Throws exceptions
      */
-    public static byte[] decrypt(byte[] crypted, byte[] passphrase) throws Exception {
+    public static byte[] decrypt(@NotNull byte[] crypted,@NotNull byte[] passphrase) throws Exception {
         return _decrypt(Base64.getDecoder().decode(crypted), passphrase);
     }
 }

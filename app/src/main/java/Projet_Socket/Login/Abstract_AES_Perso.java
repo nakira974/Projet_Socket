@@ -23,7 +23,7 @@ public abstract sealed class Abstract_AES_Perso permits AES_Perso {
      * @throws Exception Throws exceptions
      */
     @NotNull
-    protected static byte[] _encrypt(byte[] input, byte[] passphrase) throws Exception {
+    protected static byte[] _encrypt(@NotNull byte[] input,@NotNull byte[] passphrase) throws Exception {
         var salt = (new SecureRandom()).generateSeed(8);
         var keyIv = deriveKeyAndIv(passphrase, salt);
 
@@ -42,7 +42,7 @@ public abstract sealed class Abstract_AES_Perso permits AES_Perso {
      * @return Decrypted data in bytes
      * @throws Exception Throws exceptions
      */
-    protected static byte[] _decrypt(byte[] data, byte[] passphrase) throws Exception {
+    protected static byte[] _decrypt(@NotNull byte[] data, @NotNull byte[] passphrase) throws Exception {
         var salt = Arrays.copyOfRange(data, 8, 16);
 
         if (!Arrays.equals(Arrays.copyOfRange(data, 0, 8), SALTED)) {
@@ -66,7 +66,7 @@ public abstract sealed class Abstract_AES_Perso permits AES_Perso {
      */
     @NotNull
     @Contract("_, _ -> new")
-    protected static Object[] deriveKeyAndIv(byte[] passphrase, byte[] salt) throws Exception {
+    protected static Object[] deriveKeyAndIv(@NotNull byte[] passphrase,@NotNull byte[] salt) throws Exception {
         var md5 = MessageDigest.getInstance("MD5");
         var passSalt = concat(passphrase, salt);
         var dx = new byte[0];

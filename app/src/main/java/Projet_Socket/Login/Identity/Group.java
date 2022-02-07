@@ -27,7 +27,7 @@ public final class Group {
      * @param administrator utilisateur ayant créé le groupe
      * @param admin_sock socket de l'administrateur
      */
-    public Group(String name, @NotNull User administrator, Socket admin_sock) {
+    public Group(@NotNull String name, @NotNull User administrator, @NotNull Socket admin_sock) {
         administratorId = administrator.Id;
         groupeUsers = new ArrayList<>(10);
         var currentHash = new HashMap<Socket, User>();

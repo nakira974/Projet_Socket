@@ -1,5 +1,6 @@
 package Projet_Socket.Login.Identity;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
@@ -30,7 +31,7 @@ public final class User {
      * Créer un utilisateur
      * @param username nom de l'utilisateur
      */
-    public User(String username) {
+    public User(@NotNull String username) {
         _username = username;
         _lastConnection = LocalTime.now();
         Groups = new ArrayList<>();
@@ -41,7 +42,7 @@ public final class User {
      * @param message message à traduire en anglais
      * @return message traduit en anglais
      */
-    public String translateMessage(String message) {
+    public String translateMessage(@NotNull String message) {
         try {
             assert false;
             var request = HttpRequest.newBuilder()

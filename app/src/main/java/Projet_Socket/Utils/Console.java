@@ -2,6 +2,8 @@ package Projet_Socket.Utils;/*
  --- creators : nakira974 && Weefle  ----
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -21,7 +23,7 @@ public final class Console {
      * @param writeStream flux d'écriture
      * @throws IOException
      */
-    public Console(BufferedReader readStream, PrintStream writeStream) throws IOException {
+    public Console(@NotNull BufferedReader readStream,@NotNull PrintStream writeStream) throws IOException {
         try{
             this._writeBuffer = readStream;
             this._readBuffer = writeStream;

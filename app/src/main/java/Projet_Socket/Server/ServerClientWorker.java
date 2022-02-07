@@ -36,7 +36,7 @@ public final class ServerClientWorker extends Thread {
      * Lance un thread serveur de réception pour un client
      * @param s socket client
      */
-    public ServerClientWorker(Socket s) {
+    public ServerClientWorker(@NotNull Socket s) {
 
         this.client = s;
         ServerTcp.sockets.add(s);
@@ -51,7 +51,7 @@ public final class ServerClientWorker extends Thread {
      * @return
      */
     @NotNull
-    private static String toHexString(byte[] hash) {
+    private static String toHexString(@NotNull byte[] hash) {
         // Convert byte array into signum representation
         var number = new BigInteger(1, hash);
 
@@ -143,23 +143,21 @@ public final class ServerClientWorker extends Thread {
      * Affichage console sur le serveur des messages broadcast
      * @param clientCommand commande du client
      */
-    private void printBroadcast(String clientCommand) {
+    private void printBroadcast(@NotNull String clientCommand) {
         final int[] userId = {0};
         ServerTcp.users.forEach(socketUserHashMap -> {
             if (socketUserHashMap.containsKey(client))
                 userId[0] = socketUserHashMap.get(client).Id;
         });
-        if (clientCommand != null) {
-            System.out.println("\"[BROADCAST] { Client : " + userId[0] + " } Says :" + clientCommand + "\"");
-            log.writeLog("\"" + clientCommand + "\"", userId[0], "BROADCAST");
-        }
+        System.out.println("\"[BROADCAST] { Client : " + userId[0] + " } Says :" + clientCommand + "\"");
+        log.writeLog("\"" + clientCommand + "\"", userId[0], "BROADCAST");
     }
 
     /**
      * Transmet le message d'un client à tout le monde
      * @param clientCommand message du client
      */
-    private void sendBroadcast(String clientCommand) {
+    private void sendBroadcast(@NotNull String clientCommand) {
 
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
@@ -243,7 +241,7 @@ public final class ServerClientWorker extends Thread {
      * @param destination destinataire
      * @param msg contenu du message
      */
-    private void privateSend(String[] sender, String destination, String msg) {
+    private void privateSend(@NotNull String[] sender, @NotNull String destination, @NotNull String msg) {
         ServerTcp.users //stream out of arraylist
                 .forEach(map -> map.entrySet().stream()
                         .filter(entry1 -> entry1.getKey().equals(client))
@@ -454,7 +452,7 @@ public final class ServerClientWorker extends Thread {
      * @return liste des fichiers d'un espace cloud de groupe
      */
     @NotNull
-    private ArrayList<String> checkGroupFiles(String path) {
+    private ArrayList<String> checkGroupFiles(@NotNull String path) {
         var result = new ArrayList<String>();
         //Creating a File object for directory
         var directoryPath = new File(path);
@@ -563,7 +561,7 @@ public final class ServerClientWorker extends Thread {
      * Créer un nouveau repertoire pour un groupe
      * @param path chemin du repertoire à créer
      */
-    private void createRootDirectory(String path) {
+    private void createRootDirectory(@NotNull String path) {
         try {
             var currentDirectoryPath = FileSystems.getDefault().
                     getPath("").

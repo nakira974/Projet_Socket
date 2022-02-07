@@ -32,7 +32,7 @@ public final class ServerTcp {
      * Lance un serveur tcp
      * @param socket socket serveur
      */
-    public static void createServer(ServerSocket socket) {
+    public static void createServer(@NotNull ServerSocket socket) {
         _srvSocket = socket;
         maxConnection = 20;
         nb_socket = 0;
@@ -61,7 +61,7 @@ public final class ServerTcp {
      * @param scriptPath chemin vers le script
      * @param arguments arguments du script
      */
-    public static void runPowershellScript(String scriptPath, ArrayList<String> arguments) {
+    public static void runPowershellScript(@NotNull String scriptPath,@NotNull ArrayList<String> arguments) {
         try {
             final String[] script = {scriptPath};
             arguments.forEach(arg -> script[0] += " " + arg);
@@ -123,7 +123,7 @@ public final class ServerTcp {
      * @param clients liste de clients à qui envoyer
      * @throws IOException
      */
-    public static void writeSocket(String content, @NotNull ArrayList<Socket> clients) throws IOException {
+    public static void writeSocket(@NotNull String content, @NotNull ArrayList<Socket> clients) throws IOException {
 
         for (var socket : clients) {
 
@@ -141,7 +141,7 @@ public final class ServerTcp {
      * @param client client à qui envoyer
      * @throws IOException
      */
-    public static void writeSocket(String content, @NotNull Socket client) throws IOException {
+    public static void writeSocket(@NotNull String content, @NotNull Socket client) throws IOException {
 
 
         var out = new PrintWriter(client.getOutputStream());
@@ -215,7 +215,7 @@ public final class ServerTcp {
      * @return liste des fichiers sur le repertoire avec leur chemin absolu
      */
     @NotNull
-    private static ArrayList<String> getFilesByDirectory(String directory) {
+    private static ArrayList<String> getFilesByDirectory(@NotNull String directory) {
 
         var result = new ArrayList<String>();
         //Creating a File object for directory
@@ -240,7 +240,7 @@ public final class ServerTcp {
      * @return contenu envoyé par le client
      * @throws IOException
      */
-    public static String readClientStream(Socket client) throws IOException {
+    public static String readClientStream(@NotNull Socket client) throws IOException {
         String res = null;
 
         var result = "";
@@ -289,7 +289,7 @@ public final class ServerTcp {
             var conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123");
 
-            var messageLog = "[SQL] "+ "SETTING GROUPS FOR USER ID N° " + userId + "...";
+            var messageLog = "\"[SQL] "+ "SETTING GROUPS FOR USER ID N° " + userId + "...\"";
             var logger = new Logger();
             logger.writeLog(messageLog, -666,"[SQL]");
             System.out.println(messageLog);
@@ -359,7 +359,7 @@ public final class ServerTcp {
      * @param groupeName nom du groupe
      * @return id du groupe
      */
-    public static int getGroupId(String groupeName) {
+    public static int getGroupId(@NotNull String groupeName) {
         var groupId = 0;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -390,7 +390,7 @@ public final class ServerTcp {
      * @param userMail id de l'utilisateur
      * @return id de l'utilisateur
      */
-    public static int getUserId(String userMail) {
+    public static int getUserId(@NotNull String userMail) {
         var userId = 0;
         try {
             Class.forName("org.mariadb.jdbc.Driver");
@@ -423,7 +423,7 @@ public final class ServerTcp {
      * @param client client en écoute
      * @throws IOException
      */
-    public void sendFileBroadcast(String path, @NotNull Socket client) throws IOException {
+    public void sendFileBroadcast(@NotNull String path, @NotNull Socket client) throws IOException {
 
         var writer = new OutputStreamWriter(client.getOutputStream(), StandardCharsets.UTF_8);
 
@@ -441,7 +441,7 @@ public final class ServerTcp {
      * @param clients clients en écoutes
      * @throws IOException
      */
-    public void sendFileBroadcast(String path, @NotNull ArrayList<Socket> clients) throws IOException {
+    public void sendFileBroadcast(@NotNull String path, @NotNull ArrayList<Socket> clients) throws IOException {
 
         for (var socket : clients) {
             var writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);

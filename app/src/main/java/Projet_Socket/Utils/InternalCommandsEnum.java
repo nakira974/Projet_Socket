@@ -1,5 +1,7 @@
 package Projet_Socket.Utils;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Enum comprenant l'ensemble des commandes interne de l'application
  */
@@ -17,9 +19,10 @@ public enum InternalCommandsEnum {
     EndProcess("END"),
     Lazy(""),
     ;
+    @NotNull
     public final String Label;
 
-    InternalCommandsEnum(String command) {
+    InternalCommandsEnum(@NotNull String command) {
         this.Label = command;
     }
 
