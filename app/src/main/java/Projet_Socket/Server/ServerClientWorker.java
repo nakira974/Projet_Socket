@@ -322,33 +322,24 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
         var groupe = args[0];
         var spaceName = args[1];
 
-        var path = "C:/temp/" + groupe + "/" + spaceName + "/";
-        var groupId = 0;
-        ResultSet rs = null;
-        Statement stmt = null;
         try {
-            groupId = ServerTcp.getGroupId(groupe);
+            var groupId = ServerTcp.getGroupId(groupe);
             Class.forName("org.mariadb.jdbc.Driver");
+            var path = "C:/temp/" + groupe + "/" + spaceName + "/";
             try (Connection conn = DriverManager.getConnection("jdbc:mariadb://mysql-wizle.alwaysdata.net/" +
                     "wizle_test?user=wizle&password=projettest123")) {
                 //System.out.println("connected");
-                stmt = conn.createStatement();
+                var stmt = conn.createStatement();
 
-                rs = stmt.executeQuery(
+                stmt.executeQuery(
                         "INSERT INTO tcpFileSharing(groupId, rootPath) VALUES (" + groupId + ",'" + path + " ')");
                 var message = "\"Group N°" + groupId + " created new Cloud Service at : " + path + "\"";
                 log.writeLog(message, -666, "[CLOUD]");
                 sendGroup("/G" + groupe + ":\n" + "[CLOUD] " + message);
                 createRootDirectory(path);
             } catch (Exception e) {
-                if (rs == null) {
-                    System.err.println("Erreur de création d'un groupe de partage ! ");
-                    System.err.println("Erreur :\n" + (stmt != null ? stmt.getWarnings().getSQLState() : null));
-                    var message = "\"Group N°" + groupId + " cannot be created at : " + path + "\"";
-                    log.writeLog(message, -666, "[CLOUD]");
-                    sendGroup("/G" + groupe + ":\n" + "[CLOUD] " + message);
-                }
-                System.err.println("Erreur de connexion au serveur de fichier...");
+                e.printStackTrace();
+                throw new SQLException();
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
