@@ -1,7 +1,7 @@
 package Projet_Socket.Utils.File;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-
 /**
  * Classe servant à l'envoi et réception de fichiers en json
  */
@@ -24,27 +24,33 @@ public final class FileObject {
         this.content = content;
     }
 
+    @Contract(pure = true)
     @NotNull
     public String getName() {
         return name;
     }
 
+    @Contract(value = "this")
     public void setName(String name) {
         this.name = name;
     }
 
+    @Contract(pure = true)
     public int getSize() {
         return size;
     }
 
+    @Contract(value = "this")
     public void setSize(int size) {
         this.size = size;
     }
 
+    @Contract(pure = true)
     public byte[] getContent() {
         return content;
     }
 
+    @Contract(value = "this")
     public void setContent(byte[] content) {
         this.content = content;
     }

@@ -4,6 +4,7 @@ package Projet_Socket.Client;
  */
 
 import Projet_Socket.Utils.Console;
+import org.jetbrains.annotations.Contract;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -21,6 +22,11 @@ public final class ClientTcp {
     private final Socket socket;
     private final String _username;
 
+    /**
+     * Créer un socket client tcp
+     * @param socket socket du client
+     * @param p_userName nom de l'utilisateur
+     */
     public ClientTcp(Socket socket, String p_userName) {
 
 
@@ -34,6 +40,7 @@ public final class ClientTcp {
     /**
      * @return instance du client
      */
+    @Contract(pure = true)
     public Socket getSocket() {
         return this.socket;
     }

@@ -5,6 +5,7 @@ import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Utils.File.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -38,6 +39,7 @@ public final class ServerTcp {
         nb_socket = 0;
     }
 
+    @Contract(pure = true)
     public static int getMaxConnection() {
         return maxConnection;
     }
@@ -97,6 +99,7 @@ public final class ServerTcp {
     /**
      * @return nombre de sockets connectés
      */
+    @Contract(pure = true)
     public static int getNbSocket() {
         return nb_socket;
     }
@@ -240,6 +243,7 @@ public final class ServerTcp {
      * @return contenu envoyé par le client
      * @throws IOException
      */
+    @Nullable
     public static String readClientStream(@NotNull Socket client) throws IOException {
         String res = null;
 

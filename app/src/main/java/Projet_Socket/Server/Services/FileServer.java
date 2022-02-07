@@ -13,6 +13,11 @@ public class FileServer extends Thread {
     public Projet_Socket.Utils.Console Console;
     private boolean _isServerRunning;
 
+    /**
+     * Lance un Thread de serveur de fichier
+     * @param serverRootDirectory  répertoire racine où le serveur de fichier travaille
+     * @param console instance d'une console pour le débogage
+     */
     public FileServer(@NotNull String serverRootDirectory,@NotNull Console console) {
         _isServerRunning = true;
         try {
