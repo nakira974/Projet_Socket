@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @param <T>
+ * @param <T> WorkerType
  */
 public interface IWorkerService<T> extends Runnable{
     /**

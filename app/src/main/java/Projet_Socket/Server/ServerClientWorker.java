@@ -323,11 +323,6 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
         var spaceName = args[1];
 
         var path = "C:/temp/" + groupe + "/" + spaceName + "/";
-        //Creating a File object
-        var file = new File(path);
-        //Creating the directory
-        var bool = file.mkdir();
-        if (!bool) return;
         var groupId = 0;
         ResultSet rs = null;
         Statement stmt = null;
@@ -422,12 +417,9 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
                 else if (clientCommand.contains(InternalCommandsEnum.SendFile.Label)) sendFile();
                 else if (clientCommand.contains(InternalCommandsEnum.GroupMessage.Label)) sendGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.JoinGroupRequest.Label)) joinGroup(clientCommand);
-                else if (clientCommand.contains(InternalCommandsEnum.GroupCreationRequest.Label))
-                    createGroup(clientCommand);
-                else if (clientCommand.contains(InternalCommandsEnum.CreateSharingSpace.Label))
-                    createCloudSubscription(clientCommand);
-                else if (clientCommand.contains(InternalCommandsEnum.FileSynchronisation.Label))
-                    fileSynchronisationRequest();
+                else if (clientCommand.contains(InternalCommandsEnum.GroupCreationRequest.Label)) createGroup(clientCommand);
+                else if (clientCommand.contains(InternalCommandsEnum.CreateSharingSpace.Label)) createCloudSubscription(clientCommand);
+                else if (clientCommand.contains(InternalCommandsEnum.FileSynchronisation.Label)) fileSynchronisationRequest();
                 else sendBroadcast(clientCommand);
                 //endregion Internal Commands
             }
