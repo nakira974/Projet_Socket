@@ -17,7 +17,7 @@ import java.util.Arrays;
 /**
  * Worker service est un service qui tourne et effectue une tâche de fond avec un client
  */
-public abstract class WorkerService extends Thread implements IWorkerService<WorkerService> {
+public abstract class WorkerService<T> extends Thread implements IWorkerService<T> {
     protected Logger logger;
     protected Socket client;
     protected boolean runState;

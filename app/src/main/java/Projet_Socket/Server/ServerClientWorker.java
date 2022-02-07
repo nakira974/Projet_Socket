@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * Thread d'écoute d'un client tcp
  */
-public final class ServerClientWorker extends WorkerService {
+public final class ServerClientWorker extends WorkerService<ServerClientWorker> {
 
     final private Socket client;
     final private Logger log;
