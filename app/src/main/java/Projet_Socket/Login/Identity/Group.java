@@ -1,5 +1,6 @@
 package Projet_Socket.Login.Identity;
 
+import Projet_Socket.Utils.File.CloudFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -18,7 +19,7 @@ public final class Group {
     public int administratorId;
     public String name;
     public ArrayList<HashMap<Socket, User>> groupeUsers;
-    public HashMap<String, ArrayList<String>> Files;
+    public HashMap<CloudFile.FileStateEnum, ArrayList<String>> Files;
 
     public Group() {
         name = "";

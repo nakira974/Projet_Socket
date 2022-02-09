@@ -3,6 +3,7 @@ package Projet_Socket.Server;
 import Projet_Socket.Login.Identity.Group;
 import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Shared.WorkerService;
+import Projet_Socket.Utils.File.CloudFile;
 import Projet_Socket.Utils.File.Logger;
 import Projet_Socket.Utils.InternalCommandsEnum;
 import org.jetbrains.annotations.NotNull;
@@ -263,9 +264,19 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
                     .forEach(map -> map.entrySet().stream()
                             .filter(entry1 -> entry1.getKey().equals(client))
                             .forEach(username -> sender[0] = String.valueOf(username.getValue()._username)));
-
             var userName = sender[0];
-            var filesByGroup = new HashMap<String, ArrayList<String>>();
+            var filesByGroup = new HashMap<String, HashMap<CloudFile.FileStateEnum, ArrayList<String>>>();
+
+            ServerTcp.groupes.forEach(group -> {
+                group.groupeUsers.forEach(socketUserHashMap -> {
+                    if(socketUserHashMap.containsKey(client)){
+
+                    }
+
+                });
+            });
+
+
             var groups = ServerTcp.getGroups();
 
             var content = new JSONObject();
