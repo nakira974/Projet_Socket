@@ -118,6 +118,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
                         .forEach(username -> current_usr[0] = username.getValue()));
 
         var current_grp = new Group(groupe, current_usr[0], client);
+        var rootPath = "C:/temp/"+groupe;
         ServerTcp.groupes.add(current_grp);
         try {
 
@@ -128,7 +129,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
                 var stmt = conn.createStatement();
 
                 var rs = stmt.executeQuery(
-                        "INSERT INTO groupes(nom, administrator) VALUES ('" + groupe + "','" + administrator + "');");
+                        "INSERT INTO groupes(nom, administrator, rootPath) VALUES ('" + groupe + "','" + administrator + "', '"+groupe+"');");
                 rs = stmt.executeQuery("SELECT groupe_uuid FROM groupes WHERE nom=" + groupe);
                 while (rs.next()) {
                     current_grp.Id = rs.getInt("groupe_uuid");
@@ -249,34 +250,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
                         }));
     }
 
-    /**
-     * Renvoie la liste des fichiers d'un espace cloud d'un groupe
-     * @param path chemin du dossier
-     * @return liste des fichiers d'un espace cloud de groupe
-     */
-    @NotNull
-    private ArrayList<String> checkGroupFiles(@NotNull String path) {
-        var result = new ArrayList<String>();
-        //Creating a File object for directory
-        var directoryPath = new File(path);
-        var textFilefilter = new FileFilter() {
-            public boolean accept(@NotNull File file) {
-                return file.isFile();
-            }
-        };
-        //List of all the text files
-        var filesList = directoryPath.listFiles(textFilefilter);
-        System.out.println("List of the text files in the specified directory:");
 
-        for (var file : Objects.requireNonNull(filesList)) {
-            result.add(file.getAbsolutePath());
-            System.out.println("File name: " + file.getName());
-            System.out.println("File path: " + file.getAbsolutePath());
-            System.out.println("Size :" + file.getTotalSpace());
-            System.out.println(" ");
-        }
-        return result;
-    }
 
     /**
      * Compare la liste des fichiers sur le serveur avec celle des clients
