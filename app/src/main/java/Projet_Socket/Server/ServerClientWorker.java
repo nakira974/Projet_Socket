@@ -98,7 +98,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
         ServerOn = false;
         ServerTcp.writeSocket("END", ServerTcp.sockets);
         ServerTcp.sockets = null;
-        log.closeLog();
+        //log.closeLog();
         System.exit(0);
     }
 
@@ -231,9 +231,9 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
                         }));
     }
 
-    private void sendFile() {
+   /* private void sendFile() {
 
-    }
+    }*/
 
     /**
      * Renvoi les informations météo depuis openweathermap
@@ -370,7 +370,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
 
             while (runState) {
 
-                var clientCommand = client.isConnected() ? ServerTcp.readClientStream(client) : null;
+                var clientCommand = ServerTcp.readClientStream(client);
                 if (clientCommand != null) {
                     printBroadcast(clientCommand);
                 }
@@ -390,7 +390,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
 
                 else if (clientCommand.contains(InternalCommandsEnum.Translate.Label)) getTranslate(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.PrivateMessage.Label)) sendPrivate(clientCommand);
-                else if (clientCommand.contains(InternalCommandsEnum.SendFile.Label)) sendFile();
+                //else if (clientCommand.contains(InternalCommandsEnum.SendFile.Label)) sendFile();
                 else if (clientCommand.contains(InternalCommandsEnum.GroupMessage.Label)) sendGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.JoinGroupRequest.Label)) joinGroup(clientCommand);
                 else if (clientCommand.contains(InternalCommandsEnum.GroupCreationRequest.Label)) createGroup(clientCommand);

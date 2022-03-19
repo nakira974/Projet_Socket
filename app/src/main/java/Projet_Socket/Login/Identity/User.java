@@ -1,7 +1,7 @@
 package Projet_Socket.Login.Identity;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 

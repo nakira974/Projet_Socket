@@ -114,12 +114,12 @@ public class Logger {
      * Ferme le log
      * @throws IOException
      */
-    public void closeLog() throws IOException {
+   /* public void closeLog() throws IOException {
 
         this.output.close();
 
     }
-
+*/
     /*public void readLog(String p_fileName){
 
         char[] array = new char[512];

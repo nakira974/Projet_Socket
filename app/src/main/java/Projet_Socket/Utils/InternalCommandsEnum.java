@@ -13,7 +13,7 @@ public enum InternalCommandsEnum {
     WeatherInfo("/weather"),
     Translate("/translate:"),
     PrivateMessage("/@"),
-    SendFile("/file"),
+    //SendFile("/file"),
     GroupMessage("/G"),
     JoinGroupRequest("/JG"),
     GroupCreationRequest("/CG"),

@@ -251,7 +251,7 @@ public final class ServerTcp {
         try {
             var reader = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
 
-            var line = client.isConnected() ? reader.readLine() : "";
+            var line = reader.readLine();
             if (line.contains("{") && line.contains("}")) {
                 var jsonObject = new JSONObject(line);
                 var name = (String) jsonObject.get("name");
