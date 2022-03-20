@@ -86,6 +86,7 @@ public final class FileClient extends WorkerService<FileClient> {
             var jsonArray = jsonObject.getJSONArray("server_files");
             jsonArray.forEach(object->{
 
+//TODO get changed files and write to FileServer
             });
         } catch (IOException e) {
             e.printStackTrace();

@@ -130,8 +130,10 @@ public final class ClientTcp {
     public static final class Thread_Client_Receive extends Thread {
         private final ClientTcp client;
         private final Console commandes;
+        private ISocketListener iSocketListener;
 
-        public Thread_Client_Receive(ClientTcp client) throws IOException {
+        public Thread_Client_Receive(ClientTcp client, ISocketListener iSocketListener) throws IOException {
+            this.iSocketListener = iSocketListener;
             this.client = client;
             commandes = new Console(new BufferedReader(new InputStreamReader(System.in)), System.out);
         }
@@ -166,18 +168,18 @@ public final class ClientTcp {
         //String destination;
         private final ClientTcp socket;
         private final Console console;
-        private final String email;
+        private ISocketListener iSocketListener;
 
-        public Thread_Client_Send(ClientTcp s, String p_email) throws IOException {
+        public Thread_Client_Send(ClientTcp s, ISocketListener iSocketListener) throws IOException {
+            this.iSocketListener = iSocketListener;
             socket = s;
-            email = p_email;
             console = new Console(new BufferedReader(new InputStreamReader(System.in)), System.out);
         }
 
         public void run() {
             String msg;
             try {
-                socket.sendUserName(socket._username + "," + email);
+                socket.sendUserName(socket._username);
                 console.writeLine("Connexion au serveur: " + socket._username);
                 //destination = console.readKey();
 

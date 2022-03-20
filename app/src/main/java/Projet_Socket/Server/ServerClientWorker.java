@@ -17,6 +17,8 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
@@ -257,7 +259,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
      * Compare la liste des fichiers sur le serveur avec celle des clients
      */
     public void fileSynchronisationRequest() {
-        try {
+
 
             final String[] sender = {null};
             ServerTcp.users //stream out of arraylist
@@ -271,29 +273,28 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
                 group.groupeUsers.forEach(socketUserHashMap -> {
                     if(socketUserHashMap.containsKey(client)){
 
-                    }
+                //TODO send changed files on client to server (FileServer)
 
+                    }
+                    var groups = ServerTcp.getGroups();
+
+                    var content = new JSONObject();
+                    var date = log.getDateNow();
+                    content.put("date", "\"" + date + "\"");
+                    content.put("server_files", filesByGroup);
+                    content.put("user", "\"" + userName + "\"");
+                    content.put("groups", groups);
+                    content.put("response status", 200);
+                    var json = content.toString();
+
+                    try {
+                        ServerTcp.writeSocket(json, client);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 });
             });
 
-
-            var groups = ServerTcp.getGroups();
-
-            var content = new JSONObject();
-            var date = log.getDateNow();
-            content.put("date", "\"" + date + "\"");
-            content.put("server_files", filesByGroup);
-            content.put("user", "\"" + userName + "\"");
-            content.put("groups", groups);
-            content.put("response status", 200);
-            var json = content.toString();
-
-            ServerTcp.writeSocket(json, client);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
     }
 
     /**
@@ -337,7 +338,8 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
      */
     private void createRootDirectory(@NotNull String path) {
         try {
-            var currentDirectoryPath = FileSystems.getDefault().
+            Files.createDirectories(Paths.get(path));
+          /*  var currentDirectoryPath = FileSystems.getDefault().
                     getPath("").
                     toAbsolutePath().
                     toString();
@@ -347,7 +349,7 @@ public final class ServerClientWorker extends WorkerService<ServerClientWorker> 
             ServerTcp.runPowershellScript(scriptPath, arguments);
             //String command = "powershell.exe  your command";
             //Getting the version
-
+*/
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException();

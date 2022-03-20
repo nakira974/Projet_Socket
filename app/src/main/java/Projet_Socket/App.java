@@ -154,12 +154,12 @@ public final class App {
             //FIN LOGIN
 
             if (socket_client != null) {
-                var receiver = new ClientTcp.Thread_Client_Receive(socket_client);
+                var receiver = new ClientTcp.Thread_Client_Receive(socket_client, null);
 
                 receiver.start();
 
 
-                var sender = new ClientTcp.Thread_Client_Send(socket_client, userMail);
+                var sender = new ClientTcp.Thread_Client_Send(socket_client, null);
 
                 sender.start();
             } else {
@@ -193,18 +193,19 @@ public final class App {
                                 var hello_request = ServerTcp.readClientStream(client);
                                 var text = hello_request.split(",");
                                 clientUsername = text[0];
-                                clientMail = text[1];
+                                //clientMail = text[1];
                                 var currentUser = new HashMap<Socket, User>();
                                 currentUser.put(client, new User(clientUsername));
                                 ServerTcp.users.add(currentUser);
-                                var userId = ServerTcp.getUserId(clientMail);
-                                currentUser.get(client).Id = userId;
-                                currentUser.get(client).userMail = clientMail;
-                                currentUser.get(client).Groups = ServerTcp.getUserGroups(userId);
-                                ServerTcp.groupes.forEach(groupe -> currentUser.get(client).Groups.forEach(usrGroup -> {
+                                //var userId = ServerTcp.getUserId(clientMail);
+                                //currentUser.get(client).Id = userId;
+                                //currentUser.get(client).userMail = clientMail;
+                                //currentUser.get(client).Groups = ServerTcp.getUserGroups(userId);
+                                /*ServerTcp.groupes.forEach(groupe -> currentUser.get(client).Groups.forEach(usrGroup -> {
                                     if (usrGroup.Id == groupe.Id)
                                         groupe.groupeUsers.add(currentUser);
                                 }));
+                                */
                                 log = "{\n\t\t\"user\" : " + currentUser.get(client).Id + ",\n" +
                                         "\t\t\"email\" :\"" + currentUser.get(client).userMail + "\",\n" +
                                         "\t\t\"address\" : \"[" + client.getInetAddress().getHostAddress() + "]" + "\",\n" +

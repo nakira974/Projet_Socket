@@ -2,6 +2,12 @@ package Projet_Socket.Utils.File;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 /**
  * Classe servant à l'envoi et réception de fichiers en json
  */
@@ -53,5 +59,16 @@ public final class FileObject {
     @Contract(value = "this")
     public void setContent(byte[] content) {
         this.content = content;
+    }
+
+    public void saveFile(String fileToReceived) {
+        // TODO Auto-generated method stub
+        Path path = Paths.get(fileToReceived);
+        try {
+            Files.write(path, content);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
