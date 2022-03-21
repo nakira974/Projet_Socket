@@ -33,7 +33,7 @@ import java.util.HashMap;
 public final class App {
 
     public static final int FactoryPort = 5000;
-    public static final String RootDirectory = "C:\\temp\\";
+    public static final String RootDirectory = "C:/temp/";
     static String _str;
 
     /**

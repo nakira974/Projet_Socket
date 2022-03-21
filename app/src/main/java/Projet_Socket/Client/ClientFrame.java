@@ -26,6 +26,8 @@ public class ClientFrame extends JFrame implements ActionListener, ISocketListen
 	JProgressBar jb;
 	JList<String> list;
 	ClientTcp socket_client;
+	ClientTcp.Thread_Client_Receive receiver;
+	ClientTcp.Thread_Client_Send sender;
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -123,11 +125,11 @@ public class ClientFrame extends JFrame implements ActionListener, ISocketListen
 
 				socket_client = new ClientTcp(new Socket(ip, Integer.parseInt(port)), "test");
 
-				var receiver = new ClientTcp.Thread_Client_Receive(socket_client, this);
+				receiver = new ClientTcp.Thread_Client_Receive(socket_client, this);
 
 				receiver.start();
 
-				var sender = new ClientTcp.Thread_Client_Send(socket_client, this);
+				sender = new ClientTcp.Thread_Client_Send(socket_client, this);
 
 				sender.start();
 
@@ -177,7 +179,7 @@ public class ClientFrame extends JFrame implements ActionListener, ISocketListen
 				File fileToSave = fileChooser.getSelectedFile();
 				String filePath = fileToSave.getPath();
 				try {
-					socket_client.writeFileSocket(filePath);
+					socket_client.writeFileSocket(filePath.replace("\\", "/"));
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}

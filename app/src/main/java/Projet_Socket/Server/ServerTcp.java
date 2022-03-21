@@ -1,5 +1,6 @@
 package Projet_Socket.Server;
 
+import Projet_Socket.App;
 import Projet_Socket.Login.Identity.Group;
 import Projet_Socket.Login.Identity.User;
 import Projet_Socket.Utils.File.Logger;
@@ -261,7 +262,7 @@ public final class ServerTcp {
                 for (var i = 0; i < content.length(); i++) {
                     data[i] = ((Integer) content.get(i)).byteValue();
                 }
-                var out = new FileOutputStream(name + "_");
+                var out = new FileOutputStream(App.RootDirectory + name);
                 out.write(data);
                 out.close();
 

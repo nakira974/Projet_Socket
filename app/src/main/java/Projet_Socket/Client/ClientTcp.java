@@ -71,14 +71,15 @@ public final class ClientTcp {
         var fileInputStream = new FileInputStream(myFile);
         fileInputStream.read(bFile);
         fileInputStream.close();
-        var writer = new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.UTF_8);
-
+        //var writer = new OutputStreamWriter(this.socket.getOutputStream(), StandardCharsets.UTF_8);
+        var writer = new PrintWriter(Objects.requireNonNull(this.socket).getOutputStream());
 
         var jsonObject = new JSONObject();
-        jsonObject.put("name", filename);
+        jsonObject.put("name", myFile.getName());
         jsonObject.put("size", Files.size(myFile.toPath()) / 1024);
         jsonObject.put("content", bFile);
-        writer.write(jsonObject.toString());
+        //writer.write(jsonObject.toString());
+        writer.println(jsonObject);
         writer.flush();
 
     }
@@ -129,7 +130,7 @@ public final class ClientTcp {
      */
     public static final class Thread_Client_Receive extends Thread {
         private final ClientTcp client;
-        private final Console commandes;
+        public Console commandes;
         private ISocketListener iSocketListener;
 
         public Thread_Client_Receive(ClientTcp client, ISocketListener iSocketListener) throws IOException {
@@ -167,7 +168,7 @@ public final class ClientTcp {
     public static final class Thread_Client_Send extends Thread {
         //String destination;
         private final ClientTcp socket;
-        private final Console console;
+        public Console console;
         private ISocketListener iSocketListener;
 
         public Thread_Client_Send(ClientTcp s, ISocketListener iSocketListener) throws IOException {
